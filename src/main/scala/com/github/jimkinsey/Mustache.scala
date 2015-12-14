@@ -1,3 +1,5 @@
 package com.github.jimkinsey
 
-class Mustache
+class Mustache {
+  def render(template: String) = template
+}
