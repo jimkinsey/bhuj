@@ -29,6 +29,10 @@ class MustacheTest extends FunSpec {
         new Mustache().render("Hi {{first}} {{last}}", Map("first" -> "John", "last" -> "Smith")) should be("Hi John Smith")
       }
 
+      it("escapes for HTML by default") {
+        new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;")
+      }
+
     }
   }
 
