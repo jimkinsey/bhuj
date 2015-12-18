@@ -15,10 +15,10 @@ class Mustache {
     case UnescapedVariable(name) =>
       context.get(name).map(_.toString).getOrElse("") + render(remainingTemplate, context)
     case SectionStart(name) =>
-      val (_, postSectionTemplate) = ("""(?s)(.*?)\{\{/""" + name + """\}\}(.*)""").r.findFirstMatchIn(remainingTemplate).map(m => (m.group(1), m.group(2))).get
-      context.get(name).map {
+      val (sectionTemplate, postSectionTemplate) = ("""(?s)(.*?)\{\{/""" + name + """\}\}(.*)""").r.findFirstMatchIn(remainingTemplate).map(m => (m.group(1), m.group(2))).get
+      context.get(name).collect {
         case boolean: Boolean => ""
-        case iterable: Iterable[_] => ""
+        case iterable: Iterable[Map[String,Any]] if iterable.nonEmpty => iterable.map(item => render(sectionTemplate, item)).mkString
       }.getOrElse("") + render(postSectionTemplate, context)
   }
   

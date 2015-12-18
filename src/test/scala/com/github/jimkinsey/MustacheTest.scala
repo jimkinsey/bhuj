@@ -93,6 +93,31 @@ class MustacheTest extends FunSpec {
 
       }
 
+      describe("for a non-empty iterable") {
+
+        it("renders the inner template for each item of the list") {
+          new Mustache().render(
+            template =
+              """{{#repo}}
+                |  <b>{{name}}</b>
+                |{{/repo}}""".stripMargin,
+            context = Map("repo" -> Seq(
+              Map("name" -> "resque"),
+              Map("name" -> "hub"),
+              Map("name" -> "rip")
+            ))) should be(
+            """
+              |  <b>resque</b>
+              |
+              |  <b>hub</b>
+              |
+              |  <b>rip</b>
+              |""".stripMargin
+            )
+        }
+
+      }
+
     }
 
   }
