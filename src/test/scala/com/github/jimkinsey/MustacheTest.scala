@@ -59,6 +59,10 @@ class MustacheTest extends FunSpec {
 
     describe("a section tag") {
 
+      it("does not render when the key is not in the context") {
+        new Mustache().render("before:{{#x}}X{{/x}}:after") should be("before::after")
+      }
+
       describe("for a false value") {
 
         it("does not render") {

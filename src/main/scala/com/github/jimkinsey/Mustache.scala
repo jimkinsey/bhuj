@@ -17,9 +17,9 @@ class Mustache {
     case SectionStart(name) =>
       val (_, postSectionTemplate) = ("""(?s)(.*?)\{\{/""" + name + """\}\}(.*)""").r.findFirstMatchIn(remainingTemplate).map(m => (m.group(1), m.group(2))).get
       context.get(name).map {
-        case boolean: Boolean => render(postSectionTemplate, context)
-        case iterable: Iterable[_] => render(postSectionTemplate, context)
-      }.getOrElse("")
+        case boolean: Boolean => ""
+        case iterable: Iterable[_] => ""
+      }.getOrElse("") + render(postSectionTemplate, context)
   }
   
   private object Variable extends TagNameMatcher("""^([^\{#].*)$""".r)
