@@ -74,6 +74,21 @@ class MustacheTest extends FunSpec {
 
       }
 
+      describe("for an empty iterable") {
+
+        it("does not render") {
+          new Mustache().render(
+            """Shown.
+              |{{#person}}
+              |  Never shown!
+              |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) should be(
+            """Shown.
+              |""".stripMargin
+          )
+        }
+
+      }
+
     }
 
   }

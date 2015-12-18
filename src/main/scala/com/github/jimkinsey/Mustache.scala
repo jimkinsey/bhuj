@@ -18,6 +18,7 @@ class Mustache {
       val (_, postSectionTemplate) = ("""(?s)(.*?)\{\{/""" + name + """\}\}(.*)""").r.findFirstMatchIn(remainingTemplate).map(m => (m.group(1), m.group(2))).get
       context.get(name).map {
         case boolean: Boolean => render(postSectionTemplate, context)
+        case iterable: Iterable[_] => render(postSectionTemplate, context)
       }.getOrElse("")
   }
   
