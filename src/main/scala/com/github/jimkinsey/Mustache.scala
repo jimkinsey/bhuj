@@ -4,7 +4,7 @@ import scala.util.matching.Regex
 
 class Mustache {
   def render(template: String, context: Map[String, Any] = Map.empty): String = {
-    """(.*?)\{\{(.+?)\}\}([^\}].*){0,1}""".r.findFirstMatchIn(template).map {
+    """(?s)(.*?)\{\{(.+?)\}\}([^\}].*){0,1}""".r.findFirstMatchIn(template).map {
       m => m.group(1) + processTag(m.group(2), Option(m.group(3)).getOrElse(""), context)
     }.getOrElse(template)
   }

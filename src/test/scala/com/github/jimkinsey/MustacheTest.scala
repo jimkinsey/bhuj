@@ -15,6 +15,16 @@ class MustacheTest extends FunSpec {
       new Mustache().render("") should be("")
     }
 
+    it("works for a multi-line template") {
+      new Mustache().render(
+        """1: {{one}},
+          |2: {{two}},
+          |3: {{three}}""".stripMargin, Map("one" -> 1, "two" -> 2, "three" -> 3)) should be(
+        """1: 1,
+          |2: 2,
+          |3: 3""".stripMargin)
+    }
+
     describe("a variable tag") {
 
       it("is replaced by an empty string when the key is not in the context") {
@@ -38,6 +48,7 @@ class MustacheTest extends FunSpec {
       }
 
     }
+
   }
 
 }
