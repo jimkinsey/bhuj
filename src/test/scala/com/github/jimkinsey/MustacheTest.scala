@@ -118,6 +118,25 @@ class MustacheTest extends FunSpec {
 
       }
 
+      describe("for a function") {
+
+        it("invokes the function with the unprocessed template and the render method") {
+          new Mustache().render(
+            template = """{{#wrapped}}
+              |  {{name}} is awesome.
+              |{{/wrapped}}""".stripMargin,
+            context = Map(
+              "name" -> "Willy",
+              "wrapped" -> { (template: String, render: (String => String)) => s"<b>${render(template)}</b>" })
+          ) should be(
+          """<b>
+            |  Willy is awesome.
+            |</b>""".stripMargin
+          )
+        }
+
+      }
+
     }
 
   }

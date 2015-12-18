@@ -19,6 +19,7 @@ class Mustache {
       context.get(name).collect {
         case boolean: Boolean => ""
         case iterable: Iterable[Map[String,Any]] if iterable.nonEmpty => iterable.map(item => render(sectionTemplate, item)).mkString
+        case lambda: Function2[String, Function[String, String], String] => lambda(sectionTemplate, render(_, context))
       }.getOrElse("") + render(postSectionTemplate, context)
   }
   
