@@ -16,7 +16,7 @@ class Mustache {
       context.get(name).map(_.toString).getOrElse("") + render(remainingTemplate, context)
   }
   
-  private object Variable extends TagNameMatcher("""^([^\{].+)$""".r)
+  private object Variable extends TagNameMatcher("""^([^\{].*)$""".r)
   private object UnescapedVariable extends TagNameMatcher("""^\{(.+)$""".r)
 
   private class TagNameMatcher(pattern: Regex) {

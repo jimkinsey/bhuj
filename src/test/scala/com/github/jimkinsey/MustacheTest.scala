@@ -47,6 +47,14 @@ class MustacheTest extends FunSpec {
         new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be("""<blink>"&'</blink>""")
       }
 
+      it("may have a one character name") {
+        new Mustache().render("{{x}}", Map("x" -> "X")) should be("""X""")
+      }
+
+      it("may have a one character name for a non-escaped variable") {
+        new Mustache().render("{{{x}}}", Map("x" -> "X")) should be("""X""")
+      }
+
     }
 
   }
