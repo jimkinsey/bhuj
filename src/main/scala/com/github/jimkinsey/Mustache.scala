@@ -14,10 +14,16 @@ class Mustache {
       context.get(name).map(_.toString).map(escapeHTML).getOrElse("") + render(remainingTemplate, context)
     case UnescapedVariable(name) =>
       context.get(name).map(_.toString).getOrElse("") + render(remainingTemplate, context)
+    case SectionStart(name) =>
+      val (_, postSectionTemplate) = ("""(?s)(.*?)\{\{/""" + name + """\}\}(.*)""").r.findFirstMatchIn(remainingTemplate).map(m => (m.group(1), m.group(2))).get
+      context.get(name).map {
+        case boolean: Boolean => render(postSectionTemplate, context)
+      }.getOrElse("")
   }
   
-  private object Variable extends TagNameMatcher("""^([^\{].*)$""".r)
+  private object Variable extends TagNameMatcher("""^([^\{#].*)$""".r)
   private object UnescapedVariable extends TagNameMatcher("""^\{(.+)$""".r)
+  private object SectionStart extends TagNameMatcher("""^#(.+)$""".r)
 
   private class TagNameMatcher(pattern: Regex) {
     def unapply(tag: String): Option[String] = pattern.findFirstMatchIn(tag).map(_.group(1))

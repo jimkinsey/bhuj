@@ -57,6 +57,25 @@ class MustacheTest extends FunSpec {
 
     }
 
+    describe("a section tag") {
+
+      describe("for a false value") {
+
+        it("does not render") {
+          new Mustache().render(
+            """Shown.
+              |{{#person}}
+              |  Never shown!
+              |{{/person}}""".stripMargin, Map("person" -> false)) should be(
+            """Shown.
+              |""".stripMargin
+          )
+        }
+
+      }
+
+    }
+
   }
 
 }
