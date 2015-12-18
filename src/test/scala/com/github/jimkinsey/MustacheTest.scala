@@ -1,5 +1,6 @@
 package com.github.jimkinsey
 
+import com.github.jimkinsey.Mustache.UnclosedSection
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -8,59 +9,63 @@ class MustacheTest extends FunSpec {
   describe("Mustache") {
 
     it("leaves a string containing no tags untouched") {
-      new Mustache().render("No tags") should be("No tags")
+      new Mustache().render("No tags") should be(Right("No tags"))
     }
 
     it("leaves an empty string untouched") {
-      new Mustache().render("") should be("")
+      new Mustache().render("") should be(Right(""))
     }
 
     it("works for a multi-line template") {
       new Mustache().render(
         """1: {{one}},
           |2: {{two}},
-          |3: {{three}}""".stripMargin, Map("one" -> 1, "two" -> 2, "three" -> 3)) should be(
+          |3: {{three}}""".stripMargin, Map("one" -> 1, "two" -> 2, "three" -> 3)) should be(Right(
         """1: 1,
           |2: 2,
-          |3: 3""".stripMargin)
+          |3: 3""".stripMargin))
     }
 
     describe("a variable tag") {
 
       it("is replaced by an empty string when the key is not in the context") {
-        new Mustache().render("Hello {{name}}", Map.empty) should be("Hello ")
+        new Mustache().render("Hello {{name}}", Map.empty) should be(Right("Hello "))
       }
 
       it("is replaced by the value from the context when present") {
-        new Mustache().render("Hello {{name}}", Map("name" -> "Chris")) should be("Hello Chris")
+        new Mustache().render("Hello {{name}}", Map("name" -> "Chris")) should be(Right("Hello Chris"))
       }
 
       it("works with multiple variables") {
-        new Mustache().render("Hi {{first}} {{last}}", Map("first" -> "John", "last" -> "Smith")) should be("Hi John Smith")
+        new Mustache().render("Hi {{first}} {{last}}", Map("first" -> "John", "last" -> "Smith")) should be(Right("Hi John Smith"))
       }
 
       it("escapes for HTML by default") {
-        new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;")
+        new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
       }
 
       it("does not escape when the variable is triple-delimited") {
-        new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be("""<blink>"&'</blink>""")
+        new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
       it("may have a one character name") {
-        new Mustache().render("{{x}}", Map("x" -> "X")) should be("""X""")
+        new Mustache().render("{{x}}", Map("x" -> "X")) should be(Right("""X"""))
       }
 
       it("may have a one character name for a non-escaped variable") {
-        new Mustache().render("{{{x}}}", Map("x" -> "X")) should be("""X""")
+        new Mustache().render("{{{x}}}", Map("x" -> "X")) should be(Right("""X"""))
       }
 
     }
 
     describe("a section tag") {
 
+      it("returns an error when the closing tag is not found") {
+        new Mustache().render("{{#opened}}but never closed...") should be(Left(UnclosedSection("opened")))
+      }
+
       it("does not render when the key is not in the context") {
-        new Mustache().render("before:{{#x}}X{{/x}}:after") should be("before::after")
+        new Mustache().render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
       }
 
       describe("for a false value") {
@@ -70,10 +75,10 @@ class MustacheTest extends FunSpec {
             """Shown.
               |{{#person}}
               |  Never shown!
-              |{{/person}}""".stripMargin, Map("person" -> false)) should be(
+              |{{/person}}""".stripMargin, Map("person" -> false)) should be(Right(
             """Shown.
               |""".stripMargin
-          )
+          ))
         }
 
       }
@@ -85,10 +90,10 @@ class MustacheTest extends FunSpec {
             """Shown.
               |{{#person}}
               |  Never shown!
-              |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) should be(
+              |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) should be(Right(
             """Shown.
               |""".stripMargin
-          )
+          ))
         }
 
       }
@@ -105,7 +110,7 @@ class MustacheTest extends FunSpec {
               Map("name" -> "resque"),
               Map("name" -> "hub"),
               Map("name" -> "rip")
-            ))) should be(
+            ))) should be(Right(
             """
               |  <b>resque</b>
               |
@@ -113,7 +118,7 @@ class MustacheTest extends FunSpec {
               |
               |  <b>rip</b>
               |""".stripMargin
-            )
+            ))
         }
 
       }
@@ -127,12 +132,12 @@ class MustacheTest extends FunSpec {
               |{{/wrapped}}""".stripMargin,
             context = Map(
               "name" -> "Willy",
-              "wrapped" -> { (template: String, render: (String => String)) => s"<b>${render(template)}</b>" })
-          ) should be(
+              "wrapped" -> { (template: String, render: (String => Either[Mustache.Failure, String])) => Right(s"<b>${render(template).right.get}</b>") })
+          ) should be(Right(
           """<b>
             |  Willy is awesome.
             |</b>""".stripMargin
-          )
+          ))
         }
 
       }
@@ -146,11 +151,11 @@ class MustacheTest extends FunSpec {
                 |  Hi {{name}}!
                 |{{/person?}}""".stripMargin,
             context = Map("person?" -> Map("name" -> "Jon"))
-          ) should be(
+          ) should be(Right(
           """
             |  Hi Jon!
             |""".stripMargin
-          )
+          ))
         }
 
       }
