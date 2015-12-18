@@ -137,6 +137,24 @@ class MustacheTest extends FunSpec {
 
       }
 
+      describe("for a non-false, non-iterable value") {
+
+        it("uses the value as the context for a rendering of the section template") {
+          new Mustache().render(
+            template =
+              """{{#person?}}
+                |  Hi {{name}}!
+                |{{/person?}}""".stripMargin,
+            context = Map("person?" -> Map("name" -> "Jon"))
+          ) should be(
+          """
+            |  Hi Jon!
+            |""".stripMargin
+          )
+        }
+
+      }
+
     }
 
   }
