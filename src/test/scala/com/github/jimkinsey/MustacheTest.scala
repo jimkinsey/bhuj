@@ -33,6 +33,10 @@ class MustacheTest extends FunSpec {
         new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;")
       }
 
+      it("does not escape when the variable is triple-delimited") {
+        new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be("""<blink>"&'</blink>""")
+      }
+
     }
   }
 
