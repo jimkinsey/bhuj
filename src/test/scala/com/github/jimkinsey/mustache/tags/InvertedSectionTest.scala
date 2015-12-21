@@ -1,7 +1,6 @@
-package com.github.jimkinsey.mustache.com.github.jimkinsey.mustache.tags
+package com.github.jimkinsey.mustache.tags
 
 import com.github.jimkinsey.mustache.Renderer.Context
-import com.github.jimkinsey.mustache.tags.InvertedSection
 import com.github.jimkinsey.mustache.tags.InvertedSection.UnclosedInvertedSection
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

@@ -187,19 +187,37 @@ class MustacheTest extends FunSpec {
               |""".stripMargin))
       }
 
-      describe("a comment") {
+    }
 
-        it("is not rendered") {
-          new Mustache().render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
-        }
+    describe("a comment") {
 
-        it("may contain newlines") {
-          new Mustache().render(
-            """{{!
-              |If you can read this, something went wrong
-              |}}""".stripMargin) should be(Right(""))
-        }
+      it("is not rendered") {
+        new Mustache().render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
+      }
 
+      it("may contain newlines") {
+        new Mustache().render(
+          """{{!
+            |If you can read this, something went wrong
+            |}}""".stripMargin) should be(Right(""))
+      }
+
+    }
+
+    describe("a partial") {
+
+      it("is rendered once in the current context") {
+        new Mustache(partials = Map("user" -> "<strong>{{name}}</strong>")).render(
+          template = """<h2>Names</h2>
+                       |{{#names}}
+                       |  {{> user}}
+                       |{{/names}}""".stripMargin,
+          context = Map("names" -> Seq(Map("name" -> "Jennifer")))
+        ) should be(Right(
+          """<h2>Names</h2>
+            |
+            |  <strong>Jennifer</strong>
+            |""".stripMargin))
       }
 
     }

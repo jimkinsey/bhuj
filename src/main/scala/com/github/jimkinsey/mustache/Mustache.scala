@@ -1,5 +1,11 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.tags._
+import tags._
 
-class Mustache extends Renderer(tags = Set(Variable, UnescapedVariable, SectionStart, InvertedSection, Comment))
+class Mustache(partials: Map[String,String] = Map.empty) extends Renderer(tags = Set(
+  Variable,
+  UnescapedVariable,
+  SectionStart,
+  InvertedSection,
+  Comment,
+  new Partial(partials)))
