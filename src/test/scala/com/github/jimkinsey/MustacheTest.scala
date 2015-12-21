@@ -172,7 +172,19 @@ class MustacheTest extends FunSpec {
       }
 
       it("renders once when the key is an empty list") {
-        new Mustache().render("""{{#repo}}<b>{{name}}</b>{{/repo}}{{^repo}}No repos! :({{/repo}}""", Map("repo" -> List.empty)) should be(Right("No repos! :("))
+        new Mustache().render(
+          template =
+            """{{#repo}}
+              |  <b>{{name}}</b>
+              |{{/repo}}
+              |{{^repo}}
+              |  No repos! :(
+              |{{/repo}}""".stripMargin,
+          context = Map("repo" -> List.empty)) should be(Right(
+            """
+              |
+              |  No repos! :(
+              |""".stripMargin))
       }
 
     }
