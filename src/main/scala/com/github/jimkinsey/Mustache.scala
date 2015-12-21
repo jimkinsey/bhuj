@@ -1,3 +1,7 @@
 package com.github.jimkinsey
 
-class Mustache extends Renderer(tags = Set(VariableTag, UnescapedVariableTag, SectionStartTag, InvertedSection))
+import com.github.jimkinsey.Renderer.{Failure, Result, Context, Tag}
+
+
+
+class Mustache extends Renderer(tags = Set(VariableTag, UnescapedVariableTag, SectionStartTag, InvertedSection, Comment))

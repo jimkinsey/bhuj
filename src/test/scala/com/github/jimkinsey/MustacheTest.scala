@@ -187,6 +187,21 @@ class MustacheTest extends FunSpec {
               |""".stripMargin))
       }
 
+      describe("a comment") {
+
+        it("is not rendered") {
+          new Mustache().render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
+        }
+
+        it("may contain newlines") {
+          new Mustache().render(
+            """{{!
+              |If you can read this, something went wrong
+              |}}""".stripMargin) should be(Right(""))
+        }
+
+      }
+
     }
   }
 }
