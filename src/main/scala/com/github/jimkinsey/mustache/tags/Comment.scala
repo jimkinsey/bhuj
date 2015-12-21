@@ -1,6 +1,6 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache.tags
 
-import com.github.jimkinsey.Renderer.{Failure, Result, Context, Tag}
+import com.github.jimkinsey.mustache.Renderer._
 
 object Comment extends Tag {
   val pattern = """(?s)!(.+)""".r

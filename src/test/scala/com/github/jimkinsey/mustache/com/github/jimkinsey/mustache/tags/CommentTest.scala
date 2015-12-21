@@ -1,5 +1,6 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache.com.github.jimkinsey.mustache.tags
 
+import _root_.com.github.jimkinsey.mustache.tags.Comment
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

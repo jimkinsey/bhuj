@@ -1,10 +1,11 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache.tags
 
 import java.util.regex.Pattern
 
-import com.github.jimkinsey.Renderer.{Context, Failure, Result, Tag}
+import com.github.jimkinsey.mustache.Renderer
+import com.github.jimkinsey.mustache.Renderer._
 
-object SectionStartTag extends Tag {
+object SectionStart extends Tag {
   type Lambda = (String, (String => Result)) => Result
   case class UnclosedSection(name: String) extends Failure
 

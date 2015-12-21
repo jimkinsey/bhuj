@@ -1,6 +1,6 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.Renderer._
+import Renderer._
 
 import scala.util.matching.Regex
 import scala.util.matching.Regex.Match

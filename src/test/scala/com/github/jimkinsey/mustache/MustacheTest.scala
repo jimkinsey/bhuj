@@ -1,6 +1,6 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.SectionStartTag.UnclosedSection
+import tags.SectionStart.UnclosedSection
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

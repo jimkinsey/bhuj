@@ -1,6 +1,7 @@
-package com.github.jimkinsey
+package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.Renderer.{Tag, Result, Context, UnrecognisedTag}
+import Renderer.{Tag, Result, Context, UnrecognisedTag}
+import com.github.jimkinsey.mustache.Renderer.Tag
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
