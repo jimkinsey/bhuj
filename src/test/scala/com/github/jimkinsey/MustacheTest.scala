@@ -160,5 +160,21 @@ class MustacheTest extends FunSpec {
 
       }
     }
+
+    describe("an inverted section tag") {
+
+      it("renders once when the key doesn't exist") {
+        new Mustache().render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
+      }
+
+      it("renders once when the key is a false value") {
+        new Mustache().render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+      }
+
+      it("renders once when the key is an empty list") {
+        new Mustache().render("""{{#repo}}<b>{{name}}</b>{{/repo}}{{^repo}}No repos! :({{/repo}}""", Map("repo" -> List.empty)) should be(Right("No repos! :("))
+      }
+
+    }
   }
 }

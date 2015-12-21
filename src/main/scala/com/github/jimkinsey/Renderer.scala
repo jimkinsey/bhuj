@@ -3,6 +3,7 @@ package com.github.jimkinsey
 import com.github.jimkinsey.Renderer._
 
 import scala.util.matching.Regex
+import scala.util.matching.Regex.Match
 
 object Renderer {
   type Result = Either[Failure, String]
@@ -22,14 +23,21 @@ class Renderer(tags: Set[Tag]) {
 
   def render(template: String, context: Context = Map.empty): Result = {
     TagPattern.findFirstMatchIn(template).map {
-      m => processTag(m.group(2), Option(m.group(3)).getOrElse(""), context).right.map(m.group(1) + _)
+      case FoundTag((preTag, tagContent, postTag)) =>
+        processTag(tagContent, postTag.getOrElse(""), context).right.map(preTag + _)
     }.getOrElse(Right(template))
   }
 
   private lazy val TagPattern = """(?s)(.*?)\{\{(.+?)\}\}([^\}].*){0,1}""".r
 
   private def processTag(tagContent: String, remainingTemplate: String, context: Context): Result = {
-    tags.map(_ -> tagContent).collectFirst {
+    object MatchingTag {
+      def unapply(t: Tag): Option[(String, Tag)] = {
+        t.pattern.findFirstMatchIn(tagContent).map(_.group(1) -> t)
+      }
+    }
+
+    tags.collectFirst {
       case MatchingTag((name, tag: Tag)) =>
         tag
           .process(name, context, remainingTemplate, render)
@@ -38,9 +46,9 @@ class Renderer(tags: Set[Tag]) {
     }.getOrElse(Left(UnrecognisedTag(tagContent)))
   }
 
-  private object MatchingTag {
-    def unapply(t: (Tag, String)): Option[(String, Tag)] = {
-      t._1.pattern.findFirstMatchIn(t._2).map(_.group(1) -> t._1)
+  private object FoundTag {
+    def unapply(m: Match): Option[(String, String, Option[String])] = {
+      Some((m.group(1), m.group(2), Option(m.group(3))))
     }
   }
 
