@@ -14,7 +14,7 @@ object Renderer {
 
   trait Tag {
     def pattern: Regex
-    def process(name: String, context: Renderer.Context, postTagTemplate: String, render: ((String, Renderer.Context) => Renderer.Result)): (Renderer.Result, String)
+    def process(name: String, context: Renderer.Context, postTagTemplate: String, render: ((String, Renderer.Context) => Renderer.Result)): Either[Failure, (String, String)]
   }
 }
 
@@ -30,9 +30,11 @@ class Renderer(tags: Set[Tag]) {
 
   private def processTag(tagContent: String, remainingTemplate: String, context: Context): Result = {
     tags.map(_ -> tagContent).collectFirst {
-      case MatchingTag((name, tag: Tag)) => tag.process(name, context, remainingTemplate, render)
-    }.map { case (result, remaining) =>
-      result.right.flatMap(rendered => render(remaining, context).right.map(rendered + _))
+      case MatchingTag((name, tag: Tag)) =>
+        tag
+          .process(name, context, remainingTemplate, render)
+          .right
+          .flatMap { case (rendered, remaining) => render(remaining, context).right.map(rendered + _) }
     }.getOrElse(Left(UnrecognisedTag(tagContent)))
   }
 
