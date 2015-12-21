@@ -2,7 +2,7 @@ package com.github.jimkinsey
 
 import java.util.regex.Pattern
 
-import com.github.jimkinsey.Mustache.{Failure, UnclosedSection}
+import com.github.jimkinsey.Mustache.UnclosedSection
 
 import scala.util.matching.Regex
 
@@ -74,25 +74,20 @@ class Mustache {
 
   private lazy val TagPattern = """(?s)(.*?)\{\{(.+?)\}\}([^\}].*){0,1}""".r
 
-  private def processTag(tag: String, remainingTemplate: String, context: Context): Result = {
-    val processedTag = tag match {
-      case Variable(name) => processVariable(name, context, remainingTemplate, render)
-      case UnescapedVariable(name) => processUnescapedVariable(name, context, remainingTemplate, render)
-      case SectionStart(name) => processSection(name, context, remainingTemplate, render)
-    }
-    processedTag._1.right.flatMap(rendered => render(processedTag._2, context).right.map(rendered + _))
+  private lazy val tags = Set(VariableTag, UnescapedVariableTag, SectionStartTag)
+
+  private def processTag(tagContent: String, remainingTemplate: String, context: Context): Result = {
+    tags.map(_ -> tagContent).collectFirst {
+      case MatchingTag((name, tag: Tag)) => tag.process(name, context, remainingTemplate, render)
+    }.map { case (result, remaining) =>
+      result.right.flatMap(rendered => render(remaining, context).right.map(rendered + _))
+    }.get
   }
 
-  private def processVariable = VariableTag.process _
-  private def processUnescapedVariable = UnescapedVariableTag.process _
-  private def processSection = SectionStartTag.process _
-
-  private object Variable extends TagNameMatcher(VariableTag.pattern)
-  private object UnescapedVariable extends TagNameMatcher(UnescapedVariableTag.pattern)
-  private object SectionStart extends TagNameMatcher(SectionStartTag.pattern)
-
-  private class TagNameMatcher(pattern: Regex) {
-    def unapply(tag: String): Option[String] = pattern.findFirstMatchIn(tag).map(_.group(1))
+  private object MatchingTag {
+    def unapply(t: (Tag, String)): Option[(String, Tag)] = {
+      t._1.pattern.findFirstMatchIn(t._2).map(_.group(1) -> t._1)
+    }
   }
 
 }
