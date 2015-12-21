@@ -1,6 +1,6 @@
 package com.github.jimkinsey
 
-import com.github.jimkinsey.Mustache.UnclosedSection
+import com.github.jimkinsey.SectionStartTag.UnclosedSection
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -132,7 +132,7 @@ class MustacheTest extends FunSpec {
               |{{/wrapped}}""".stripMargin,
             context = Map(
               "name" -> "Willy",
-              "wrapped" -> { (template: String, render: (String => Either[Mustache.Failure, String])) => Right(s"<b>${render(template).right.get}</b>") })
+              "wrapped" -> { (template: String, render: (String => Either[Renderer.Failure, String])) => Right(s"<b>${render(template).right.get}</b>") })
           ) should be(Right(
           """<b>
             |  Willy is awesome.
@@ -159,9 +159,6 @@ class MustacheTest extends FunSpec {
         }
 
       }
-
     }
-
   }
-
 }
