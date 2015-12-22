@@ -7,13 +7,16 @@ import com.github.jimkinsey.mustache.Renderer._
 
 object SectionStart extends Tag {
   type Lambda = (String, (String => Result)) => Result
+  type Render = ((String, Context) => Result)
   case class UnclosedSection(name: String) extends Failure
 
   val pattern = """^#(.+)$""".r
-  def process(name: String, context: Context, postTagTemplate: String, render: ((String, Context) => Result)) = {
+  def process(name: String, context: Context, postTagTemplate: String, render: Render) = {
     ("""(?s)(.*?)\{\{/""" + Pattern.quote(name) + """\}\}(.*)""").r.findFirstMatchIn(postTagTemplate).map(m => (m.group(1), m.group(2))).flatMap {
       case (sectionTemplate, postSectionTemplate) =>
         context.get(name).collect {
+          case true =>
+            render(sectionTemplate, context)
           case nonFalseValue: Context =>
             render(sectionTemplate, nonFalseValue)
           case iterable: Renderer.ContextList if iterable.nonEmpty =>

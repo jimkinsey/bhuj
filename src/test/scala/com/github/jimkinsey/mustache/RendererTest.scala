@@ -2,6 +2,7 @@ package com.github.jimkinsey.mustache
 
 import Renderer.{Tag, Result, Context, UnrecognisedTag}
 import com.github.jimkinsey.mustache.Renderer.Tag
+import com.github.jimkinsey.mustache.tags.Variable
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -17,6 +18,16 @@ class RendererTest extends FunSpec {
 
     it("returns an UnrecognisedTag failure when a tag is encountered which does not match the provided tags") {
       new Renderer(tags = Set.empty).render("{{wut}}") should be(Left(UnrecognisedTag("wut")))
+    }
+
+    it("works for a multi-line template") {
+      new Renderer(tags = Set(Variable)).render(
+        """1: {{one}},
+          |2: {{two}},
+          |3: {{three}}""".stripMargin, Map("one" -> 1, "two" -> 2, "three" -> 3)) should be(Right(
+        """1: 1,
+          |2: 2,
+          |3: 3""".stripMargin))
     }
 
     describe("for a matching tag") {
