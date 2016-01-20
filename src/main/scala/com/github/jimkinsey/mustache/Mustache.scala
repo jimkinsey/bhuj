@@ -8,7 +8,7 @@ object Mustache {
   case class TemplateNotFound(name: String) extends Failure
 }
 
-class Mustache(templates: Map[String,String] = Map.empty) extends Renderer(tags = Set(
+class Mustache(templates: (String => Option[String]) = Map.empty.get) extends Renderer(tags = Set(
   Variable,
   UnescapedVariable,
   SectionStart,
@@ -16,9 +16,12 @@ class Mustache(templates: Map[String,String] = Map.empty) extends Renderer(tags 
   Comment,
   new Partial(templates))) {
 
+  def this(map: Map[String,String]) = {
+    this(map.get _)
+  }
+
   def renderTemplate(name: String, context: Map[String, Any] = Map.empty): Either[Failure, String] = {
-    templates
-      .get(name)
+    templates(name)
       .map(template => render(template, context))
       .getOrElse(Left(TemplateNotFound(name)))
   }

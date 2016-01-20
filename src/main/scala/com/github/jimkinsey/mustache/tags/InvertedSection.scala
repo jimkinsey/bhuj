@@ -6,9 +6,6 @@ import com.github.jimkinsey.mustache.Renderer._
 
 import scala.util.matching.Regex
 
-/**
- * Created by jimkinsey on 21/12/15.
- */
 object InvertedSection extends Tag {
    case class UnclosedInvertedSection(name: String) extends Failure
 

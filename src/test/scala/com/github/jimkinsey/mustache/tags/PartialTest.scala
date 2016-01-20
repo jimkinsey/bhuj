@@ -27,13 +27,13 @@ class PartialTest extends FunSpec {
 
     it("returns the result of rendering the partial in the current context when it is available") {
       val render = (template: String, context: Renderer.Context) => Right(s"RENDERED(${context(template)})")
-      new Partial(partials = Map("partial" -> "a"))
+      new Partial(Map("partial" -> "a"))
         .process("partial", Map("a" -> 1), "remaining", render) should be(Right("RENDERED(1)", "remaining"))
     }
 
     it("returns a failure if the rendering failed") {
       val render = (template: String, context: Renderer.Context) => Left(PartialNotFound(template))
-      new Partial(partials = Map("partial" -> "a"))
+      new Partial(Map("partial" -> "a"))
         .process("partial", Map("a" -> 1), "remaining", render) should be(Left(PartialNotFound("a")))
     }
 

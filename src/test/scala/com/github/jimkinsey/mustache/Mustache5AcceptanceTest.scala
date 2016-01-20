@@ -155,7 +155,7 @@ class Mustache5AcceptanceTest extends FunSpec {
     describe("a partial") {
 
       it("is rendered once in the current context") {
-        new Mustache(templates = Map("user" -> "<strong>{{name}}</strong>")).render(
+        new Mustache(Map("user" -> "<strong>{{name}}</strong>")).render(
           template = """<h2>Names</h2>
                        |{{#names}}
                        |  {{> user}}
