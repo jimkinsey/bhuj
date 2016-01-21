@@ -2,8 +2,11 @@ package com.github.jimkinsey.mustache
 
 import java.io.{File, PrintWriter}
 
+import com.github.jimkinsey.mustache.FilePartialLoader.Cache
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+
+import scala.collection.mutable
 
 class FilePartialLoaderTests extends FunSpec {
 
@@ -19,11 +22,25 @@ class FilePartialLoaderTests extends FunSpec {
       loader.partial("greeting") should be(Some("Hello {{name}}!"))
     }
 
+    it("uses the cache to store the partial if it is specified") {
+      require(templateFile("result", "{{a}} + {{b}} = {{c}}").exists())
+      val cache = mutable.Map[String,String]()
+      loader(cache).partial("result")
+      cache should contain("result" -> "{{a}} + {{b}} = {{c}}")
+    }
+
+    it("retrieves the partial from the cache when present") {
+      val cache = mutable.Map("cached" -> "Template")
+      loader(cache).partial("cached") should be(Some("Template"))
+    }
+
   }
 
   private val testPath = getClass.getResource("/templates").getPath
 
-  private val loader: FilePartialLoader = new FilePartialLoader(testPath)
+  private def loader: FilePartialLoader = new FilePartialLoader(testPath)
+
+  private def loader(cache: Cache): FilePartialLoader = new FilePartialLoader(testPath, Some(cache))
 
   private def templateFile(name: String, content: String): File = templateFile(name, Some(content))
 

@@ -6,5 +6,4 @@ Roadmap
 ---
 * Allow objects to be used as the context for rendering, not just maps - case classes only?
 * support set delimiter tag
-* add convenience class for loading partials from the file system
 * strict mode i.e. require keys to be present and usable in the context of the tag
