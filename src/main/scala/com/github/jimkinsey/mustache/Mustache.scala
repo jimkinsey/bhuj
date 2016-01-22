@@ -1,10 +1,10 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
-import com.github.jimkinsey.mustache.Renderer.Failure
-import tags._
+import com.github.jimkinsey.mustache.tags._
 
 object Mustache {
+  trait Failure
   case class TemplateNotFound(name: String) extends Failure
 }
 
@@ -20,9 +20,13 @@ class Mustache(templates: (String => Option[String]) = Map.empty.get) extends Re
     this(map.get _)
   }
 
-  def renderTemplate(name: String, context: Map[String, Any] = Map.empty): Either[Failure, String] = {
+  def renderTemplate[C](name: String, context: C)(implicit ev: Contextualiser[C]): Either[Any, String] = {
     templates(name)
-      .map(template => render(template, context))
+      .map(Right.apply)
       .getOrElse(Left(TemplateNotFound(name)))
+      .right
+      .flatMap { template =>
+        ev.context(context).right.flatMap(ctx => render(template, ctx))
+      }
   }
 }

@@ -3,7 +3,7 @@ package com.github.jimkinsey.mustache
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class Mustache5AcceptanceTest extends FunSpec {
+class Mustache5AcceptanceTests extends FunSpec {
 
   describe("Mustache") {
 

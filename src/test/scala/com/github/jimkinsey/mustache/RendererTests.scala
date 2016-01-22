@@ -8,7 +8,7 @@ import org.scalatest.Matchers._
 
 import scala.util.matching.Regex
 
-class RendererTest extends FunSpec {
+class RendererTests extends FunSpec {
 
   describe("A renderer") {
 
