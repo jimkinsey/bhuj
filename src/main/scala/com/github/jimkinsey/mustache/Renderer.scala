@@ -15,18 +15,20 @@ object Renderer {
 
   trait Tag {
     def pattern: Regex
-    def process(name: String, context: Renderer.Context, postTagTemplate: String, render: ((String, Renderer.Context) => Renderer.Result)): Either[Failure, (String, String)]
+    def process(name: String, context: Context, postTagTemplate: String, render: ((String, Context) => Renderer.Result)): Either[Failure, (String, String)]
   }
 }
 
 class Renderer(tags: Set[Tag]) {
 
-  def render(template: String, context: Context = Map.empty): Result = {
+  def render(template: String, context: Context): Result = {
     TagPattern.findFirstMatchIn(template).map {
       case FoundTag((preTag, tagContent, postTag)) =>
         processTag(tagContent, postTag.getOrElse(""), context).right.map(preTag + _)
     }.getOrElse(Right(template))
   }
+
+  def render(template: String): Result = render(template, Map.empty)
 
   private lazy val TagPattern = """(?s)(.*?)\{\{(.+?)\}\}([^\}].*){0,1}""".r
 

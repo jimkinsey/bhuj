@@ -4,25 +4,26 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class Mustache5AcceptanceTests extends FunSpec {
+  implicit val mapContextualiser = new MapContextualiser()
 
   describe("Mustache") {
 
     describe("a variable tag") {
 
       it("is replaced by an empty string when the key is not in the context") {
-        new Mustache().render("Hello {{name}}", Map.empty) should be(Right("Hello "))
+        new Mustache().render("Hello {{name}}", emptyContext) should be(Right("Hello "))
       }
 
       it("is replaced by the value from the context when present") {
-        new Mustache().render("Hello {{name}}", Map("name" -> "Chris")) should be(Right("Hello Chris"))
+        new Mustache().render("Hello {{name}}", context("name" -> "Chris")) should be(Right("Hello Chris"))
       }
 
       it("escapes for HTML by default") {
-        new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
+        new Mustache().render("{{html}}", context("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
       }
 
       it("does not escape when the variable is triple-delimited") {
-        new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+        new Mustache().render("{{{html}}}", context("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
     }
@@ -38,7 +39,7 @@ class Mustache5AcceptanceTests extends FunSpec {
           """Shown.
             |{{#person}}
             |  Never shown!
-            |{{/person}}""".stripMargin, Map("person" -> false)) should be(Right(
+            |{{/person}}""".stripMargin, context("person" -> false)) should be(Right(
           """Shown.
             |""".stripMargin
         ))
@@ -49,7 +50,7 @@ class Mustache5AcceptanceTests extends FunSpec {
           """Shown.
             |{{#person}}
             |  Never shown!
-            |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) should be(Right(
+            |{{/person}}""".stripMargin, context("person" -> Seq.empty)) should be(Right(
           """Shown.
             |""".stripMargin
         ))
@@ -61,7 +62,7 @@ class Mustache5AcceptanceTests extends FunSpec {
               """{{#repo}}
                 |  <b>{{name}}</b>
                 |{{/repo}}""".stripMargin,
-            context = Map("repo" -> Seq(
+            context = context("repo" -> Seq(
               Map("name" -> "resque"),
               Map("name" -> "hub"),
               Map("name" -> "rip")
@@ -81,9 +82,11 @@ class Mustache5AcceptanceTests extends FunSpec {
             template = """{{#wrapped}}
               |  {{name}} is awesome.
               |{{/wrapped}}""".stripMargin,
-            context = Map(
+            context = context(
               "name" -> "Willy",
-              "wrapped" -> { (template: String, render: (String => Either[Renderer.Failure, String])) => Right(s"<b>${render(template).right.get}</b>") })
+              "wrapped" -> {
+                (template: String, render: (String => Either[Renderer.Failure, String])) => Right(s"<b>${render(template).right.get}</b>")
+              })
           ) should be(Right(
           """<b>
             |  Willy is awesome.
@@ -97,7 +100,7 @@ class Mustache5AcceptanceTests extends FunSpec {
               """{{#person?}}
                 |  Hi {{name}}!
                 |{{/person?}}""".stripMargin,
-            context = Map("person?" -> Map("name" -> "Jon"))
+            context = context("person?" -> Map("name" -> "Jon"))
           ) should be(Right(
           """
             |  Hi Jon!
@@ -114,7 +117,7 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("renders once when the key is a false value") {
-        new Mustache().render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+        new Mustache().render("{{^else}}do this{{/else}}", context("else" -> false)) should be(Right("do this"))
       }
 
       it("renders once when the key is an empty list") {
@@ -126,7 +129,7 @@ class Mustache5AcceptanceTests extends FunSpec {
               |{{^repo}}
               |  No repos! :(
               |{{/repo}}""".stripMargin,
-          context = Map("repo" -> List.empty)) should be(Right(
+          context = context("repo" -> List.empty)) should be(Right(
             """
               |
               |  No repos! :(
@@ -158,7 +161,7 @@ class Mustache5AcceptanceTests extends FunSpec {
                        |{{#names}}
                        |  {{> user}}
                        |{{/names}}""".stripMargin,
-          context = Map("names" -> Seq(Map("name" -> "Jennifer")))
+          context = context("names" -> Seq(Map("name" -> "Jennifer")))
         ) should be(Right(
           """<h2>Names</h2>
             |
@@ -168,4 +171,9 @@ class Mustache5AcceptanceTests extends FunSpec {
 
     }
   }
+
+  private val emptyContext: Map[String, Any] = Map.empty
+
+  private def context(pairs: (String, Any)*): Map[String, Any] = Map(pairs:_*)
+
 }
