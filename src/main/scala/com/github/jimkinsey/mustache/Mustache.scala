@@ -8,13 +8,15 @@ object Mustache {
   case class TemplateNotFound(name: String) extends Failure
 }
 
-class Mustache(templates: (String => Option[String]) = Map.empty.get) extends Renderer(tags = Set(
-  Variable,
-  UnescapedVariable,
-  SectionStart,
-  InvertedSection,
-  Comment,
-  new Partial(templates))) {
+class Mustache(templates: (String => Option[String]) = Map.empty.get) {
+  private val renderer = new Renderer(tags = Set(
+    Variable,
+    UnescapedVariable,
+    SectionStart,
+    InvertedSection,
+    Comment,
+    new Partial(templates))
+  )
 
   def this(map: Map[String,String]) = {
     this(map.get _)
@@ -26,7 +28,12 @@ class Mustache(templates: (String => Option[String]) = Map.empty.get) extends Re
       .getOrElse(Left(TemplateNotFound(name)))
       .right
       .flatMap { template =>
-        ev.context(context).right.flatMap(ctx => render(template, ctx))
-      }
+      ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
+    }
   }
+
+  def render(template: String, context: Map[String,Any] = Map.empty): Either[Any, String] = {
+    renderer.render(template, context)
+  }
+
 }
