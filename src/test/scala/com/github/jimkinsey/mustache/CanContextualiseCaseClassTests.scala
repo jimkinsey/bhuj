@@ -11,10 +11,6 @@ class CanContextualiseCaseClassTests extends FunSpec {
 
   describe("CanContextualiseCaseClass") {
 
-    it("works by assuming that case classes are Products") {
-      contextualiser should be(a[CanContextualise[Product]])
-    }
-
     it("cannot contextualise a Product which is not a case class") {
       val notACaseClass = new Product {
         override def productElement(n: Int): Any = 42
@@ -41,7 +37,7 @@ class CanContextualiseCaseClassTests extends FunSpec {
 
     it("can contextualise a Boolean field") {
       case class Flagged(awesome: Boolean)
-      context(Flagged(true)) should be(Right(Map("awesome" -> true)))
+      context(Flagged(awesome = true)) should be(Right(Map("awesome" -> true)))
     }
 
     it("can contextualise a Mustache-compatible lambda field") {
@@ -64,7 +60,7 @@ class CanContextualiseCaseClassTests extends FunSpec {
       ))
     }
 
-    it("recursively contextualises a collection") {
+    it("recursively contextualises an iterable") {
       case class Thing(n: Int)
       case class Container(things: Seq[Thing])
       context(
@@ -72,6 +68,13 @@ class CanContextualiseCaseClassTests extends FunSpec {
       ) should be(Right(
         Map("things" -> Seq(Map("n" -> 1), Map("n" -> 2)))
       ))
+    }
+
+    it("recursively contextualises a map") {
+      case class Navigator(map: Map[Int, Int])
+      context(
+        Navigator(Map(1 -> 2))
+      ) should be(Right(Map("map" -> Map("1" -> 2))))
     }
 
   }

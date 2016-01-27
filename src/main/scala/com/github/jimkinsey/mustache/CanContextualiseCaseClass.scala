@@ -20,7 +20,7 @@ class CanContextualiseCaseClass extends CanContextualise[Product] {
 
   private def map(caseClass: Product): Map[String, Any] = {
     val fields = publicFields(caseClass).map{ f =>
-      f.setAccessible(true);
+      f.setAccessible(true)
       f.getName -> value(f.get(caseClass))
     }
     fields.toMap
@@ -29,6 +29,8 @@ class CanContextualiseCaseClass extends CanContextualise[Product] {
   private def value(obj: Any): Any = obj match {
     case product: Product if isCaseClass(product) =>
       map(obj.asInstanceOf[Product])
+    case map: Map[_,_] =>
+      map.map { case (k,v) => k.toString -> value(v) }
     case iterable: Iterable[_] =>
       iterable.map(value)
     case _ =>
