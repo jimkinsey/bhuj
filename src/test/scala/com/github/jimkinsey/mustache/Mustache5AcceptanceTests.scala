@@ -4,7 +4,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class Mustache5AcceptanceTests extends FunSpec {
-  implicit val mapContextualiser = new MapContextualiser()
+  implicit val canContextualiseMap = new CanContextualiseMap()
 
   describe("Mustache") {
 

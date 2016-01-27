@@ -22,7 +22,7 @@ class Mustache(templates: (String => Option[String]) = Map.empty.get) {
     this(map.get _)
   }
 
-  def renderTemplate[C](name: String, context: C)(implicit ev: Contextualiser[C]): Either[Any, String] = {
+  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
     templates(name)
       .map(Right.apply)
       .getOrElse(Left(TemplateNotFound(name)))
@@ -32,7 +32,7 @@ class Mustache(templates: (String => Option[String]) = Map.empty.get) {
       }
   }
 
-  def render[C](template: String, context: C)(implicit ev: Contextualiser[C]): Either[Any, String] = {
+  def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
     ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
   }
 
