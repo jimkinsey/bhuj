@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.CanContextualiseCaseClass.NotACaseClass
+import com.github.jimkinsey.mustache.tags.SectionStart.Lambda
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -29,6 +30,22 @@ class CanContextualiseCaseClassTests extends FunSpec {
     it("can contextualise a case class with an Int field") {
       case class Numbered(n: Int)
       new CanContextualiseCaseClass().context(Numbered(42)) should be(Right(Map("n" -> 42)))
+    }
+
+    it("can contextualise a String field") {
+      case class Named(name: String)
+      new CanContextualiseCaseClass().context(Named("Charley")) should be(Right(Map("name" -> "Charley")))
+    }
+
+    it("can contextualise a Boolean field") {
+      case class Flagged(awesome: Boolean)
+      new CanContextualiseCaseClass().context(Flagged(true)) should be(Right(Map("awesome" -> true)))
+    }
+
+    it("can contextualise a Mustache-compatible lambda field") {
+      case class Ram(lambda: Lambda)
+      val lambda: Lambda = (str, render) => Right("Lambdad!")
+      new CanContextualiseCaseClass().context(Ram(lambda)) should be(Right(Map("lambda" -> lambda)))
     }
 
   }
