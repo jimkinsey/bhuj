@@ -29,6 +29,8 @@ class CanContextualiseCaseClass extends CanContextualise[Product] {
   private def value(obj: Any): Any = obj match {
     case product: Product if isCaseClass(product) =>
       map(obj.asInstanceOf[Product])
+    case iterable: Iterable[_] =>
+      iterable.map(value)
     case _ =>
       obj
   }
