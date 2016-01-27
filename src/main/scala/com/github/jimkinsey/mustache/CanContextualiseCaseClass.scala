@@ -11,15 +11,26 @@ object CanContextualiseCaseClass {
 class CanContextualiseCaseClass extends CanContextualise[Product] {
   def context(obj: Product): Either[Failure, Context] = {
     if (isCaseClass(obj)) {
-      val fields = publicFields(obj).map{ f =>
-        f.setAccessible(true);
-        f.getName -> f.get(obj)
-      }
-      Right(fields.toMap)
+      Right(map(obj))
     }
     else {
       Left(NotACaseClass(obj))
     }
+  }
+
+  private def map(caseClass: Product): Map[String, Any] = {
+    val fields = publicFields(caseClass).map{ f =>
+      f.setAccessible(true);
+      f.getName -> value(f.get(caseClass))
+    }
+    fields.toMap
+  }
+
+  private def value(obj: Any): Any = obj match {
+    case product: Product if isCaseClass(product) =>
+      map(obj.asInstanceOf[Product])
+    case _ =>
+      obj
   }
 
   private def publicFields(obj: Product) = {

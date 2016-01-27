@@ -48,6 +48,20 @@ class CanContextualiseCaseClassTests extends FunSpec {
       new CanContextualiseCaseClass().context(Ram(lambda)) should be(Right(Map("lambda" -> lambda)))
     }
 
+    it("recursively contextualises a case class") {
+      case class PostCode(areaCode: String, code: String)
+      case class Address(postCode: PostCode)
+      new CanContextualiseCaseClass().context(
+        Address(
+          PostCode("SE10", "8HR")
+        )
+      ) should be(Right(
+        Map(
+          "postCode" -> Map("areaCode" -> "SE10", "code" -> "8HR")
+        )
+      ))
+    }
+
   }
 
 }
