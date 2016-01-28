@@ -7,9 +7,7 @@ import org.scalatest.Matchers._
 
 class MustacheTests extends FunSpec {
 
-  implicit object MapCanContextualise$ extends CanContextualise[Map[String,Any]] {
-    def context(map: Map[String,Any]) = Right(map)
-  }
+  import ContextImplicits._
 
   describe("A Mustache renderer") {
 
