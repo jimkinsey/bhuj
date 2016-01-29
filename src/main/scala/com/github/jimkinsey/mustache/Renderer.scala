@@ -19,12 +19,12 @@ object Renderer {
   }
 }
 
-class Renderer(tags: Set[Tag]) {
+class Renderer(tags: Set[Tag], globalContext: Context = Map.empty) {
 
   def render(template: String, context: Context): Result = {
     TagPattern.findFirstMatchIn(template).map {
       case FoundTag((preTag, tagContent, postTag)) =>
-        processTag(tagContent, postTag.getOrElse(""), context).right.map(preTag + _)
+        processTag(tagContent, postTag.getOrElse(""), globalContext ++ context).right.map(preTag + _)
     }.getOrElse(Right(template))
   }
 

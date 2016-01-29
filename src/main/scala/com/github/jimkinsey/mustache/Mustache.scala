@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
+import com.github.jimkinsey.mustache.Renderer.Context
 import com.github.jimkinsey.mustache.tags._
 
 object Mustache {
@@ -8,14 +9,19 @@ object Mustache {
   case class TemplateNotFound(name: String) extends Failure
 }
 
-class Mustache(templates: (String => Option[String]) = Map.empty.get) {
-  private val renderer = new Renderer(tags = Set(
-    Variable,
-    UnescapedVariable,
-    SectionStart,
-    InvertedSection,
-    Comment,
-    new Partial(templates))
+class Mustache(
+  templates: (String => Option[String]) = Map.empty.get,
+  globalContext: Context = Map.empty) {
+
+  private val renderer = new Renderer(
+    tags = Set(
+      Variable,
+      UnescapedVariable,
+      SectionStart,
+      InvertedSection,
+      Comment,
+      new Partial(templates)),
+    globalContext = globalContext
   )
 
   def this(map: Map[String,String]) = {

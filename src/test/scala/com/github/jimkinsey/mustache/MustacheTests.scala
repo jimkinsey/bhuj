@@ -36,6 +36,11 @@ class MustacheTests extends FunSpec {
       mustache.renderTemplate("greeting", Person("Charlotte")) should be(Right("Hello Charlotte!"))
     }
 
+    it("can be constructed with a global context to pass to the Renderer") {
+      val mustache = new Mustache(globalContext = Map("theAnswer" -> 42))
+      mustache.render("The answer is {{theAnswer}}") should be(Right("The answer is 42"))
+    }
+
   }
 
 }

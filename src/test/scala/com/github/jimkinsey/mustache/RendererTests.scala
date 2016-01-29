@@ -2,7 +2,7 @@ package com.github.jimkinsey.mustache
 
 import Renderer.{Tag, Result, Context, UnrecognisedTag}
 import com.github.jimkinsey.mustache.Renderer.Tag
-import com.github.jimkinsey.mustache.tags.Variable
+import com.github.jimkinsey.mustache.tags.{Partial, Variable}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -95,6 +95,14 @@ class RendererTests extends FunSpec {
         }
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("before {{hello}} {{world}}") should be(Right("before RENDERED(hello) RENDERED(world)"))
+    }
+
+    it("can be set up with a global context which is overridden by local contexts") {
+      val partials = new Partial(Map("format-n" -> "[{{n}}]"))
+      val renderer = new Renderer(
+        tags = Set(Variable, partials),
+        globalContext = Map("n" -> 10))
+      renderer.render("""N: {{> format-n}}""") should be(Right("N: [10]"))
     }
 
   }
