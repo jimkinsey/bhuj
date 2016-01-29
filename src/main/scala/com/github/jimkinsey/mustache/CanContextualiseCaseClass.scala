@@ -8,10 +8,10 @@ object CanContextualiseCaseClass {
   case class NotACaseClass(obj: Product) extends Failure
 }
 
-class CanContextualiseCaseClass extends CanContextualise[Product] {
+class CanContextualiseCaseClass(converter: CaseClassConverter) extends CanContextualise[Product] {
   def context(obj: Product): Either[Failure, Context] = {
     if (isCaseClass(obj)) {
-      Right(map(obj))
+      converter.map(obj).left.map()
     }
     else {
       Left(NotACaseClass(obj))
