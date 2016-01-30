@@ -17,14 +17,14 @@ object SectionStart extends Tag {
         context.get(name).collect {
           case true =>
             render(sectionTemplate, context)
-          case nonFalseValue: Context =>
+          case nonFalseValue: Context @unchecked =>
             render(sectionTemplate, nonFalseValue)
-          case iterable: Renderer.ContextList if iterable.nonEmpty =>
+          case iterable: Renderer.ContextList @unchecked if iterable.nonEmpty =>
             iterable.foldLeft[Result](Right("")) {
               case (Right(acc), item) => render(sectionTemplate, item).right.map(acc + _)
               case (fail, _) => fail
             }
-          case lambda: Lambda =>
+          case lambda: Lambda @unchecked =>
             lambda(sectionTemplate, render(_, context))
         }.orElse(Some(Right(""))).map(_.right.map(_ -> postSectionTemplate))
     }.getOrElse(Left(UnclosedSection(name)))
