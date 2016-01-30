@@ -1,18 +1,17 @@
 package com.github.jimkinsey.mustache
 
-import java.io.{PrintWriter, File}
+import java.io.{File, PrintWriter}
 
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import scala.collection.mutable
 
 class IntegrationTests extends FunSpec {
   import ContextImplicits._
 
   describe("Mustache rendering") {
+    val templateLoader = new FilePartialLoader(getClass.getClassLoader.getResource("templates").getPath)
 
     it("allows for rapid turnaround by not caching template files") {
-      val templateLoader = new FilePartialLoader(getClass.getClassLoader.getResource("templates").getPath)
       val mustache = new Mustache(templates = templateLoader.partial)
       writeTemplate("greeting", "hello {{name}}")
       val model: Map[String, Any] = Map("name" -> "Jim")
@@ -22,8 +21,7 @@ class IntegrationTests extends FunSpec {
     }
 
     it("allows for better performance by caching template files") {
-      val templateLoader = new FilePartialLoader(getClass.getClassLoader.getResource("templates").getPath, Some(mutable.Map.empty))
-      val mustache = new Mustache(templates = templateLoader.partial)
+      val mustache = new Mustache(templates = Caching.cached(templateLoader.partial))
       writeTemplate("greeting", "hello {{name}}")
       val model: Map[String, Any] = Map("name" -> "Jim")
       mustache.renderTemplate("greeting", model) should be(Right("hello Jim"))
@@ -42,3 +40,4 @@ class IntegrationTests extends FunSpec {
   }
 
 }
+

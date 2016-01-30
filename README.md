@@ -9,7 +9,7 @@ Assuming a template `greeting.mustache` with content `Hello {{name}}!` is in the
 
     import ContextImplicits._
     val templates = new FilePartialLoader("templates")
-    val mustache = new Mustache(templates)
+    val mustache = new Mustache(templates.partial)
     case class Person(name: String)
     mustache.render("greeting", Person(name = "Charlotte")).right.get
 
@@ -21,4 +21,3 @@ Roadmap
 * strict mode i.e. require keys to be present and usable in the context of the tag
 * improve README - more examples
 * factory to build common mustache renderer case? i.e. with file templates and global context?
-* move caching to outside the partial loader
