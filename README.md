@@ -1,9 +1,23 @@
 Scala Mustache
 ===
-An implementation of Mustache in Scala, just as a personal project for my own benefit.
+An implementation of [Mustache](https://mustache.github.io/mustache.5.html) in Scala.
+
+Usage
+---
+
+Assuming a template `greeting.mustache` with content `Hello {{name}}!` is in the `templates` dir:
+
+    import ContextImplicits._
+    val templates = new FilePartialLoader("templates")
+    val mustache = new Mustache(templates)
+    case class Person(name: String)
+    mustache.render("greeting", Person(name = "Charlotte"))
+
+Results in `Hello Charlotte!`.
 
 Roadmap
 ---
-* Allow objects to be used as the context for rendering, not just maps - case classes only?
 * support set delimiter tag
 * strict mode i.e. require keys to be present and usable in the context of the tag
+* improve README - more examples
+* factory to build common mustache renderer case? i.e. with file templates and global context?
