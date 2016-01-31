@@ -11,4 +11,8 @@ object Caching {
       value
     })
   }
+
+  implicit class AddCaching[K,V](fn: K => V) {
+    lazy val withCache: K => V = cached(fn)
+  }
 }

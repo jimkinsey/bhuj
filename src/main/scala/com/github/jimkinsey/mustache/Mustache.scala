@@ -4,13 +4,18 @@ import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
 import com.github.jimkinsey.mustache.Renderer.Context
 import com.github.jimkinsey.mustache.tags._
 
+import Mustache._
+
 object Mustache {
   trait Failure
   case class TemplateNotFound(name: String) extends Failure
+
+  type Templates = (String => Option[String])
+  lazy val emptyTemplates: Templates = Map.empty.get
 }
 
 class Mustache(
-  templates: (String => Option[String]) = Map.empty.get,
+  templates: Templates = emptyTemplates,
   globalContext: Context = Map.empty) {
 
   private val renderer = new Renderer(

@@ -6,8 +6,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class MustacheTests extends FunSpec {
-
-  import ContextImplicits._
+  import ContextImplicits.canContextualiseMap
 
   describe("A Mustache renderer") {
 
