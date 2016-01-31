@@ -1,5 +1,7 @@
 package com.github.jimkinsey.mustache
 
+import com.github.jimkinsey.mustache.partials.{Caching, FilePartialLoader}
+
 import scala.language.implicitConversions
 
 object MustacheBuilder {

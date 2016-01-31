@@ -1,9 +1,9 @@
 package com.github.jimkinsey.mustache.tags
 
 import java.util.regex.Pattern
-
-import com.github.jimkinsey.mustache.Renderer
-import com.github.jimkinsey.mustache.Renderer._
+import com.github.jimkinsey.mustache.rendering.Renderer
+import Renderer._
+import com.github.jimkinsey.mustache.rendering.Renderer
 
 object SectionStart extends Tag {
   type Lambda = (String, (String => Result)) => Result

@@ -1,4 +1,4 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.context
 
 class CanContextualiseMap(caseClassConverter: CaseClassConverter) extends CanContextualise[Map[String, Any]] {
   def context(map: Map[String, Any]) = {

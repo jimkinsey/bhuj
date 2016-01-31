@@ -1,6 +1,6 @@
 package com.github.jimkinsey.mustache.tags
 
-import com.github.jimkinsey.mustache.Renderer
+import com.github.jimkinsey.mustache.rendering.Renderer
 import com.github.jimkinsey.mustache.tags.Partial.PartialNotFound
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

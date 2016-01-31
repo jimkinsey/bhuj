@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.tags
 
-import com.github.jimkinsey.mustache.Renderer.{Result, Context}
+import com.github.jimkinsey.mustache.rendering.Renderer
+import Renderer.{Result, Context}
 import com.github.jimkinsey.mustache.tags.SectionStart.{Render, Lambda, UnclosedSection}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

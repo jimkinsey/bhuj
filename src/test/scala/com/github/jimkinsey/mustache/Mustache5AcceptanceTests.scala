@@ -1,5 +1,7 @@
 package com.github.jimkinsey.mustache
 
+import com.github.jimkinsey.mustache.context.ContextImplicits
+import com.github.jimkinsey.mustache.rendering.Renderer
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

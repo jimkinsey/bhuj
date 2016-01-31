@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.tags
 
-import com.github.jimkinsey.mustache.Renderer.{Failure, Result, Context, Tag}
+import com.github.jimkinsey.mustache.rendering.Renderer
+import Renderer.{Failure, Result, Context, Tag}
 import com.github.jimkinsey.mustache.tags.Partial.PartialNotFound
 
 object Partial {

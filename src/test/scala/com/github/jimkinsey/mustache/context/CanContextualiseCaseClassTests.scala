@@ -1,7 +1,7 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.context
 
-import com.github.jimkinsey.mustache.CanContextualiseCaseClass.ConversionFailure
-import com.github.jimkinsey.mustache.CaseClassConverter.GeneralFailure
+import com.github.jimkinsey.mustache.context.CanContextualiseCaseClass.ConversionFailure
+import com.github.jimkinsey.mustache.context.CaseClassConverter.GeneralFailure
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec

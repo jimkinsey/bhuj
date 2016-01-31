@@ -1,4 +1,4 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.partials
 
 import scala.io.Source
 import scala.util.Try

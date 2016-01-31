@@ -1,6 +1,6 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.context
 
-import com.github.jimkinsey.mustache.CaseClassConverter.{NotACaseClass, Failure}
+import com.github.jimkinsey.mustache.context.CaseClassConverter.NotACaseClass
 import com.github.jimkinsey.mustache.tags.SectionStart._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

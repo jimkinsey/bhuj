@@ -1,4 +1,4 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.partials
 
 import scala.collection.mutable
 

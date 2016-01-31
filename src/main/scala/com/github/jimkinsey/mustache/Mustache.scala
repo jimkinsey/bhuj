@@ -1,7 +1,9 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
-import com.github.jimkinsey.mustache.Renderer.Context
+import com.github.jimkinsey.mustache.rendering.Renderer
+import Renderer.Context
+import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.tags._
 
 import Mustache._

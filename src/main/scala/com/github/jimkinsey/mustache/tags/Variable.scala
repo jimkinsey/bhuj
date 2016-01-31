@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.tags
 
-import com.github.jimkinsey.mustache.Renderer._
+import com.github.jimkinsey.mustache.rendering.Renderer
+import Renderer._
 
 object Variable extends Tag {
   val pattern = """^([^\{#>\^!].*)$""".r

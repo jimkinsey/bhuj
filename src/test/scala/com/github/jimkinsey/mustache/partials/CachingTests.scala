@@ -1,4 +1,4 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.partials
 
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

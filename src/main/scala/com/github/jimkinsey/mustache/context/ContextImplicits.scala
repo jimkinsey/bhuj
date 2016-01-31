@@ -1,4 +1,4 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.context
 
 object ContextImplicits {
   implicit val canContextualiseCaseClass = new CanContextualiseCaseClass(new CaseClassConverter)

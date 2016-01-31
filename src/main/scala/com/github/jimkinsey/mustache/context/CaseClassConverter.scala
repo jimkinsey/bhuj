@@ -1,6 +1,6 @@
-package com.github.jimkinsey.mustache
+package com.github.jimkinsey.mustache.context
 
-import com.github.jimkinsey.mustache.CaseClassConverter.NotACaseClass
+import com.github.jimkinsey.mustache.context.CaseClassConverter.NotACaseClass
 
 object CaseClassConverter {
   sealed trait Failure

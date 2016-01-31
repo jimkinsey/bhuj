@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.CanContextualise.ContextualisationFailure
+import com.github.jimkinsey.mustache.context.{ContextImplicits, CanContextualise}
+import CanContextualise.ContextualisationFailure
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

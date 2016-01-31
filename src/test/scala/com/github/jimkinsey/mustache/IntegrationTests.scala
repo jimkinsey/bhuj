@@ -2,6 +2,7 @@ package com.github.jimkinsey.mustache
 
 import java.io.{File, PrintWriter}
 
+import com.github.jimkinsey.mustache.context.ContextImplicits
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
