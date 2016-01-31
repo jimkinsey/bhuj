@@ -20,5 +20,4 @@ Roadmap
 * support set delimiter tag
 * strict mode i.e. require keys to be present and usable in the context of the tag
 * improve README - more examples
-* use typeclass to contextualise global context if possible?
 * refactor the section-type tags so that there is a distinction between value and section tags - should simplify code

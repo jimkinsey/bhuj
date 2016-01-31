@@ -7,25 +7,26 @@ import org.scalatest.Matchers._
 
 class Mustache5AcceptanceTests extends FunSpec {
   import ContextImplicits._
+  import MustacheBuilder.mustacheRenderer
 
   describe("Mustache") {
 
     describe("a variable tag") {
 
       it("is replaced by an empty string when the key is not in the context") {
-        new Mustache().render("Hello {{name}}", Map[String,Any]()) should be(Right("Hello "))
+        mustacheRenderer.render("Hello {{name}}", Map[String,Any]()) should be(Right("Hello "))
       }
 
       it("is replaced by the value from the context when present") {
-        new Mustache().render("Hello {{name}}", Map("name" -> "Chris")) should be(Right("Hello Chris"))
+        mustacheRenderer.render("Hello {{name}}", Map("name" -> "Chris")) should be(Right("Hello Chris"))
       }
 
       it("escapes for HTML by default") {
-        new Mustache().render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
+        mustacheRenderer.render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
       }
 
       it("does not escape when the variable is triple-delimited") {
-        new Mustache().render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+        mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
     }
@@ -33,11 +34,11 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a section tag") {
 
       it("does not render when the key is not in the context") {
-        new Mustache().render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
+        mustacheRenderer.render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
       }
 
       it("does not render for a false value") {
-        new Mustache().render(
+        mustacheRenderer.render(
           """Shown.
             |{{#person}}
             |  Never shown!
@@ -48,7 +49,7 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("does not render for an empty iterable") {
-        new Mustache().render(
+        mustacheRenderer.render(
           """Shown.
             |{{#person}}
             |  Never shown!
@@ -59,7 +60,7 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("renders the inner template for each item of the list") {
-          new Mustache().render(
+        mustacheRenderer.render(
             template =
               """{{#repo}}
                 |  <b>{{name}}</b>
@@ -80,7 +81,7 @@ class Mustache5AcceptanceTests extends FunSpec {
         }
 
       it("invokes the lambda with the unprocessed template and a render method") {
-          new Mustache().render(
+        mustacheRenderer.render(
             template = """{{#wrapped}}
               |  {{name}} is awesome.
               |{{/wrapped}}""".stripMargin,
@@ -97,7 +98,7 @@ class Mustache5AcceptanceTests extends FunSpec {
         }
 
       it("for a non-false, non-iterable value uses the value as the context for a rendering of the section template") {
-          new Mustache().render(
+        mustacheRenderer.render(
             template =
               """{{#person?}}
                 |  Hi {{name}}!
@@ -115,15 +116,15 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("an inverted section tag") {
 
       it("renders once when the key doesn't exist") {
-        new Mustache().render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
+        mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
       }
 
       it("renders once when the key is a false value") {
-        new Mustache().render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+        mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
       }
 
       it("renders once when the key is an empty list") {
-        new Mustache().render(
+        mustacheRenderer.render(
           template =
             """{{#repo}}
               |  <b>{{name}}</b>
@@ -143,11 +144,11 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a comment") {
 
       it("is not rendered") {
-        new Mustache().render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
+        mustacheRenderer.render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
       }
 
       it("may contain newlines") {
-        new Mustache().render(
+        mustacheRenderer.render(
           """{{!
             |If you can read this, something went wrong
             |}}""".stripMargin) should be(Right(""))
@@ -158,7 +159,7 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a partial") {
 
       it("is rendered once in the current context") {
-        new Mustache(Map("user" -> "<strong>{{name}}</strong>")).render(
+        mustacheRenderer.withTemplates("user" -> "<strong>{{name}}</strong>").render(
           template = """<h2>Names</h2>
                        |{{#names}}
                        |  {{> user}}
