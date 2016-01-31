@@ -7,7 +7,7 @@ import Renderer._
 
 import scala.util.matching.Regex
 
-object InvertedSection extends Tag {
+private[mustache] object InvertedSection extends Tag {
    case class UnclosedInvertedSection(name: String) extends Failure
 
    val pattern: Regex = """^\^(.+)$""".r

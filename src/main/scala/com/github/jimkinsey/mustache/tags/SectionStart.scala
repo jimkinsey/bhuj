@@ -5,7 +5,7 @@ import com.github.jimkinsey.mustache.rendering.Renderer
 import Renderer._
 import com.github.jimkinsey.mustache.rendering.Renderer
 
-object SectionStart extends Tag {
+private[mustache] object SectionStart extends Tag {
   type Lambda = (String, (String => Result)) => Result
   type Render = ((String, Context) => Result)
   case class UnclosedSection(name: String) extends Failure

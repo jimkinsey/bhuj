@@ -5,7 +5,7 @@ import com.github.jimkinsey.mustache.rendering.Renderer._
 import scala.util.matching.Regex
 import scala.util.matching.Regex.Match
 
-object Renderer {
+private[mustache] object Renderer {
   type Result = Either[Failure, String]
   type Context = Map[String, Any]
   type ContextList = Iterable[Context]
@@ -19,7 +19,7 @@ object Renderer {
   }
 }
 
-class Renderer(tags: Set[Tag], globalContext: Context = Map.empty) {
+private[mustache] class Renderer(tags: Set[Tag], globalContext: Context = Map.empty) {
 
   def render(template: String, context: Context): Result = {
     TagPattern.findFirstMatchIn(template).map {
