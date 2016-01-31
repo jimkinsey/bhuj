@@ -7,6 +7,6 @@ object CanContextualise {
   case class ContextualisationFailure(message: String) extends Failure
 }
 
-trait CanContextualise[T] {
+trait CanContextualise[-T] {
   def context(obj: T): Either[CanContextualise.Failure,Context]
 }
