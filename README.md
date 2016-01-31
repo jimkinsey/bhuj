@@ -8,8 +8,9 @@ Usage
 Assuming a template `greeting.mustache` with content `Hello {{name}}!` is in the `templates` dir:
 
     import ContextImplicits._
-    val templates = new FilePartialLoader("templates")
-    val mustache = new Mustache(templates.partial)
+    import MustacheBuilder._
+
+    val mustache = mustacheRenderer.withTemplatePath("templates")
     case class Person(name: String)
     mustache.render("greeting", Person(name = "Charlotte")).right.get
 

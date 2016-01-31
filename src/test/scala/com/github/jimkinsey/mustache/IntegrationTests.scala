@@ -3,6 +3,7 @@ package com.github.jimkinsey.mustache
 import java.io.{File, PrintWriter}
 
 import com.github.jimkinsey.mustache.context.ContextImplicits
+import com.github.jimkinsey.mustache.tags.SectionStart.Lambda
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -28,6 +29,14 @@ class IntegrationTests extends FunSpec {
       mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
       writeTemplate("greeting", "Hello {{name}}")
       mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
+    }
+
+    it("provides a global context which is useful for localisation") {
+      val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
+      val mustache = mustacheRenderer
+        .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")
+        .withHelpers("localised" -> localised)
+      mustache.renderTemplate("greeting", Person("Elisabeth")) should be(Right("Bonjour Elisabeth"))
     }
 
   }
