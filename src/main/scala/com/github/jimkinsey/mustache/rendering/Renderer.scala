@@ -16,9 +16,7 @@ private[mustache] trait Component {
   def rendered(context: Context): Either[Component.Failure, String]
 }
 
-case class Text(content: String) extends Component {
-  def rendered(context: Context): Either[Component.Failure, String] = ???
-}
+
 
 private[mustache] object Renderer {
   type Result = Either[Failure, String]

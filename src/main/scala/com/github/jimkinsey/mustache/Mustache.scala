@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
+import com.github.jimkinsey.mustache.parsing.VariableParser
 import com.github.jimkinsey.mustache.rendering.Renderer
 import Renderer.Context
 import com.github.jimkinsey.mustache.context.CanContextualise
@@ -20,6 +21,7 @@ class Mustache(
   templates: Templates = emptyTemplates,
   globalContext: Context = Map.empty) {
 
+  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser))
   private val renderer = new Renderer(
 //    tags = Set(
 //      Variable,
@@ -48,7 +50,14 @@ class Mustache(
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
 //    ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
-    ???
+    templateParser
+      .parse(template)
+      .right
+      .flatMap(t => ev.context(context).right.map(t -> _))
+      .right
+      .flatMap { case (template, context) => renderer.render(template, context) }
+
+//    ev.context(context).right.flatMap(ctx => renderer.render(templateParser.parse(template), ctx))
   }
 
   def render(template: String): Either[Any, String] = {

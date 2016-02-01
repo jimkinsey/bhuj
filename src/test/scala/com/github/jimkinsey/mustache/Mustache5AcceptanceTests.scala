@@ -10,7 +10,6 @@ class Mustache5AcceptanceTests extends FunSpec {
   import MustacheBuilder.mustacheRenderer
 
   describe("Mustache") {
-    pending
 
     describe("a variable tag") {
 
@@ -27,12 +26,14 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("does not escape when the variable is triple-delimited") {
+        pending
         mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
     }
 
     describe("a section tag") {
+      pending
 
       it("does not render when the key is not in the context") {
         mustacheRenderer.render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
@@ -115,6 +116,7 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("an inverted section tag") {
+      pending
 
       it("renders once when the key doesn't exist") {
         mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
@@ -143,6 +145,7 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("a comment") {
+      pending
 
       it("is not rendered") {
         mustacheRenderer.render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
@@ -158,6 +161,7 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("a partial") {
+      pending
 
       it("is rendered once in the current context") {
         mustacheRenderer.withTemplates("user" -> "<strong>{{name}}</strong>").render(

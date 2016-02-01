@@ -1,7 +1,8 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.TemplateParser.{Delimiters, TagParseFailure, UnrecognisedTag}
-import com.github.jimkinsey.mustache.rendering.{Component, Template, Text}
+import com.github.jimkinsey.mustache.components.Text
+import com.github.jimkinsey.mustache.rendering.{Component, Template}
 
 import scala.util.matching.Regex
 
@@ -11,7 +12,7 @@ object TagParser {
 
 trait TagParser {
   def pattern: Regex
-  def parsed: Either[TagParser.Failure, Component]
+  def parsed(name: String): Either[TagParser.Failure, Component]
 }
 
 object TemplateParser {
@@ -39,7 +40,7 @@ private[mustache] class TemplateParser(
         val tagContent = template.substring(tagIndex + delimiters.start.length, tagIndex + endIndex + delimiters.end.length)
         tagParsers
           .collectFirst { case parser if parser.pattern.findFirstIn(tagContent).isDefined => {
-            parser.parsed.left.map(failure => TagParseFailure(tagIndex, failure))
+            parser.parsed(tagContent).left.map(failure => TagParseFailure(tagIndex, failure))
           }}
           .getOrElse(Left(UnrecognisedTag(tagIndex, tagContent)))
           .right
