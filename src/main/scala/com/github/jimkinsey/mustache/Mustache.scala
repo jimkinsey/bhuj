@@ -3,7 +3,7 @@ package com.github.jimkinsey.mustache
 import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
 import com.github.jimkinsey.mustache.parsing.VariableParser
 import com.github.jimkinsey.mustache.rendering.Renderer
-import Renderer.Context
+import com.github.jimkinsey.mustache.rendering.Renderer.{Result, Context}
 import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.tags._
 
@@ -22,16 +22,7 @@ class Mustache(
   globalContext: Context = Map.empty) {
 
   private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser))
-  private val renderer = new Renderer(
-//    tags = Set(
-//      Variable,
-//      UnescapedVariable,
-//      SectionStart,
-//      InvertedSection,
-//      Comment,
-//      new Partial(templates)),
-//    globalContext = globalContext
-  )
+  private val renderer = new Renderer()
 
   def this(map: Map[String,String]) = {
     this(map.get _)
@@ -49,20 +40,18 @@ class Mustache(
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-//    ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
-    templateParser
-      .parse(template)
-      .right
-      .flatMap(t => ev.context(context).right.map(t -> _))
-      .right
-      .flatMap { case (template, context) => renderer.render(template, context) }
-
-//    ev.context(context).right.flatMap(ctx => renderer.render(templateParser.parse(template), ctx))
+    for {
+      parsed <- templateParser.parse(template).right
+      ctx <- ev.context(context).right
+      rendered <- renderer.render(parsed, ctx).right
+    } yield { rendered }
   }
 
   def render(template: String): Either[Any, String] = {
-//    renderer.render(template)
-    ???
+    for {
+      parsed <- templateParser.parse(template).right
+      rendered <- renderer.render(parsed).right
+    } yield { rendered }
   }
 
 }
