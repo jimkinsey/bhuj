@@ -12,17 +12,14 @@ class MustacheTests extends FunSpec {
   describe("A Mustache renderer") {
 
     it("returns a TemplateNotFound failure when asked to render a template not known to it") {
-      pending
       new Mustache(templates = Map.empty.get).renderTemplate("page", Map[String,Any]()) should be(Left(TemplateNotFound("page")))
     }
 
     it("returns the result of rendering the named template when it is available") {
-      pending
       new Mustache(templates = Map("page" -> "A page!").get).renderTemplate("page", Map[String,Any]()) should be(Right("A page!"))
     }
 
     it("returns the failure if the contextualiser cannot produce a context") {
-      pending
       implicit object IntCanContextualise$ extends CanContextualise[Int] {
         def context(i: Int) = Left(ContextualisationFailure("Ints cannot be maps"))
       }
@@ -31,7 +28,6 @@ class MustacheTests extends FunSpec {
     }
 
     it("uses the available evidence to produce a context for rendering") {
-      pending
       case class Person(name: String)
       implicit object PersonCanContextualise$ extends CanContextualise[Person] {
         def context(person: Person) = Right(Map("name" -> person.name))

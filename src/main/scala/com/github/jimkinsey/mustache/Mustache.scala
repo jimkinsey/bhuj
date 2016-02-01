@@ -1,13 +1,10 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
+import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
+import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.parsing.VariableParser
 import com.github.jimkinsey.mustache.rendering.Renderer
-import com.github.jimkinsey.mustache.rendering.Renderer.{Result, Context}
-import com.github.jimkinsey.mustache.context.CanContextualise
-import com.github.jimkinsey.mustache.tags._
-
-import Mustache._
+import com.github.jimkinsey.mustache.rendering.Renderer.Context
 
 object Mustache {
   trait Failure
@@ -29,14 +26,10 @@ class Mustache(
   }
 
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-//    templates(name)
-//      .map(Right.apply)
-//      .getOrElse(Left(TemplateNotFound(name)))
-//      .right
-//      .flatMap { template =>
-//        ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
-//      }
-    ???
+    for {
+      template <- templates(name).toRight({TemplateNotFound(name)}).right
+      result <- render(template, context).right
+    } yield { result }
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
