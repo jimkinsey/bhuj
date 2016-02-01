@@ -14,6 +14,7 @@ class IntegrationTests extends FunSpec {
   import MustacheBuilder._
 
   describe("Mustache rendering") {
+    pending
 
     it("allows for rapid turnaround by not caching template files") {
       val mustache = mustacheRenderer.withTemplatePath(templatePath).withoutCache

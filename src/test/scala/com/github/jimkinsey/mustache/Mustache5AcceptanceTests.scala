@@ -10,6 +10,7 @@ class Mustache5AcceptanceTests extends FunSpec {
   import MustacheBuilder.mustacheRenderer
 
   describe("Mustache") {
+    pending
 
     describe("a variable tag") {
 

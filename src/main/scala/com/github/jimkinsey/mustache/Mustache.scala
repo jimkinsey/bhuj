@@ -21,14 +21,14 @@ class Mustache(
   globalContext: Context = Map.empty) {
 
   private val renderer = new Renderer(
-    tags = Set(
-      Variable,
-      UnescapedVariable,
-      SectionStart,
-      InvertedSection,
-      Comment,
-      new Partial(templates)),
-    globalContext = globalContext
+//    tags = Set(
+//      Variable,
+//      UnescapedVariable,
+//      SectionStart,
+//      InvertedSection,
+//      Comment,
+//      new Partial(templates)),
+//    globalContext = globalContext
   )
 
   def this(map: Map[String,String]) = {
@@ -36,21 +36,24 @@ class Mustache(
   }
 
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-    templates(name)
-      .map(Right.apply)
-      .getOrElse(Left(TemplateNotFound(name)))
-      .right
-      .flatMap { template =>
-        ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
-      }
+//    templates(name)
+//      .map(Right.apply)
+//      .getOrElse(Left(TemplateNotFound(name)))
+//      .right
+//      .flatMap { template =>
+//        ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
+//      }
+    ???
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-    ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
+//    ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
+    ???
   }
 
   def render(template: String): Either[Any, String] = {
-    renderer.render(template)
+//    renderer.render(template)
+    ???
   }
 
 }

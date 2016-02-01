@@ -10,6 +10,7 @@ class MustacheTests extends FunSpec {
   import ContextImplicits.canContextualiseMap
 
   describe("A Mustache renderer") {
+    pending
 
     it("returns a TemplateNotFound failure when asked to render a template not known to it") {
       new Mustache(templates = Map.empty.get).renderTemplate("page", Map[String,Any]()) should be(Left(TemplateNotFound("page")))

@@ -19,7 +19,7 @@ private[mustache] object SectionStart extends Tag {
             render(sectionTemplate, context)
           case nonFalseValue: Context @unchecked =>
             render(sectionTemplate, nonFalseValue)
-          case iterable: Renderer.ContextList @unchecked if iterable.nonEmpty =>
+          case iterable: Iterable[Context] @unchecked if iterable.nonEmpty =>
             iterable.foldLeft[Result](Right("")) {
               case (Right(acc), item) => render(sectionTemplate, item).right.map(acc + _)
               case (fail, _) => fail
