@@ -12,8 +12,7 @@ private[mustache] object Component {
 }
 
 private[mustache] trait Component {
-//  def rendered(context: Context): Either[Component.Failure, String]
-  def rendered: Either[Component.Failure, String]
+  def rendered(context: Context): Either[Component.Failure, String]
 }
 
 private[mustache] object Renderer {
@@ -36,11 +35,11 @@ private[mustache] object Renderer {
 }
 
 private[mustache] class Renderer {
-  def render(template: Template): Result = template
+  def render(template: Template, context: Context = Map.empty): Result = template
     .components
     .foldLeft(emptyResult) {
       case (Right(rendered), component) =>
-        component.rendered
+        component.rendered(context)
           .right.map(rendered + _)
           .left.map(RenderFailure.apply)
       case (failure: Left[Failure, String], _) =>
