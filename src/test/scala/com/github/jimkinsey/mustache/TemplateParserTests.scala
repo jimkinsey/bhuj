@@ -64,7 +64,7 @@ class TemplateParserTests extends FunSpec {
   }
 
   private val succeeding = new TagParser {
-    lazy val pattern = "succeed".r
+    lazy val pattern = "(succeed)".r
     def parsed(name: String) = Right(NamedComponent(name))
   }
 

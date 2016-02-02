@@ -2,7 +2,7 @@ package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
 import com.github.jimkinsey.mustache.context.CanContextualise
-import com.github.jimkinsey.mustache.parsing.VariableParser
+import com.github.jimkinsey.mustache.parsing.{UnescapedVariableParser, VariableParser}
 import com.github.jimkinsey.mustache.rendering.Renderer
 import com.github.jimkinsey.mustache.rendering.Renderer.Context
 
@@ -18,7 +18,7 @@ class Mustache(
   templates: Templates = emptyTemplates,
   globalContext: Context = Map.empty) {
 
-  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser))
+  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser, UnescapedVariableParser))
   private val renderer = new Renderer()
 
   def this(map: Map[String,String]) = {
