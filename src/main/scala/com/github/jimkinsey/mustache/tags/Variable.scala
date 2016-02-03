@@ -6,7 +6,7 @@ import Renderer._
 private[mustache] object Variable extends Tag {
   val pattern = """^([^\{#>\^!].*)$""".r
   def process(name: String, context: Context, postTagTemplate: String, render: ((String, Context) => Result)) =
-    Right(context.get(name).map(_.toString).map(escapeHTML).getOrElse(""), postTagTemplate)
+    Right(context.get(name).map(_.toString).map(escapeHTML).getOrElse("") -> postTagTemplate)
 
   private def escapeHTML(str: String) = str.foldLeft("") { case (acc, char) => acc + escapeCode.getOrElse(char, char) }
 

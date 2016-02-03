@@ -35,7 +35,7 @@ class InvertedSectionTest extends FunSpec {
         "name",
         Map("name" -> List("hello")),
         "section{{/name}}remaining",
-        unusedRender) should be(Right("", "remaining"))
+        unusedRender) should be(Right("" ->  "remaining"))
     }
 
     it("renders once for the current context if the key is not in the context") {
@@ -44,7 +44,7 @@ class InvertedSectionTest extends FunSpec {
         "name",
         Map("template" -> "Jim"),
         "template{{/name}}remaining",
-        render) should be(Right("RENDERED(Jim)", "remaining"))
+        render) should be(Right("RENDERED(Jim)" ->  "remaining"))
     }
 
     it("renders once for the current context if the key is in the context and is an empty iterable") {
@@ -53,7 +53,7 @@ class InvertedSectionTest extends FunSpec {
         "name",
         Map("name" -> List(), "template" -> "Jim"),
         "template{{/name}}remaining",
-        render) should be(Right("RENDERED(Jim)", "remaining"))
+        render) should be(Right("RENDERED(Jim)" ->  "remaining"))
     }
 
     it("renders once for the current context if the key is in the context and is false") {
@@ -62,7 +62,7 @@ class InvertedSectionTest extends FunSpec {
         "name",
         Map("name" -> false, "template" -> "Jim"),
         "template{{/name}}remaining",
-        render) should be(Right("RENDERED(Jim)", "remaining"))
+        render) should be(Right("RENDERED(Jim)" ->  "remaining"))
     }
   }
 

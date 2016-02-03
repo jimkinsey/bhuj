@@ -27,7 +27,7 @@ class CommentTest extends FunSpec {
     }
 
     it("is never processed") {
-      Comment.process("comment", Map.empty, "remaining template", (x,y) => ???) should be(Right("", "remaining template"))
+      Comment.process("comment", Map.empty, "remaining template", (x,y) => ???) should be(Right("" ->  "remaining template"))
     }
 
   }

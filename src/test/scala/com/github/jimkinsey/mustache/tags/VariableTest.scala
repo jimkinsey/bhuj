@@ -30,19 +30,19 @@ class VariableTest extends FunSpec {
     }
 
     it("is replaced with no content when the key is not in the context") {
-      Variable.process("x", Map.empty, "", render) should be(Right("", ""))
+      Variable.process("x", Map.empty, "", render) should be(Right("" ->  ""))
     }
 
     it("is replaced by the value from the context") {
-      Variable.process("x", Map("x" -> 1), "", render) should be(Right("1", ""))
+      Variable.process("x", Map("x" -> 1), "", render) should be(Right("1" ->  ""))
     }
 
     it("is escaped for HTML by default") {
-      Variable.process("html", Map("html" -> """<blink>"&'</blink>"""), "", render) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;", ""))
+      Variable.process("html", Map("html" -> """<blink>"&'</blink>"""), "", render) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;" ->  ""))
     }
 
     it("passes on the post-tag-template") {
-      Variable.process("a", Map.empty, "template", render) should be(Right("", "template"))
+      Variable.process("a", Map.empty, "template", render) should be(Right("" ->  "template"))
     }
 
   }

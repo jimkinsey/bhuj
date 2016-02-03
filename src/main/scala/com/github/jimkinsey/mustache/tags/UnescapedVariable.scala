@@ -6,5 +6,5 @@ import Renderer._
 private[mustache] object UnescapedVariable extends Tag {
   val pattern = """^\{(.+)$""".r
   def process(name: String, context: Context, postTagTemplate: String, render: ((String, Context) => Result)) =
-    Right(context.get(name).map(_.toString).getOrElse(""), postTagTemplate)
+    Right(context.get(name).map(_.toString).getOrElse("") -> postTagTemplate)
 }

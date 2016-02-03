@@ -42,7 +42,7 @@ class RendererTests extends FunSpec {
       val lowercaseNameTag = new Tag {
         def pattern: Regex = """([a-z]+)""".r
         def process(name: String, context: Context, postTagTemplate: String, render: (String, Context) => Result) =
-          Right("pass", " {{FAIL}} ")
+          Right("pass" ->  " {{FAIL}} ")
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("{{hello}}") should be(Left(UnrecognisedTag("FAIL")))
     }
@@ -53,7 +53,7 @@ class RendererTests extends FunSpec {
         def pattern: Regex = """([a-z]+)""".r
         def process(name: String, context: Context, postTagTemplate: String, render: (String, Context) => Result) = {
           passedName = Some(name)
-          Right("", "")
+          Right("" ->  "")
         }
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("{{hello}}")
@@ -66,7 +66,7 @@ class RendererTests extends FunSpec {
         def pattern: Regex = """([a-z]+)""".r
         def process(name: String, context: Context, postTagTemplate: String, render: (String, Context) => Result) = {
           passedContext = Some(context)
-          Right("", "")
+          Right("" ->  "")
         }
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("{{hello}}", Map("a" -> 1))
@@ -79,7 +79,7 @@ class RendererTests extends FunSpec {
         def pattern: Regex = """([a-z]+)""".r
         def process(name: String, context: Context, postTagTemplate: String, render: (String, Context) => Result) = {
           passedPostTagTemplate = Some(postTagTemplate)
-          Right("", "")
+          Right("" ->  "")
         }
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("before {{hello}} after")
@@ -90,7 +90,7 @@ class RendererTests extends FunSpec {
       val lowercaseNameTag = new Tag {
         def pattern: Regex = """([a-z]+)""".r
         def process(name: String, context: Context, postTagTemplate: String, render: (String, Context) => Result) = {
-          Right(s"RENDERED($name)", postTagTemplate)
+          Right(s"RENDERED($name)" ->  postTagTemplate)
         }
       }
       new Renderer(tags = Set(lowercaseNameTag)).render("before {{hello}} {{world}}") should be(Right("before RENDERED(hello) RENDERED(world)"))

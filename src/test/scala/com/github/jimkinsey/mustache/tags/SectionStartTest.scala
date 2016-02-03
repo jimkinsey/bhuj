@@ -23,19 +23,19 @@ class SectionStartTest extends FunSpec {
     }
 
     it("replaces the whole section with nothing if the key is not in the context") {
-      SectionStart.process("section", Map.empty, "template{{/section}}", render) should be(Right("", ""))
+      SectionStart.process("section", Map.empty, "template{{/section}}", render) should be(Right("" ->  ""))
     }
 
     it("returns the template after the section close tag") {
-      SectionStart.process("section", Map.empty, "{{/section}} after", render) should be(Right("", " after"))
+      SectionStart.process("section", Map.empty, "{{/section}} after", render) should be(Right("" ->  " after"))
     }
 
     it("does not render if the named value in the context is false") {
-      SectionStart.process("section", Map("section" -> false), "true!{{/section}}", render) should be(Right("", ""))
+      SectionStart.process("section", Map("section" -> false), "true!{{/section}}", render) should be(Right("" ->  ""))
     }
 
     it("does not render if the named value in the context is an empty iterable") {
-      SectionStart.process("section", Map("section" -> List.empty), "non-empty!{{/section}}", render) should be(Right("", ""))
+      SectionStart.process("section", Map("section" -> List.empty), "non-empty!{{/section}}", render) should be(Right("" ->  ""))
     }
 
     it("returns the failure if the named value is a lambda which fails") {
@@ -50,12 +50,12 @@ class SectionStartTest extends FunSpec {
 
     it("renders the section once using the value as a context if it is a map") {
       val render: Render = (template, context) => Right(context(template).toString)
-      SectionStart.process("section", Map("section" -> Map("a" -> 1)), "a{{/section}}", render) should be(Right("1", ""))
+      SectionStart.process("section", Map("section" -> Map("a" -> 1)), "a{{/section}}", render) should be(Right("1" ->  ""))
     }
 
     it("renders the section once in the current context if it is true") {
       val render: Render = (template, context) => Right(context(template).toString)
-      SectionStart.process("section", Map("section" -> true), "section{{/section}}", render) should be(Right("true", ""))
+      SectionStart.process("section", Map("section" -> true), "section{{/section}}", render) should be(Right("true" ->  ""))
     }
 
     it("renders the section for each item in a non-empty iterable with the item as the context") {
@@ -64,7 +64,7 @@ class SectionStartTest extends FunSpec {
         name = "section",
         context = Map("section" -> List(Map("a" -> 1), Map("a" -> 2))),
         postTagTemplate = "a{{/section}}",
-        render) should be(Right("12", ""))
+        render) should be(Right("12" ->  ""))
     }
 
     it("renders the section once for a lambda, passing the template and render function in") {
@@ -75,7 +75,7 @@ class SectionStartTest extends FunSpec {
         context = Map("section" -> lambda, "a" -> 42),
         postTagTemplate = "a{{/section}}",
         render
-      ) should be(Right("LAMBDA'D: 42", ""))
+      ) should be(Right("LAMBDA'D: 42" ->  ""))
     }
 
   }
