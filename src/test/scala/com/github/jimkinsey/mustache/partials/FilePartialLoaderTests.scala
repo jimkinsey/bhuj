@@ -2,10 +2,11 @@ package com.github.jimkinsey.mustache.partials
 
 import java.io.{File, PrintWriter}
 
-import org.scalatest.FunSpec
+import com.github.jimkinsey.mustache.TemplateFiles
+import org.scalatest.{Suite, BeforeAndAfterEach, FunSpec}
 import org.scalatest.Matchers._
 
-class FilePartialLoaderTests extends FunSpec {
+class FilePartialLoaderTests extends FunSpec with BeforeAndAfterEach with TemplateFiles {
 
   describe("A file partial loader") {
 
@@ -21,20 +22,8 @@ class FilePartialLoaderTests extends FunSpec {
 
   }
 
-  private val testPath = getClass.getResource("/templates").getPath
+  val templateDirName = "file-partial-loader-tests"
 
-  private def loader: FilePartialLoader = new FilePartialLoader(testPath)
-
-  private def templateFile(name: String, content: String): File = templateFile(name, Some(content))
-
-  private def templateFile(name: String, content: Option[String] = None): File = {
-    val file = new File(s"$testPath/$name.mustache")
-    content.foreach { template =>
-      val writer = new PrintWriter(file)
-      writer.write(template)
-      writer.close()
-    }
-    file
-  }
+  private def loader: FilePartialLoader = new FilePartialLoader(templateDirPath)
 
 }

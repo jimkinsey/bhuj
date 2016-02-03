@@ -1,7 +1,5 @@
 package com.github.jimkinsey.mustache
 
-import java.io.{File, PrintWriter}
-
 import com.github.jimkinsey.mustache.context.ContextImplicits
 import com.github.jimkinsey.mustache.tags.SectionStart.Lambda
 import org.scalatest.FunSpec
@@ -9,25 +7,25 @@ import org.scalatest.Matchers._
 
 import scala.language.postfixOps
 
-class IntegrationTests extends FunSpec {
+class IntegrationTests extends FunSpec with TemplateFiles {
   import ContextImplicits._
   import MustacheBuilder._
 
   describe("Mustache rendering") {
 
     it("allows for rapid turnaround by not caching template files") {
-      val mustache = mustacheRenderer.withTemplatePath(templatePath).withoutCache
-      writeTemplate("greeting", "hello {{name}}")
+      val mustache = mustacheRenderer.withTemplatePath(templateDirPath).withoutCache
+      require(templateFile("greeting", "hello {{name}}").exists())
       mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
-      writeTemplate("greeting", "Hello {{name}}")
-      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("Hello Jim"))
+      require(templateFile("greeting", "HELLO {{name}}").exists())
+      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("HELLO Jim"))
     }
 
     it("allows for better performance by caching template files") {
-      val mustache = mustacheRenderer.withTemplatePath(templatePath).withCache
-      writeTemplate("greeting", "hello {{name}}")
+      val mustache = mustacheRenderer.withTemplatePath(templateDirPath).withCache
+      require(templateFile("greeting", "hello {{name}}").exists())
       mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
-      writeTemplate("greeting", "Hello {{name}}")
+      require(templateFile("greeting", "HELLO {{name}}").exists())
       mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
     }
 
@@ -41,14 +39,7 @@ class IntegrationTests extends FunSpec {
 
   }
 
-  private val templatePath: String = getClass.getClassLoader.getResource("templates").getPath
-
-  private def writeTemplate(name: String, content: String) = {
-    val file = new File(s"$templatePath/$name.mustache")
-    val writer = new PrintWriter(file)
-    writer.write(content)
-    writer.close()
-  }
+  val templateDirName = "integration-tests"
 
   private case class Person(name: String)
 
