@@ -26,7 +26,6 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("does not escape when the variable is triple-delimited") {
-        pending
         mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 

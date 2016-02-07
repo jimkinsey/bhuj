@@ -8,16 +8,12 @@ class VariableParserTests extends FunSpec {
 
   describe("A variable parser") {
 
-    it("does not match if the first char is not a letter or underscore") {
-      Set("*ABC", "+abc", "1bc").foreach { name => VariableParser.pattern.findFirstMatchIn(name) should not be defined }
-    }
-
-    it("does not match if the remaining chars are not a letter, undercore, number or plus sign") {
-      Set("A*", "a{", "a`").foreach { name => VariableParser.pattern.findFirstMatchIn(name) should not be defined }
+    it("does not match if the name contains inappropriate chars") {
+      Set("*ABC", "+abc", "1bc").foreach { name => VariableParser.pattern.findPrefixMatchOf(name) should not be defined }
     }
 
     it("matches if the first char is not a letter or underscore") {
-      Set("ABC", "abc", "_bc").foreach { name => VariableParser.pattern.findFirstMatchIn(name) should be(defined) }
+      Set("ABC", "abc", "_bc").foreach { name => VariableParser.pattern.findPrefixMatchOf(name) should be(defined) }
     }
 
     it("returns a variable component with the name") {

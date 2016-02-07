@@ -1,11 +1,13 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.TemplateParser.{TagParseFailure, UnrecognisedTag}
+import com.github.jimkinsey.mustache.TemplateParser.{InvalidParserPattern, TagParseFailure, UnrecognisedTag}
 import com.github.jimkinsey.mustache.components.Text
 import com.github.jimkinsey.mustache.rendering.Renderer.Context
 import com.github.jimkinsey.mustache.rendering.{Component, Template}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+
+import scala.util.matching.Regex
 
 class TemplateParserTests extends FunSpec {
 
@@ -20,7 +22,7 @@ class TemplateParserTests extends FunSpec {
     }
 
     it("fails if no tag parser is registered which matches the tag content") {
-      parser.parse("what {{bar}}") should be(Left(UnrecognisedTag(5, "bar")))
+      parser.parse("what {{bar}}") should be(Left(UnrecognisedTag(5)))
     }
 
     it("fails if the found tag parser fails") {
@@ -44,11 +46,27 @@ class TemplateParserTests extends FunSpec {
     }
 
     it("returns the first unrecognised tag") {
-      parser.parse("{{succeed}}{{unknown}}{{fail}}") should be(Left(UnrecognisedTag(11, "unknown")))
+      parser.parse("{{succeed}}{{unknown}}{{fail}}") should be(Left(UnrecognisedTag(11)))
     }
 
     it("passes the name of the tag to the tag parser") {
       parser.parse("{{succeed}}") should be(Right(Template(NamedComponent("succeed"))))
+    }
+
+    it("only matches the name from directly after the start delimiter") {
+      parser.parse("{{donotsucceed}}") should be(Left(UnrecognisedTag(0)))
+    }
+
+    it("only matches the name up to the end delimiter") {
+      parser.parse("{{succeednot}}") should be(Left(UnrecognisedTag(0)))
+    }
+
+    it("matches if chars from the end of the name are in the start of the end delimiter") {
+      parser.parse("{{{succeed}}}") should be(Right(Template(NamedComponent("TRIPLE:succeed"))))
+    }
+
+    it("fails if the parser does not have any groups in the regex pattern") {
+      parser.parse("{{invalid}}") should be(Left(InvalidParserPattern(invalid.pattern)))
     }
 
   }
@@ -69,10 +87,20 @@ class TemplateParserTests extends FunSpec {
   }
 
   private val failing = new TagParser {
-    lazy val pattern = "fail".r
+    lazy val pattern = "(fail)".r
     def parsed(name: String) = Left(failure)
   }
 
-  private val parser: TemplateParser = new TemplateParser(tagParsers = Seq(succeeding, failing))
+  private val triple_braces = new TagParser {
+    lazy val pattern = """\{(succeed)\}""".r
+    def parsed(name: String) = Right(NamedComponent(s"TRIPLE:$name"))
+  }
+
+  private val invalid = new TagParser {
+    lazy val pattern: Regex = """invalid""".r
+    def parsed(name: String) = ???
+  }
+
+  private val parser: TemplateParser = new TemplateParser(tagParsers = Seq(succeeding, failing, triple_braces, invalid))
 
 }

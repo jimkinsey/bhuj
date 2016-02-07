@@ -6,7 +6,9 @@ import com.github.jimkinsey.mustache.rendering.Renderer._
 import scala.util.matching.Regex
 import scala.util.matching.Regex.Match
 
-private[mustache] case class Template(components: Component*)
+private[mustache] case class Template(components: Component*) {
+  def append(template: Template) = Template(components ++ template.components :_*)
+}
 
 private[mustache] object Component {
   trait Failure
