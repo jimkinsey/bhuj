@@ -3,7 +3,7 @@ package com.github.jimkinsey.mustache.components
 import com.github.jimkinsey.mustache.Context
 
 private[mustache] sealed trait Component {
-  def rendered(context: Context): Either[Any, String]
+  def rendered(context: Context)(implicit global: Context): Either[Any, String]
 }
 private[mustache] trait Value extends Component
 private[mustache] trait Container extends Component {
@@ -17,8 +17,8 @@ private[mustache] object Template {
 
 private[mustache] case class Template(components: Component*) extends Component {
   def append(template: Template) = Template(components ++ template.components :_*)
-  def rendered(context: Context) = components.foldLeft(Template.emptyResult) {
-    case (Right(acc), component) => component.rendered(context).right.map(acc + _)
+  def rendered(context: Context)(implicit global: Context) = components.foldLeft(Template.emptyResult) {
+    case (Right(acc), component) => component.rendered(global ++ context).right.map(acc + _)
     case (failure: Left[Any, String], _) => failure
   }
 }

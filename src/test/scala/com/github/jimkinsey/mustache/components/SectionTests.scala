@@ -1,11 +1,13 @@
 package com.github.jimkinsey.mustache.components
 
+import com.github.jimkinsey.mustache._
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
 
 class SectionTests extends FunSpec {
+  implicit val global: Context = Map.empty
 
   describe("A section component") {
 

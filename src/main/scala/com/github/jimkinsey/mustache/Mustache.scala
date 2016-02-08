@@ -14,7 +14,7 @@ object Mustache {
 
 class Mustache(
   templates: Templates = emptyTemplates,
-  globalContext: Context = Map.empty) {
+  implicit val globalContext: Context = Map.empty) {
 
   private lazy val templateParser: TemplateParser = new TemplateParser(tagParsers = Seq(
     VariableParser,

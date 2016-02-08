@@ -32,7 +32,6 @@ class IntegrationTests extends FunSpec {
     }
 
     it("provides a global context which is useful for localisation") {
-      pending
       val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
       val mustache = mustacheRenderer
         .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")

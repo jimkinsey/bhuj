@@ -37,7 +37,6 @@ class MustacheTests extends FunSpec {
     }
 
     it("can be constructed with a global context to pass to the Renderer") {
-      pending
       val mustache = new Mustache(globalContext = Map("theAnswer" -> 42))
       mustache.render("The answer is {{theAnswer}}") should be(Right("The answer is 42"))
     }

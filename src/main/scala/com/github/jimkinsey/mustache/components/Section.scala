@@ -11,7 +11,7 @@ object Section {
 }
 
 case class Section(name: String, template: Template) extends Container {
-  override def rendered(context: Context): Either[Any, String] = {
+  override def rendered(context: Context)(implicit global: Context): Either[Any, String] = {
     context.get(name).map {
       case true => template.rendered(context)
       case lambda: Lambda @unchecked => lambda(template, _.rendered(context))
@@ -26,7 +26,7 @@ case class Section(name: String, template: Template) extends Container {
 }
 
 case class InvertedSection(name: String, template: Template) extends Container {
-  override def rendered(context: Context): Either[Any, String] = {
+  override def rendered(context: Context)(implicit global: Context): Either[Any, String] = {
     context.get(name).map {
       case false => template.rendered(context)
       case iterable: Iterable[Context] @unchecked if iterable.isEmpty => template.rendered(context)

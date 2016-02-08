@@ -1,9 +1,11 @@
 package com.github.jimkinsey.mustache.components
 
+import com.github.jimkinsey.mustache._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class UnescapedVariableTests extends FunSpec {
+  implicit val global: Context = Map.empty
 
   describe("An unescaped variable") {
     it("returns an empty string if the key is not in the context") {
@@ -11,6 +13,16 @@ class UnescapedVariableTests extends FunSpec {
     }
 
     it("returns the value from the context when present") {
+      UnescapedVariable("name").rendered(Map("name" -> "Jim")) should be(Right("Jim"))
+    }
+
+    it("uses the value from the global context when not in the local") {
+      implicit val global: Context = Map("name" -> "Jim")
+      UnescapedVariable("name").rendered(Map.empty) should be(Right("Jim"))
+    }
+
+    it("overrides the value from the global context with the local") {
+      implicit val global: Context = Map("name" -> "James")
       UnescapedVariable("name").rendered(Map("name" -> "Jim")) should be(Right("Jim"))
     }
 

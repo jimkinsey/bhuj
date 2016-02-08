@@ -85,15 +85,15 @@ class TemplateParserTests extends FunSpec {
   private val failure = new TagParser.Failure {}
 
   private case class NamedComponent(name: String) extends Value {
-    def rendered(context: Context) = ???
+    def rendered(context: Context)(implicit global: Context) = ???
   }
 
   private case class NamedContainer(name: String, template: Template) extends Container {
-    def rendered(context: Context) = ???
+    def rendered(context: Context)(implicit global: Context) = ???
   }
 
   private val component = new Value {
-    def rendered(context: Context) = ???
+    def rendered(context: Context)(implicit global: Context) = ???
   }
 
   private val succeeding = new ValueTagParser {

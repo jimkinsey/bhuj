@@ -1,12 +1,14 @@
 package com.github.jimkinsey.mustache.rendering
 
-import com.github.jimkinsey.mustache.components.{Template, Component}
+import com.github.jimkinsey.mustache.components.{Variable, Template, Component}
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
+import com.github.jimkinsey.mustache.Context
 
 class TemplateTests extends FunSpec {
+  implicit val global: Context = Map.empty
 
   describe("A template") {
 
@@ -27,6 +29,11 @@ class TemplateTests extends FunSpec {
       val component2 = mock[Component]
       when(component2.rendered(Map.empty)).thenReturn(Right("Y"))
       Template(component1, component2).rendered(Map.empty) should be(Right("XY"))
+    }
+
+    it("uses values in the global context") {
+      implicit val global: Context = Map("x" -> 2, "y" -> 3)
+      Template(Variable("x"), Variable("y")).rendered(Map("x" -> 1)) should be(Right("13"))
     }
 
   }

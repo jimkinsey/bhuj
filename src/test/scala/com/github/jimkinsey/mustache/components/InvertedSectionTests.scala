@@ -1,11 +1,13 @@
 package com.github.jimkinsey.mustache.components
 
+import com.github.jimkinsey.mustache._
 import org.scalatest.FunSpec
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.Matchers._
 
 class InvertedSectionTests extends FunSpec {
+  implicit val global: Context = Map.empty
 
   describe("An inverted section") {
 
@@ -30,6 +32,7 @@ class InvertedSectionTests extends FunSpec {
     it("renders once when the key does not exist") {
       new InvertedSection("section", Template(Text("a"))).rendered(Map.empty) should be(Right("a"))
     }
+
   }
 
 }
