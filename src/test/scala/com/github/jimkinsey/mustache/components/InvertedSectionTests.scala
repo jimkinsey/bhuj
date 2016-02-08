@@ -21,6 +21,10 @@ class InvertedSectionTests extends FunSpec {
       new InvertedSection("section", Template(Text("a"))).rendered(Map("section" -> false)) should be(Right("a"))
     }
 
+    it("renders the template once when the value is none") {
+      new InvertedSection("section", Template(Text("a"))).rendered(Map("section" -> None)) should be(Right("a"))
+    }
+
     it("renders nothing when the value is true") {
       new InvertedSection("section", Template(Text("a"))).rendered(Map("section" -> true)) should be(Right(""))
     }

@@ -23,6 +23,10 @@ class SectionTests extends FunSpec {
       new Section("things", Template()).rendered(Map("things" -> List.empty)) should be(Right(""))
     }
 
+    it("does not render if the named value in the context is an undefined option") {
+      new Section("maybe", Template(Text("a"))).rendered(Map("Maybe" -> None)) should be(Right(""))
+    }
+
     it("returns the failure if the named value is a lambda which fails") {
       val failingLambda: Section.Lambda = (_, _) => Left("lol")
       new Section("wrap", Template()).rendered(Map("wrap" -> failingLambda)) should be(Left("lol"))
@@ -43,6 +47,11 @@ class SectionTests extends FunSpec {
     it("renders the section once in the current context if it is true") {
       val template = Template(Text("a"))
       new Section("doIt", template).rendered(Map("doIt" -> true)) should be(Right("a"))
+    }
+
+    it("renders the section once in the current context if the item is a defined option") {
+      val template = Template(Text("a"))
+      new Section("maybe", template).rendered(Map("maybe" -> Some(Map.empty))) should be(Right("a"))
     }
 
     it("renders the section for each item in a non-empty iterable with the item as the context") {

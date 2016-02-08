@@ -68,6 +68,16 @@ class CanContextualiseMapTests extends FunSpec {
         "wall" -> List(List(Map("length" -> 2)))
       )))
     }
+
+    it("contextualises a case class in an option") {
+      case class House(name: String)
+      when(caseClassConverter.map(any[House])).thenReturn(Right(Map("name" -> "dunromin")))
+      context(Map(
+        "house" -> Some(House("dunromin"))
+      )) should be(Right(Map(
+        "house" -> Some(Map("name" -> "dunromin"))
+      )))
+    }
   }
 
   private val caseClassConverter = mock[CaseClassConverter]

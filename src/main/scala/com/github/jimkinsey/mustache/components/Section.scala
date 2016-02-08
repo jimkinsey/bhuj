@@ -20,6 +20,7 @@ case class Section(name: String, template: Template) extends Container {
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)
         case (Left(fail), _) => Left(fail)
       }
+      case Some(ctx: Context) => template.rendered(ctx)
       case _ => emptyResult
     }.getOrElse(emptyResult)
   }
@@ -29,6 +30,7 @@ case class InvertedSection(name: String, template: Template) extends Container {
   override def rendered(context: Context)(implicit global: Context): Either[Any, String] = {
     context.get(name).map {
       case false => template.rendered(context)
+      case None => template.rendered(context)
       case iterable: Iterable[Context] @unchecked if iterable.isEmpty => template.rendered(context)
       case _ => emptyResult
     }.getOrElse(template.rendered(context))
