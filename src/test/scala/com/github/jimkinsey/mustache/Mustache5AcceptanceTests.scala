@@ -141,7 +141,6 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("a comment") {
-      pending
 
       it("is not rendered") {
         mustacheRenderer.render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
