@@ -1,9 +1,9 @@
 package com.github.jimkinsey.mustache
 
+import com.github.jimkinsey.mustache.components.Section.Lambda
 import com.github.jimkinsey.mustache.partials.FilePartialLoader
 import com.github.jimkinsey.mustache.rendering.Renderer.Context
 import com.github.jimkinsey.mustache.partials.Caching._
-import com.github.jimkinsey.mustache.tags.SectionStart.Lambda
 
 import scala.language.implicitConversions
 

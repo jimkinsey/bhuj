@@ -2,8 +2,8 @@ package com.github.jimkinsey.mustache
 
 import java.io.{File, PrintWriter}
 
+import com.github.jimkinsey.mustache.components.Section.Lambda
 import com.github.jimkinsey.mustache.context.ContextImplicits
-import com.github.jimkinsey.mustache.tags.SectionStart.Lambda
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

@@ -3,7 +3,6 @@ package com.github.jimkinsey.mustache
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
 import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.parsing.{SectionParser, UnescapedVariableParser, VariableParser}
-import com.github.jimkinsey.mustache.rendering.Renderer
 import com.github.jimkinsey.mustache.rendering.Renderer.Context
 
 object Mustache {
@@ -19,7 +18,6 @@ class Mustache(
   globalContext: Context = Map.empty) {
 
   private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser, UnescapedVariableParser, SectionParser))
-  private val renderer = new Renderer()
 
   def this(map: Map[String,String]) = {
     this(map.get _)
@@ -28,7 +26,9 @@ class Mustache(
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
     for {
       template <- templates(name).toRight({TemplateNotFound(name)}).right
-      result <- render(template, context).right
+      parsed <- templateParser.parse(template).right
+      ctx <- ev.context(context).right
+      result <- parsed.rendered(ctx).right
     } yield { result }
   }
 
@@ -36,14 +36,14 @@ class Mustache(
     for {
       parsed <- templateParser.parse(template).right
       ctx <- ev.context(context).right
-      rendered <- renderer.render(parsed, ctx).right
+      rendered <- parsed.rendered(ctx).right
     } yield { rendered }
   }
 
   def render(template: String): Either[Any, String] = {
     for {
       parsed <- templateParser.parse(template).right
-      rendered <- renderer.render(parsed).right
+      rendered <- parsed.rendered(Map.empty).right
     } yield { rendered }
   }
 
