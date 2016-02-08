@@ -22,7 +22,9 @@ case class MustacheBuilder(
   def withTemplates(templates: (String, String)*) = copy(templates = Some(templates.toMap))
   def withCache = copy(cached = true)
   def withoutCache = copy(cached = false)
+  def withCacheEnabled(enabled: Boolean) = copy(cached = enabled)
   def withHelpers(helpers: (String, Lambda)*) = copy(globalContext = globalContext ++ helpers.toMap)
+  def withGlobalValues(pairs: (String, Any)*) = copy(globalContext = globalContext ++ pairs.toMap)
 
   lazy val build = {
     val partials: Mustache.Templates =
