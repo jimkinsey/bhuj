@@ -2,7 +2,7 @@ package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
 import com.github.jimkinsey.mustache.context.CanContextualise
-import com.github.jimkinsey.mustache.parsing.{SectionParser, UnescapedVariableParser, VariableParser}
+import com.github.jimkinsey.mustache.parsing.{InvertedSectionParser, SectionParser, UnescapedVariableParser, VariableParser}
 
 object Mustache {
   trait Failure
@@ -16,7 +16,7 @@ class Mustache(
   templates: Templates = emptyTemplates,
   globalContext: Context = Map.empty) {
 
-  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser, UnescapedVariableParser, SectionParser))
+  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser, UnescapedVariableParser, SectionParser, InvertedSectionParser))
 
   def this(map: Map[String,String]) = {
     this(map.get _)

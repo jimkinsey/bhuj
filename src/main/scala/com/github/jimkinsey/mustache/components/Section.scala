@@ -7,7 +7,7 @@ object Section {
   type Render = (Template, Context) => Either[Any,String]
   type NonContextualRender = (Template) => Either[Any,String]
   type Lambda = (Template, NonContextualRender) => Either[Any,String]
-  private val emptyResult: Either[Any,String] = Right("")
+  val emptyResult: Either[Any,String] = Right("")
 }
 
 case class Section(name: String, template: Template) extends Container {
@@ -22,5 +22,15 @@ case class Section(name: String, template: Template) extends Container {
       }
       case _ => emptyResult
     }.getOrElse(emptyResult)
+  }
+}
+
+case class InvertedSection(name: String, template: Template) extends Container {
+  override def rendered(context: Context): Either[Any, String] = {
+    context.get(name).map {
+      case false => template.rendered(context)
+      case iterable: Iterable[Context] @unchecked if iterable.isEmpty => template.rendered(context)
+      case _ => emptyResult
+    }.getOrElse(template.rendered(context))
   }
 }

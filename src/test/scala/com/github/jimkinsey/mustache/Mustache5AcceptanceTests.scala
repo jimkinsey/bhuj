@@ -113,7 +113,6 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("an inverted section tag") {
-      pending
 
       it("renders once when the key doesn't exist") {
         mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
