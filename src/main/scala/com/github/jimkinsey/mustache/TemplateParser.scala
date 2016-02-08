@@ -6,7 +6,7 @@ import com.github.jimkinsey.mustache.parsing.{ContainerTagParser, ValueTagParser
 
 import scala.util.matching.Regex
 
-object TemplateParser {
+private[mustache] object TemplateParser {
   sealed trait Failure
   case class UnrecognisedTag(index: Int) extends Failure
   case class TagParseFailure(index: Int, failure: Any) extends Failure

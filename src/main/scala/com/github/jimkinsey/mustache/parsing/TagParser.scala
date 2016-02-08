@@ -4,18 +4,18 @@ import com.github.jimkinsey.mustache.components.{Container, Template, Value}
 
 import scala.util.matching.Regex
 
-object TagParser {
+private[mustache] object TagParser {
   trait Failure
 }
 
-sealed trait TagParser {
+private[mustache] sealed trait TagParser {
   def pattern: Regex
 }
 
-trait ValueTagParser extends TagParser {
+private[mustache] trait ValueTagParser extends TagParser {
   def parsed(name: String): Either[Any, Value]
 }
 
-trait ContainerTagParser extends TagParser {
+private[mustache] trait ContainerTagParser extends TagParser {
   def parsed(name: String, template: Template): Either[Any, Container]
 }

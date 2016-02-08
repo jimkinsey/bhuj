@@ -1,6 +1,5 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.components.Section.Lambda
 import com.github.jimkinsey.mustache.partials.FilePartialLoader
 import com.github.jimkinsey.mustache.partials.Caching._
 
