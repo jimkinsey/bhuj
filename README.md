@@ -19,8 +19,6 @@ Results in `Hello Charlotte!`.
 Roadmap
 ---
 * support set delimiter tag
-* strict mode i.e. require keys to be present and usable in the context of the tag
 * improve README - more examples
-* refactor the section-type tags so that there is a distinction between value and section tags - should simplify code
 * Mustache should return Mustache.Failure, NOT Any
 * Tidy up the template parser
