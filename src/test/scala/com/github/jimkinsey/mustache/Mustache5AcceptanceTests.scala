@@ -156,7 +156,6 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("a partial") {
-      pending
 
       it("is rendered once in the current context") {
         mustacheRenderer.withTemplates("user" -> "<strong>{{name}}</strong>").render(

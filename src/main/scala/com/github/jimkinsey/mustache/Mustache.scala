@@ -16,7 +16,14 @@ class Mustache(
   templates: Templates = emptyTemplates,
   globalContext: Context = Map.empty) {
 
-  private val templateParser = new TemplateParser(tagParsers = Seq(VariableParser, UnescapedVariableParser, SectionParser, InvertedSectionParser, CommentParser))
+  private lazy val templateParser: TemplateParser = new TemplateParser(tagParsers = Seq(
+    VariableParser,
+    UnescapedVariableParser,
+    SectionParser,
+    InvertedSectionParser,
+    CommentParser,
+    new PartialParser(templates, templateParser)
+  ))
 
   def this(map: Map[String,String]) = {
     this(map.get _)
