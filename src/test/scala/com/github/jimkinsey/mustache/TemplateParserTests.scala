@@ -1,11 +1,8 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.TemplateParser.{InvalidParserPattern, TagParseFailure, UnclosedTag, UnrecognisedTag}
-import com.github.jimkinsey.mustache.components.Section.Render
-import com.github.jimkinsey.mustache.components.Text
+import com.github.jimkinsey.mustache.components.{Container, Template, Text, Value}
 import com.github.jimkinsey.mustache.parsing.{ContainerTagParser, TagParser, ValueTagParser}
-import com.github.jimkinsey.mustache.rendering.Renderer.Context
-import com.github.jimkinsey.mustache.rendering.{Container, Template, Value}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -92,7 +89,7 @@ class TemplateParserTests extends FunSpec {
   }
 
   private case class NamedContainer(name: String, template: Template) extends Container {
-    def rendered(context: Context, render: Render) = ???
+    def rendered(context: Context) = ???
   }
 
   private val component = new Value {

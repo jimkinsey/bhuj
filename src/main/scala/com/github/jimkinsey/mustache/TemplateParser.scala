@@ -1,9 +1,8 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.TemplateParser._
-import com.github.jimkinsey.mustache.components.Text
+import com.github.jimkinsey.mustache.components.{Template, Text}
 import com.github.jimkinsey.mustache.parsing.{ContainerTagParser, ValueTagParser, TagParser}
-import com.github.jimkinsey.mustache.rendering.Template
 
 import scala.util.matching.Regex
 

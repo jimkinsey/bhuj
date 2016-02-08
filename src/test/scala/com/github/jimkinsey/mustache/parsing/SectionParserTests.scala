@@ -1,6 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.rendering.Template
+import com.github.jimkinsey.mustache.components.Template
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

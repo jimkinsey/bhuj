@@ -1,7 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.components.Section
-import com.github.jimkinsey.mustache.rendering.Template
+import com.github.jimkinsey.mustache.components.{Template, Section}
 
 import scala.util.matching.Regex
 

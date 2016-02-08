@@ -1,10 +1,10 @@
 package com.github.jimkinsey.mustache.rendering
 
-import com.github.jimkinsey.mustache.rendering.Renderer.Context
+import com.github.jimkinsey.mustache.components.{Template, Component}
+import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
-import org.mockito.Mockito.when
 
 class TemplateTests extends FunSpec {
 

@@ -3,7 +3,6 @@ package com.github.jimkinsey.mustache
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
 import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.parsing.{SectionParser, UnescapedVariableParser, VariableParser}
-import com.github.jimkinsey.mustache.rendering.Renderer.Context
 
 object Mustache {
   trait Failure
