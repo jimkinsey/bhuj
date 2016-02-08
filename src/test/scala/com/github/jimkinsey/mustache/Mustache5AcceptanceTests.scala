@@ -1,7 +1,7 @@
 package com.github.jimkinsey.mustache
 
+import com.github.jimkinsey.mustache.components.Section.Lambda
 import com.github.jimkinsey.mustache.context.ContextImplicits
-import com.github.jimkinsey.mustache.rendering.Renderer
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -32,7 +32,6 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("a section tag") {
-      pending
 
       it("does not render when the key is not in the context") {
         mustacheRenderer.render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
@@ -82,15 +81,14 @@ class Mustache5AcceptanceTests extends FunSpec {
         }
 
       it("invokes the lambda with the unprocessed template and a render method") {
+        val wrapped: Lambda = (template, render) => Right(s"<b>${render(template).right.get}</b>")
         mustacheRenderer.render(
             template = """{{#wrapped}}
               |  {{name}} is awesome.
               |{{/wrapped}}""".stripMargin,
             context = Map(
               "name" -> "Willy",
-              "wrapped" -> {
-                (template: String, render: (String => Either[Renderer.Failure, String])) => Right(s"<b>${render(template).right.get}</b>")
-              })
+              "wrapped" -> wrapped)
           ) should be(Right(
           """<b>
             |  Willy is awesome.

@@ -1,9 +1,8 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.TagParser
-import com.github.jimkinsey.mustache.components.{UnescapedVariable, Variable}
+import com.github.jimkinsey.mustache.components.UnescapedVariable
 
-private[mustache] object UnescapedVariableParser extends TagParser {
+private[mustache] object UnescapedVariableParser extends ValueTagParser {
   override lazy val pattern = """\{([a-zA-Z_][a-zA-Z_0-9]*)\}""".r
   override def parsed(name: String) = Right(UnescapedVariable(name))
 }

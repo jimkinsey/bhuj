@@ -1,9 +1,11 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.TemplateParser.{InvalidParserPattern, TagParseFailure, UnrecognisedTag}
+import com.github.jimkinsey.mustache.TemplateParser.{InvalidParserPattern, TagParseFailure, UnclosedTag, UnrecognisedTag}
+import com.github.jimkinsey.mustache.components.Section.Render
 import com.github.jimkinsey.mustache.components.Text
+import com.github.jimkinsey.mustache.parsing.{ContainerTagParser, TagParser, ValueTagParser}
 import com.github.jimkinsey.mustache.rendering.Renderer.Context
-import com.github.jimkinsey.mustache.rendering.{Component, Template}
+import com.github.jimkinsey.mustache.rendering.{Container, Template, Value}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -69,38 +71,59 @@ class TemplateParserTests extends FunSpec {
       parser.parse("{{invalid}}") should be(Left(InvalidParserPattern(invalid.pattern)))
     }
 
+    it("fails if a container tag does not have a closing tag") {
+      parser.parse("{{#section}}This is unclosed") should be(Left(UnclosedTag(0)))
+    }
+
+    it("fails if the content of the container tag cannot be parsed") {
+      parser.parse("{{#section}}{{fail}}{{/section}}") should be(Left(TagParseFailure(0, failure))) // FIXME this should be 12!!!
+    }
+
+    it("parses the content of the container tag") {
+      parser.parse("{{#section}}{{succeed}}{{/section}}") should be(Right(Template(NamedContainer("section", Template(NamedComponent("succeed"))))))
+    }
+
   }
 
   private val failure = new TagParser.Failure {}
 
-  private case class NamedComponent(name: String) extends Component {
+  private case class NamedComponent(name: String) extends Value {
     def rendered(context: Context) = ???
   }
 
-  private val component = new Component {
+  private case class NamedContainer(name: String, template: Template) extends Container {
+    def rendered(context: Context, render: Render) = ???
+  }
+
+  private val component = new Value {
     def rendered(context: Context) = ???
   }
 
-  private val succeeding = new TagParser {
+  private val succeeding = new ValueTagParser {
     lazy val pattern = "(succeed)".r
     def parsed(name: String) = Right(NamedComponent(name))
   }
 
-  private val failing = new TagParser {
+  private val failing = new ValueTagParser {
     lazy val pattern = "(fail)".r
     def parsed(name: String) = Left(failure)
   }
 
-  private val triple_braces = new TagParser {
+  private val triple_braces = new ValueTagParser {
     lazy val pattern = """\{(succeed)\}""".r
     def parsed(name: String) = Right(NamedComponent(s"TRIPLE:$name"))
   }
 
-  private val invalid = new TagParser {
+  private val invalid = new ValueTagParser {
     lazy val pattern: Regex = """invalid""".r
     def parsed(name: String) = ???
   }
 
-  private val parser: TemplateParser = new TemplateParser(tagParsers = Seq(succeeding, failing, triple_braces, invalid))
+  private val section = new ContainerTagParser {
+    lazy val pattern: Regex = """#(section)""".r
+    def parsed(name: String, template: Template) = Right(NamedContainer(name, template))
+  }
+
+  private val parser: TemplateParser = new TemplateParser(tagParsers = Seq(succeeding, failing, triple_braces, invalid, section))
 
 }
