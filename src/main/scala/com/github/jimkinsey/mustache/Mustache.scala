@@ -3,6 +3,7 @@ package com.github.jimkinsey.mustache
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
 import com.github.jimkinsey.mustache.context.CanContextualise
 import com.github.jimkinsey.mustache.parsing._
+import com.github.jimkinsey.mustache.partials.Caching
 
 object Mustache {
   trait Failure
@@ -25,6 +26,8 @@ class Mustache(
     new PartialParser(templates, templateParser)
   ))
 
+  private val parse = Caching.cached(templateParser.parse _)
+
   def this(map: Map[String,String]) = {
     this(map.get _)
   }
@@ -32,7 +35,7 @@ class Mustache(
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
     for {
       template <- templates(name).toRight({TemplateNotFound(name)}).right
-      parsed <- templateParser.parse(template).right
+      parsed <- parse(template).right
       ctx <- ev.context(context).right
       result <- parsed.rendered(ctx).right
     } yield { result }
