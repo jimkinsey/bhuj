@@ -171,6 +171,21 @@ class Mustache5AcceptanceTests extends FunSpec {
               |""".stripMargin))
         }
       }
+
+      it("is rendered at runtime and so may be recursive") {
+        pendingUntilFixed {
+          mustacheRenderer
+            .withTemplates("child" -> "{{name}} {{#child}}{{> child}}{{/child}}")
+            .renderTemplate("child", Map(
+              "name" -> "Grandma",
+              "child" -> Map(
+                "name" -> "Mum",
+                "child" -> Map("name" -> "Me")
+            ))) should be(Right(
+              "Grandma Mum Me"
+            ))
+        }
+      }
     }
   }
 }
