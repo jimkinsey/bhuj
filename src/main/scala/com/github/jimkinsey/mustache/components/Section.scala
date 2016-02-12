@@ -20,7 +20,7 @@ case class Section(name: String, template: Template) extends Container {
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)
         case (Left(fail), _) => Left(fail)
       }
-      case Some(ctx: Context) => template.rendered(ctx)
+      case Some(ctx: Context @unchecked) => template.rendered(ctx)
       case _ => emptyResult
     }.getOrElse(emptyResult)
   }

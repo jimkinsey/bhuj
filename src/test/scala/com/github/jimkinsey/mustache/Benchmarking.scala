@@ -28,9 +28,14 @@ object Benchmarking extends App {
     .withTemplatePath(getClass.getClassLoader.getResource("templates").getPath)
     .withCache
     .withHelpers("localised" -> ((template, rendered) => Right("LOCALISED!!!")))
+  def doRun =  mustache.renderTemplate("page", context)
+  val coldStart = System.currentTimeMillis()
+  val coldRun = doRun
+  val coldDuration = System.currentTimeMillis() - coldStart
+  println(s"Cold run took ${coldDuration}ms")
   val start = System.currentTimeMillis()
   val results = (1 to runs).map(_ => {
-    mustache.renderTemplate("page", context)
+    doRun
   })
   val duration = System.currentTimeMillis() - start
   val avg = duration.toFloat / runs.toFloat

@@ -17,17 +17,6 @@ class Mustache(
   templates: Templates = emptyTemplates,
   implicit val globalContext: Context = Map.empty) {
 
-  private lazy val templateParser: TemplateParser = new TemplateParser(tagParsers = Seq(
-    VariableParser,
-    UnescapedVariableParser,
-    SectionParser,
-    InvertedSectionParser,
-    CommentParser,
-    new PartialParser(templates, templateParser)
-  ))
-
-  private val parse = Caching.cached(templateParser.parse _)
-
   def this(map: Map[String,String]) = {
     this(map.get _)
   }
@@ -43,7 +32,7 @@ class Mustache(
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
     for {
-      parsed <- templateParser.parse(template).right
+      parsed <- parse(template).right
       ctx <- ev.context(context).right
       rendered <- parsed.rendered(ctx).right
     } yield { rendered }
@@ -51,9 +40,12 @@ class Mustache(
 
   def render(template: String): Either[Any, String] = {
     for {
-      parsed <- templateParser.parse(template).right
+      parsed <- parse(template).right
       rendered <- parsed.rendered(Map.empty).right
     } yield { rendered }
   }
+
+  private lazy val templateParser = new TemplateParser(TextParser, VariableParser, UnescapedVariableParser, CommentParser, SectionParser, InvertedSectionParser)
+  private lazy val parse = Caching.cached(templateParser.template)
 
 }
