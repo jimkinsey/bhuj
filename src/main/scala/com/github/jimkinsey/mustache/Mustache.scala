@@ -48,7 +48,8 @@ class Mustache(
   private lazy val templateParser: TemplateParser = new TemplateParser(
     TextParser,
     VariableParser,
-    UnescapedVariableParser,
+    TripleDelimitedVariableParser,
+    AmpersandPrefixedVariableParser,
     CommentParser,
     SectionParser,
     InvertedSectionParser,

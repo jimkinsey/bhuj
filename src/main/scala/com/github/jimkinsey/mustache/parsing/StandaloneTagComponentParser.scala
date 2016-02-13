@@ -13,8 +13,13 @@ trait StandaloneTagComponentParser[+T <: Component] extends ComponentParser[T] {
   }
 }
 
-object UnescapedVariableParser extends StandaloneTagComponentParser[UnescapedVariable] {
+object TripleDelimitedVariableParser extends StandaloneTagComponentParser[UnescapedVariable] {
   lazy val contentPattern = "\\{([a-zA-Z0-9]+?)\\}"
+  lazy val constructor = UnescapedVariable.apply _
+}
+
+object AmpersandPrefixedVariableParser extends StandaloneTagComponentParser[UnescapedVariable] {
+  lazy val contentPattern = "&([a-zA-Z0-9]+?)"
   lazy val constructor = UnescapedVariable.apply _
 }
 

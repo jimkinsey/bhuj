@@ -28,6 +28,10 @@ class Mustache5AcceptanceTests extends FunSpec {
         mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
+      it("does not escape when the variable starts with an ampersand") {
+        mustacheRenderer.render("{{&html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+      }
+
     }
 
     describe("a section tag") {
@@ -182,6 +186,10 @@ class Mustache5AcceptanceTests extends FunSpec {
             "Grandma Mum Me "
           ))
       }
+    }
+
+    describe("set delimiters") {
+      pending
     }
   }
 }
