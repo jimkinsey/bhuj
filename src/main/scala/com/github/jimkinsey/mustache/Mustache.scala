@@ -45,7 +45,15 @@ class Mustache(
     } yield { rendered }
   }
 
-  private lazy val templateParser = new TemplateParser(TextParser, VariableParser, UnescapedVariableParser, CommentParser, SectionParser, InvertedSectionParser)
+  private lazy val templateParser: TemplateParser = new TemplateParser(
+    TextParser,
+    VariableParser,
+    UnescapedVariableParser,
+    CommentParser,
+    SectionParser,
+    InvertedSectionParser,
+    new PartialParser(templates, templateParser.template _))
+
   private lazy val parse = Caching.cached(templateParser.template)
 
 }

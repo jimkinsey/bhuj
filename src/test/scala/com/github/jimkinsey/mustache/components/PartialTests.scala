@@ -21,6 +21,16 @@ class PartialTests extends FunSpec {
       val template: Template = Template(Variable("foo"))
       new Partial("partial", template).rendered(Map("foo" -> 42)) should be(Right("42"))
     }
+
+    it("can work recursively") {
+      lazy val template: Template = Template(
+        Variable("name"),
+        Section("child", Template(Text(" "), new Partial("person", template))))
+      new Partial("person", template).rendered(Map(
+        "name" -> "Mum",
+        "child" -> Map(
+          "name" -> "Me"))) should be(Right("Mum Me"))
+    }
   }
 
 }
