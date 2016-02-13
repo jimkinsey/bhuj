@@ -12,25 +12,15 @@ class PartialTests extends FunSpec {
   describe("A partial component") {
 
     it("propagates failure to render the template") {
-      val failing = mock[Template]
-      when(failing.rendered(Map.empty)).thenReturn(Left("BOOM!"))
-      new Partial("partial", failing).rendered(Map.empty) should be(Left("BOOM!"))
+      val rendered: (String, Context) => Either[Any, String] = (_,_) => Left("BOOM!")
+      new Partial("partial", rendered).rendered(Map.empty) should be(Left("BOOM!"))
     }
 
-    it("renders the template in the provided context") {
-      val template: Template = Template(Variable("foo"))
-      new Partial("partial", template).rendered(Map("foo" -> 42)) should be(Right("42"))
+    it("renders the named template in the provided context") {
+      val rendered: (String, Context) => Either[Any, String] = (_,_) => Right("42")
+      new Partial("partial", rendered).rendered(Map("foo" -> 42)) should be(Right("42"))
     }
 
-    it("can work recursively") {
-      lazy val template: Template = Template(
-        Variable("name"),
-        Section("child", Template(Text(" "), new Partial("person", template))))
-      new Partial("person", template).rendered(Map(
-        "name" -> "Mum",
-        "child" -> Map(
-          "name" -> "Me"))) should be(Right("Mum Me"))
-    }
   }
 
 }
