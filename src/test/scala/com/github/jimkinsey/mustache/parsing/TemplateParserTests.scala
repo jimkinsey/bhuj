@@ -7,10 +7,6 @@ import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.{FunSpec, Tag}
 
-
-
-
-
 class TemplateParserTests extends FunSpec {
   import org.mockito.Matchers.{any, eq => equalTo}
   private implicit val parserConfig = ParserConfig(_ => ???)

@@ -4,11 +4,11 @@ import com.github.jimkinsey.mustache.components.{InvertedSection, Section, Templ
 import com.github.jimkinsey.mustache.parsing.ContainerTagComponentParser.UnclosedTag
 import scala.util.matching.Regex.quote
 
-object ContainerTagComponentParser {
+private[mustache] object ContainerTagComponentParser {
   case object UnclosedTag
 }
 
-trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
+private[mustache] trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   def prefix: String
   def constructor: (String, Template) => T
 
@@ -38,12 +38,12 @@ trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   }
 }
 
-object SectionParser extends ContainerTagComponentParser[Section] {
+private[mustache] object SectionParser extends ContainerTagComponentParser[Section] {
   lazy val prefix = "#"
   lazy val constructor = Section.apply _
 }
 
-object InvertedSectionParser extends ContainerTagComponentParser[InvertedSection] {
+private[mustache] object InvertedSectionParser extends ContainerTagComponentParser[InvertedSection] {
   lazy val prefix = "^"
   lazy val constructor = InvertedSection.apply _
 }

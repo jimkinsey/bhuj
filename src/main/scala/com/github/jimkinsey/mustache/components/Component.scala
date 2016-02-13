@@ -2,20 +2,20 @@ package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.Context
 
-sealed trait Component {
+private[mustache] sealed trait Component {
   def rendered(context: Context)(implicit global: Context): Either[Any, String]
 }
-trait Value extends Component
-trait Container extends Component {
+private[mustache] trait Value extends Component
+private[mustache] trait Container extends Component {
   def template: Template
 }
 
-object Template {
+private[mustache] object Template {
   type Result = Either[Any, String]
   val emptyResult: Result = Right("")
 }
 
-case class Template(components: Component*) extends Component {
+private[mustache] case class Template(components: Component*) extends Component {
   def append(template: Template) = Template(components ++ template.components :_*)
   def rendered(context: Context)(implicit global: Context) = components.foldLeft(Template.emptyResult) {
     case (Right(acc), component) => component.rendered(global ++ context).right.map(acc + _)

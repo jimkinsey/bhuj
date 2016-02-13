@@ -2,7 +2,7 @@ package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.components.Text
 
-object TextParser extends ComponentParser[Text] {
+private[mustache] object TextParser extends ComponentParser[Text] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Any, Option[ParseResult[Text]]] = {
     if (template == "") return Right(None)
     val i = template.indexOf("{{")

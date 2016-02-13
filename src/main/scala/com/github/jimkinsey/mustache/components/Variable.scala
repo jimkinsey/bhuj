@@ -2,8 +2,10 @@ package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.Context
 
-case class Variable(name: String) extends Value {
-  def rendered(context: Context)(implicit global: Context) = Right((global ++ context).get(name).map(_.toString).map(escapeHTML).getOrElse(""))
+private[mustache] case class Variable(name: String) extends Value {
+  def rendered(context: Context)(implicit global: Context) = {
+    Right((global ++ context).get(name).map(_.toString).map(escapeHTML).getOrElse(""))
+  }
 
   private def escapeHTML(str: String) = str.foldLeft("") { case (acc, char) => acc + escapeCode.getOrElse(char, char) }
 

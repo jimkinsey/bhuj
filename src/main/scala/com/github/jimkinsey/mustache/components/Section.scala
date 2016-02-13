@@ -3,15 +3,15 @@ package com.github.jimkinsey.mustache.components
 import com.github.jimkinsey.mustache.Context
 import com.github.jimkinsey.mustache.components.Section.{Lambda, emptyResult}
 
-object Section {
+private[mustache] object Section {
   type Render = (Template, Context) => Either[Any,String]
   type NonContextualRender = (Template) => Either[Any,String]
   type Lambda = (Template, NonContextualRender) => Either[Any,String]
   val emptyResult: Either[Any,String] = Right("")
 }
 
-case class Section(name: String, template: Template) extends Container {
-  override def rendered(context: Context)(implicit global: Context): Either[Any, String] = {
+private[mustache] case class Section(name: String, template: Template) extends Container {
+  def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case true => template.rendered(context)
       case lambda: Lambda @unchecked => lambda(template, _.rendered(context))
@@ -26,8 +26,8 @@ case class Section(name: String, template: Template) extends Container {
   }
 }
 
-case class InvertedSection(name: String, template: Template) extends Container {
-  override def rendered(context: Context)(implicit global: Context): Either[Any, String] = {
+private[mustache] case class InvertedSection(name: String, template: Template) extends Container {
+  def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case false => template.rendered(context)
       case None => template.rendered(context)
