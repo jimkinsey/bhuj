@@ -12,13 +12,52 @@ Assuming a template `greeting.mustache` with content `Hello {{name}}!` is in the
 
     val mustache = mustacheRenderer.withTemplatePath("templates")
     case class Person(name: String)
-    mustache.render("greeting", Person(name = "Charlotte")).right.get
+    mustache.renderTemplate("greeting", Person(name = "Charlotte")).right.get
 
 Results in `Hello Charlotte!`.
+
+Caching
+---
+
+The mustache renderer may be set up to cache templates:
+
+    mustacheRenderer.withCache
+
+Global Context
+---
+
+Values which should be available in the context at all levels may be placed in a global context for the renderer:
+
+    mustacheRenderer
+      .withGlobalValues("n" -> 42)
+      .render("{{n}} {{#displayN}}{{n}}{{/displayN}}", Map("displayN" -> true))
+
+The global context is also a convenient place to put lambdas for tasks like localisation:
+
+    mustacheRenderer
+      .withHelpers("loc" -> loc)
+      .render("{{#loc}}Some UI text{{/loc}}")
+
+Contextualisation
+---
+
+A hook is provided by which any object may be converted to a mustache context for rendering, using typeclasses.
+
+Some basic typeclasses are provided which appropriately transform maps and case classes, and can be imported into scope like so:
+
+    import ContextImplicits._
+
+It is relatively straightforward to provide your own by implementing `CanContextualise[T]` and placing it implicitly in scope:
+
+    implicit object CanContextualiseInt extends CanContextualise[Int] {
+      def context(int: Int) = Right(Map("value" -> int))
+    }
+
+    mustache.render("The answer is {{value}}", 42)
 
 Roadmap
 ---
 * support set delimiter tag
-* improve README - more examples
 * Mustache should return Mustache.Failure, NOT Any
-* Tidy up the template parser
+* Tidy up the public API - Template should not be expose, just String
+* ScalaCheck tests?
