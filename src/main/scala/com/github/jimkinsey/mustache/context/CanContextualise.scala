@@ -1,7 +1,6 @@
 package com.github.jimkinsey.mustache.context
 
-import com.github.jimkinsey.mustache.rendering.Renderer
-import Renderer.Context
+import com.github.jimkinsey.mustache.Context
 
 object CanContextualise {
   trait Failure

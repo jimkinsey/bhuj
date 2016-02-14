@@ -1,7 +1,6 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.context.ContextImplicits
-import com.github.jimkinsey.mustache.rendering.Renderer
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -27,6 +26,10 @@ class Mustache5AcceptanceTests extends FunSpec {
 
       it("does not escape when the variable is triple-delimited") {
         mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+      }
+
+      it("does not escape when the variable starts with an ampersand") {
+        mustacheRenderer.render("{{&html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
       }
 
     }
@@ -81,15 +84,14 @@ class Mustache5AcceptanceTests extends FunSpec {
         }
 
       it("invokes the lambda with the unprocessed template and a render method") {
+        val wrapped: Lambda = (template, render) => Right(s"<b>${render(template).right.get}</b>")
         mustacheRenderer.render(
             template = """{{#wrapped}}
               |  {{name}} is awesome.
               |{{/wrapped}}""".stripMargin,
             context = Map(
               "name" -> "Willy",
-              "wrapped" -> {
-                (template: String, render: (String => Either[Renderer.Failure, String])) => Right(s"<b>${render(template).right.get}</b>")
-              })
+              "wrapped" -> wrapped)
           ) should be(Right(
           """<b>
             |  Willy is awesome.
@@ -172,7 +174,22 @@ class Mustache5AcceptanceTests extends FunSpec {
             |""".stripMargin))
       }
 
+      it("is rendered at runtime and so may be recursive") {
+        mustacheRenderer
+          .withTemplates("child" -> "{{name}} {{#child}}{{> child}}{{/child}}")
+          .renderTemplate("child", Map(
+            "name" -> "Grandma",
+            "child" -> Map(
+              "name" -> "Mum",
+              "child" -> Map("name" -> "Me")
+          ))) should be(Right(
+            "Grandma Mum Me "
+          ))
+      }
+    }
+
+    describe("set delimiters") {
+      pending
     }
   }
-
 }

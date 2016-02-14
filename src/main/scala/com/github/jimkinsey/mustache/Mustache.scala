@@ -1,12 +1,9 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
-import com.github.jimkinsey.mustache.rendering.Renderer
-import Renderer.Context
-import com.github.jimkinsey.mustache.context.CanContextualise
-import com.github.jimkinsey.mustache.tags._
-
-import Mustache._
+import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
+import com.github.jimkinsey.mustache.context.{CaseClassConverter, CanContextualiseMap, CanContextualise}
+import com.github.jimkinsey.mustache.parsing._
+import com.github.jimkinsey.mustache.partials.Caching
 
 object Mustache {
   trait Failure
@@ -18,39 +15,46 @@ object Mustache {
 
 class Mustache(
   templates: Templates = emptyTemplates,
-  globalContext: Context = Map.empty) {
-
-  private val renderer = new Renderer(
-    tags = Set(
-      Variable,
-      UnescapedVariable,
-      SectionStart,
-      InvertedSection,
-      Comment,
-      new Partial(templates)),
-    globalContext = globalContext
-  )
+  implicit val globalContext: Context = Map.empty) {
 
   def this(map: Map[String,String]) = {
     this(map.get _)
   }
 
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-    templates(name)
-      .map(Right.apply)
-      .getOrElse(Left(TemplateNotFound(name)))
-      .right
-      .flatMap { template =>
-        ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
-      }
+    for {
+      template <- templates(name).toRight({TemplateNotFound(name)}).right
+      parsed <- parse(template).right
+      ctx <- ev.context(context).right
+      result <- parsed.rendered(ctx).right
+    } yield { result }
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
-    ev.context(context).right.flatMap(ctx => renderer.render(template, ctx))
+    for {
+      parsed <- parse(template).right
+      ctx <- ev.context(context).right
+      rendered <- parsed.rendered(ctx).right
+    } yield { rendered }
   }
 
   def render(template: String): Either[Any, String] = {
-    renderer.render(template)
+    for {
+      parsed <- parse(template).right
+      rendered <- parsed.rendered(Map.empty).right
+    } yield { rendered }
   }
+
+  private lazy val templateParser: TemplateParser = new TemplateParser(
+    TextParser,
+    VariableParser,
+    TripleDelimitedVariableParser,
+    AmpersandPrefixedVariableParser,
+    CommentParser,
+    SectionParser,
+    InvertedSectionParser,
+    new PartialParser(this.renderTemplate(_,_)(new CanContextualiseMap(new CaseClassConverter))))
+
+  private lazy val parse = Caching.cached(templateParser.template)
 
 }
