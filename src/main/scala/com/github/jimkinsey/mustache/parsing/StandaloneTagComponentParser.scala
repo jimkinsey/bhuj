@@ -1,6 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.components.{Comment, Variable, UnescapedVariable, Component}
+import com.github.jimkinsey.mustache.components._
 
 private[mustache] trait StandaloneTagComponentParser[+T <: Component] extends ComponentParser[T] {
   def contentPattern: String
@@ -13,14 +13,14 @@ private[mustache] trait StandaloneTagComponentParser[+T <: Component] extends Co
   }
 }
 
-private[mustache] object TripleDelimitedVariableParser extends StandaloneTagComponentParser[UnescapedVariable] {
+private[mustache] object TripleDelimitedVariableParser extends StandaloneTagComponentParser[TripleDelimitedVariable] {
   lazy val contentPattern = "\\{([a-zA-Z0-9]+?)\\}"
-  lazy val constructor = UnescapedVariable.apply _
+  lazy val constructor = TripleDelimitedVariable.apply _
 }
 
-private[mustache] object AmpersandPrefixedVariableParser extends StandaloneTagComponentParser[UnescapedVariable] {
+private[mustache] object AmpersandPrefixedVariableParser extends StandaloneTagComponentParser[AmpersandPrefixedVariable] {
   lazy val contentPattern = "&([a-zA-Z0-9]+?)"
-  lazy val constructor = UnescapedVariable.apply _
+  lazy val constructor = AmpersandPrefixedVariable.apply _
 }
 
 private[mustache] object VariableParser extends StandaloneTagComponentParser[Variable] {

@@ -9,7 +9,7 @@ import org.scalatest.{FunSpec, Tag}
 
 class TemplateParserTests extends FunSpec {
   import org.mockito.Matchers.{any, eq => equalTo}
-  private implicit val parserConfig = ParserConfig(_ => ???)
+  private implicit val parserConfig = ParserConfig(_ => ???, (_,_) => ???)
 
   describe("A template parser") {
 

@@ -1,20 +1,20 @@
 package com.github.jimkinsey.mustache.components
 
-import com.github.jimkinsey.mustache.Context
-import com.github.jimkinsey.mustache.components.Section.{Lambda, emptyResult}
+import com.github.jimkinsey.mustache.components.Partial.Render
+import com.github.jimkinsey.mustache.components.Section.emptyResult
+import com.github.jimkinsey.mustache.{Context, Lambda}
 
 private[mustache] object Section {
   type Render = (Template, Context) => Either[Any,String]
   type NonContextualRender = (Template) => Either[Any,String]
-  type Lambda = (Template, NonContextualRender) => Either[Any,String]
   val emptyResult: Either[Any,String] = Right("")
 }
 
-private[mustache] case class Section(name: String, template: Template) extends Container {
+private[mustache] case class Section(name: String, template: Template, private val rendered: (String, Context) => Either[Any, String]) extends Container {
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case true => template.rendered(context)
-      case lambda: Lambda @unchecked => lambda(template, _.rendered(context))
+      case lambda: Lambda @unchecked => lambda(template.formatted, rendered(_, context))
       case map: Context @unchecked => template.rendered(map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)
@@ -24,9 +24,11 @@ private[mustache] case class Section(name: String, template: Template) extends C
       case _ => emptyResult
     }.getOrElse(emptyResult)
   }
+
+  lazy val formatted = s"{{#$name}}${template.formatted}{{/$name}}"
 }
 
-private[mustache] case class InvertedSection(name: String, template: Template) extends Container {
+private[mustache] case class InvertedSection(name: String, template: Template, render: Render) extends Container {
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case false => template.rendered(context)
@@ -35,4 +37,6 @@ private[mustache] case class InvertedSection(name: String, template: Template) e
       case _ => emptyResult
     }.getOrElse(template.rendered(context))
   }
+
+  lazy val formatted = s"{{^$name}}${template.formatted}{{/$name}}"
 }

@@ -4,6 +4,7 @@ import com.github.jimkinsey.mustache.Context
 
 private[mustache] sealed trait Component {
   def rendered(context: Context)(implicit global: Context): Either[Any, String]
+  def formatted: String
 }
 private[mustache] trait Value extends Component
 private[mustache] trait Container extends Component {
@@ -21,4 +22,6 @@ private[mustache] case class Template(components: Component*) extends Component 
     case (Right(acc), component) => component.rendered(global ++ context).right.map(acc + _)
     case (failure: Left[Any, String], _) => failure
   }
+
+  lazy val formatted = components.foldLeft("") { case (acc, component) => acc + component.formatted }
 }

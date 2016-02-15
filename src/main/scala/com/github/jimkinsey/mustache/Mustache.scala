@@ -1,7 +1,7 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
-import com.github.jimkinsey.mustache.context.{CaseClassConverter, CanContextualiseMap, CanContextualise}
+import com.github.jimkinsey.mustache.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import com.github.jimkinsey.mustache.parsing._
 import com.github.jimkinsey.mustache.partials.Caching
 
@@ -45,6 +45,8 @@ class Mustache(
     } yield { rendered }
   }
 
+  private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
+
   private lazy val templateParser: TemplateParser = new TemplateParser(
     TextParser,
     VariableParser,
@@ -53,7 +55,9 @@ class Mustache(
     CommentParser,
     SectionParser,
     InvertedSectionParser,
-    new PartialParser(this.renderTemplate(_,_)(new CanContextualiseMap(new CaseClassConverter))))
+    new PartialParser(this.renderTemplate(_,_)))
+
+  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context](_,_))
 
   private lazy val parse = Caching.cached(templateParser.template)
 

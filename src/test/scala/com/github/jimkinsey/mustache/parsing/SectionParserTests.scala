@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class SectionParserTests extends FunSpec {
-  private implicit val parserConfig = ParserConfig(t => Right(Template(Text(t))))
+  private implicit val parserConfig = ParserConfig(t => Right(Template(Text(t))), (_,_) => ???)
 
   describe("A section parser") {
 
@@ -39,7 +39,7 @@ class SectionParserTests extends FunSpec {
     }
 
     it("propagates a failure to parse the inner template") {
-      implicit val parserConfig = ParserConfig(_ => Left("BOOM"))
+      implicit val parserConfig = ParserConfig(_ => Left("BOOM"), (_,_) => ???)
       SectionParser.parseResult("{{#t}}fail{{/t}}") should be(Left("BOOM"))
     }
 

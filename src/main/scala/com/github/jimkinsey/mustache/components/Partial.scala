@@ -9,4 +9,5 @@ private[mustache] object Partial {
 
 private[mustache] class Partial(val name: String, val render: Render) extends Value {
   def rendered(context: Context)(implicit global: Context) = render(name, context)
+  lazy val formatted = s"{{> $name}}"
 }

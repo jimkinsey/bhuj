@@ -47,7 +47,7 @@ Some basic typeclasses are provided which appropriately transform maps and case 
 
     import ContextImplicits._
 
-It is relatively straightforward to provide your own by implementing `CanContextualise[T]` and placing it implicitly in scope:
+It is relatively straightforward to provide your own by implementing `CanContextualise[T]` which takes type `T` and converts it to a `Map[String, Any]` and placing it implicitly in scope:
 
     implicit object CanContextualiseInt extends CanContextualise[Int] {
       def context(int: Int) = Right(Map("value" -> int))
@@ -61,3 +61,4 @@ Roadmap
 * Mustache should return Mustache.Failure, NOT Any
 * Tidy up the public API - Template should not be expose, just String
 * ScalaCheck tests?
+* build script + fail on warning

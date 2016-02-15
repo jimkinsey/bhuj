@@ -1,5 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
+import com.github.jimkinsey.mustache.components.Partial.Render
 import com.github.jimkinsey.mustache.components.{InvertedSection, Section, Template, Container}
 import com.github.jimkinsey.mustache.parsing.ContainerTagComponentParser.UnclosedTag
 import scala.util.matching.Regex.quote
@@ -10,7 +11,7 @@ private[mustache] object ContainerTagComponentParser {
 
 private[mustache] trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   def prefix: String
-  def constructor: (String, Template) => T
+  def constructor: (String, Template, Render) => T
 
   final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Any, Option[ParseResult[T]]] = {
     s"""\\{\\{${quote(prefix)}(.+?)\\}\\}""".r.findPrefixMatchOf(template) match {
@@ -22,7 +23,7 @@ private[mustache] trait ContainerTagComponentParser[+T <: Container] extends Com
           case i if i < 0 => Left(UnclosedTag)
           case i =>
             parserConfig.parsed(afterOpenTag.substring(0, i)).right.map { template =>
-              Some(ParseResult(constructor(mtch.group(1), template), afterOpenTag.substring(i + s"{{/$key}}".length)))
+              Some(ParseResult(constructor(mtch.group(1), template, parserConfig.rendered), afterOpenTag.substring(i + s"{{/$key}}".length)))
             }
       }
     }

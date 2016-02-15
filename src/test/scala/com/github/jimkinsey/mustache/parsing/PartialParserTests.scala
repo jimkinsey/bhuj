@@ -5,7 +5,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class PartialParserTests extends FunSpec {
-  private lazy implicit val parseConfig = ParserConfig(_ => ???)
+  private lazy implicit val parseConfig = ParserConfig(_ => ???, (_,_) => ???)
 
   describe("A partial parser") {
 

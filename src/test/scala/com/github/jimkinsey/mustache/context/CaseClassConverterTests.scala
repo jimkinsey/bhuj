@@ -1,6 +1,6 @@
 package com.github.jimkinsey.mustache.context
 
-import com.github.jimkinsey.mustache.components.Section.Lambda
+import com.github.jimkinsey.mustache.Lambda
 import com.github.jimkinsey.mustache.context.CaseClassConverter.NotACaseClass
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

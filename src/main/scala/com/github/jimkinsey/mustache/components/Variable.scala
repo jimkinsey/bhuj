@@ -7,6 +7,8 @@ private[mustache] case class Variable(name: String) extends Value {
     Right((global ++ context).get(name).map(_.toString).map(escapeHTML).getOrElse(""))
   }
 
+  lazy val formatted = s"{{$name}}"
+
   private def escapeHTML(str: String) = str.foldLeft("") { case (acc, char) => acc + escapeCode.getOrElse(char, char) }
 
   private lazy val escapeCode = Map(
