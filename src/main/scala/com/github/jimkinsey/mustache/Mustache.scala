@@ -55,9 +55,10 @@ class Mustache(
     CommentParser,
     SectionParser,
     InvertedSectionParser,
-    new PartialParser(this.renderTemplate(_,_)))
+    new PartialParser(this.renderTemplate(_,_)),
+    SetDelimitersParser)
 
-  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context](_,_))
+  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context], Delimiters("{{", "}}"))
 
   private lazy val parse = Caching.cached(templateParser.template)
 

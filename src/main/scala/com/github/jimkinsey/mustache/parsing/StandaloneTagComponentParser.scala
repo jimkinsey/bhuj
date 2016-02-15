@@ -14,18 +14,21 @@ private[mustache] trait StandaloneTagComponentParser[+T <: Component] extends Co
 }
 
 private[mustache] object TripleDelimitedVariableParser extends StandaloneTagComponentParser[TripleDelimitedVariable] {
-  lazy val contentPattern = "\\{([a-zA-Z0-9]+?)\\}"
+  import VariableParser._
+  lazy val contentPattern = s"\\{($variableKeyPattern?)\\}"
   lazy val constructor = TripleDelimitedVariable.apply _
 }
 
 private[mustache] object AmpersandPrefixedVariableParser extends StandaloneTagComponentParser[AmpersandPrefixedVariable] {
-  lazy val contentPattern = "&([a-zA-Z0-9]+?)"
+  import VariableParser._
+  lazy val contentPattern = s"&($variableKeyPattern?)"
   lazy val constructor = AmpersandPrefixedVariable.apply _
 }
 
 private[mustache] object VariableParser extends StandaloneTagComponentParser[Variable] {
-  lazy val contentPattern = "([a-zA-Z0-9]+?)"
+  lazy val contentPattern = s"($variableKeyPattern?)"
   lazy val constructor = Variable.apply _
+  val variableKeyPattern = "[a-zA-Z0-9_]+"
 }
 
 private[mustache] object CommentParser extends StandaloneTagComponentParser[Comment] {

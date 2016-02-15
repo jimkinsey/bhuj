@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache.parsing.ParserConfig
 
 private[mustache] sealed trait Component {
   def rendered(context: Context)(implicit global: Context): Either[Any, String]
@@ -9,6 +10,10 @@ private[mustache] sealed trait Component {
 private[mustache] trait Value extends Component
 private[mustache] trait Container extends Component {
   def template: Template
+}
+private[mustache] trait ParserDirective extends Component {
+  final def rendered(context: Context)(implicit global: Context) = Right("")
+  def modified(implicit config: ParserConfig): ParserConfig
 }
 
 private[mustache] object Template {

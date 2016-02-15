@@ -1,11 +1,10 @@
 package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.components._
-import com.github.jimkinsey.mustache.parsing.ContainerTagComponentParser.UnclosedTag
 import org.mockito.Mockito.when
+import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
-import org.scalatest.{FunSpec, Tag}
 
 class TemplateParserTests extends FunSpec {
   import org.mockito.Matchers.{any, eq => equalTo}
@@ -53,6 +52,20 @@ class TemplateParserTests extends FunSpec {
       val abcComponent = mock[Component]
       when(abcParser.parseResult(equalTo("abc"))(any())).thenReturn(Right(Some(ParseResult(abcComponent, ""))))
       new TemplateParser(xyzParser, abcParser).template("xyzabc") should be(Right(Template(xyzComponent, abcComponent)))
+    }
+
+    it("uses the parser config provided by the component when it is a directive") {
+      val directiveParser = mock[ComponentParser[ParserDirective]]
+      val directive = mock[ParserDirective]
+      when(directiveParser.parseResult(equalTo("dirtail"))(any())).thenReturn(Right(Some(ParseResult(directive, "tail"))))
+      val newParserConfig = mock[ParserConfig]
+      when(directive.modified(parserConfig)).thenReturn(newParserConfig)
+
+      val tailParser = mock[ComponentParser[Component]]
+      val tail = mock[Component]
+      when(tailParser.parseResult(equalTo("tail"))(equalTo(newParserConfig))).thenReturn(Right(Some(ParseResult(tail, ""))))
+
+      new TemplateParser(directiveParser, tailParser).template("dirtail") should be(Right(Template(directive, tail)))
     }
 
   }

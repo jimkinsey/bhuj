@@ -189,7 +189,32 @@ class Mustache5AcceptanceTests extends FunSpec {
     }
 
     describe("set delimiters") {
-      pending
+
+      it("changes the tag delimiters to custom strings") {
+        pendingUntilFixed {
+          mustacheRenderer
+            .render(
+              """* {{default_tags}}
+              |{{=<% %>=}}
+              |* <% erb_style_tags %>
+              |<%={{ }}=%>
+              |* {{ default_tags_again }}
+              |""".
+                stripMargin,
+            context = Map(
+              "default_tags" -> 1,
+              "erb_style_tags" -> 2,
+              "default_tags_again" -> 3
+            )) should be(Right( """* 1
+                |
+                |* 2
+                |
+                |* 3
+                |""".stripMargin
+            ))
+        }
+      }
+
     }
   }
 }

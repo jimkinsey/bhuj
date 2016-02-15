@@ -41,6 +41,18 @@ class MustacheTests extends FunSpec {
       mustache.render("The answer is {{theAnswer}}") should be(Right("The answer is 42"))
     }
 
+    it("works for multiline templates") {
+      val mustache = new Mustache()
+      mustache.render(
+        """{{a}}
+          |{{b}}
+          |""".stripMargin, Map("a" -> 1, "b" -> 2)) should be(Right(
+        """1
+          |2
+          |""".stripMargin
+      ))
+    }
+
   }
 
 }

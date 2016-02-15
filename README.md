@@ -59,6 +59,5 @@ Roadmap
 ---
 * support set delimiter tag
 * Mustache should return Mustache.Failure, NOT Any
-* Tidy up the public API - Template should not be expose, just String
 * ScalaCheck tests?
 * build script + fail on warning

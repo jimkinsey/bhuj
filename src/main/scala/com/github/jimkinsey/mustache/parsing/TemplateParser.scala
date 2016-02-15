@@ -11,13 +11,16 @@ private[mustache] trait ComponentParser[+T <: Component] {
 
 private[mustache] case class ParserConfig(
   parsed: (String) => Either[Any, Template],
-  rendered: (String, Context) => Either[Any, String]
+  rendered: (String, Context) => Either[Any, String],
+  delimiters: Delimiters = Delimiters("{{", "}}")
 )
 
 private[mustache] class TemplateParser(componentParsers: ComponentParser[Component]*) {
 
   def template(raw: String)(implicit parserConfig: ParserConfig): Either[Any, Template] = {
     Stream(componentParsers:_*).map(_.parseResult(raw)).collectFirst {
+      case Right(Some(ParseResult(directive: ParserDirective, remainder))) =>
+        template(remainder)(directive.modified).right.map(tail => Template(directive).append(tail))
       case Right(Some(ParseResult(head, remainder))) =>
         template(remainder).right.map(tail => Template(head).append(tail))
       case Left(fail) =>
