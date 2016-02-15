@@ -9,7 +9,7 @@ private[mustache] object PartialParser {
 private[mustache] class PartialParser(rendered: Partial.Render) extends ComponentParser[Partial] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {
     Right(for {
-      res <- s"\\{\\{>\\s*(.+?)\\s*\\}\\}".r.findPrefixMatchOf(template)
+      res <- parserConfig.delimiters.pattern(s">\\s*(.+?)\\s*").r.findPrefixMatchOf(template)
       name = res.group(1)
       remainder = res.after.toString
     } yield ParseResult(new Partial(name, rendered), remainder))

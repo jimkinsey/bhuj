@@ -14,7 +14,7 @@ private[mustache] trait ContainerTagComponentParser[+T <: Container] extends Com
   def constructor: (String, Template, Render) => T
 
   final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Any, Option[ParseResult[T]]] = {
-    s"""\\{\\{${quote(prefix)}(.+?)\\}\\}""".r.findPrefixMatchOf(template) match {
+    parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {
       case None => Right(None)
       case Some(mtch) =>
         val key = mtch.group(1)
@@ -29,8 +29,8 @@ private[mustache] trait ContainerTagComponentParser[+T <: Container] extends Com
     }
   }
 
-  private def indexOfClosingTag(key: String, template: String): Int = {
-    s"""\\{\\{(.${quote(key)})\\}\\}""".r.findAllMatchIn(template).foldLeft[Either[Int, Int]](Left(0)) {
+  private def indexOfClosingTag(key: String, template: String)(implicit parserConfig: ParserConfig): Int = {
+    parserConfig.delimiters.pattern(s"""(.${quote(key)})""").r.findAllMatchIn(template).foldLeft[Either[Int, Int]](Left(0)) {
       case (Left(0), m) if m.group(1).startsWith("/")     => Right(m.start)
       case (Left(open), m) if m.group(1).startsWith("/")  => Left(open - 1)
       case (Left(open), m) if !m.group(1).startsWith("/") => Left(open + 1)

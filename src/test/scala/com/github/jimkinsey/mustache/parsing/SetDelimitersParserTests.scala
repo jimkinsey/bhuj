@@ -13,6 +13,22 @@ class SetDelimitersParserTests extends FunSpec {
       SetDelimitersParser.parseResult("{{=<% %>=}}") should be(Right(Some(ParseResult(SetDelimiters(Delimiters("<%", "%>")), ""))))
     }
 
+    it("returns a failure if the start delimiter contains whitespace") {
+      SetDelimitersParser.parseResult("{{= x x=}}") should be(Left(InvalidDelimiters(" x", "x")))
+    }
+
+    it("returns a failure if the start delimiter contains an equals sign") {
+      SetDelimitersParser.parseResult("{{=x= x=}}") should be(Left(InvalidDelimiters("x=", "x")))
+    }
+
+    it("returns a failure if the end delimiter contains an equals sign") {
+      SetDelimitersParser.parseResult("{{=x =x=}}") should be(Left(InvalidDelimiters("x", "=x")))
+    }
+
+    it("returns a failure if the end delimiter contains whitespace") {
+      SetDelimitersParser.parseResult("{{=x x =}}") should be(Left(InvalidDelimiters("x", "x ")))
+    }
+
   }
 
 }

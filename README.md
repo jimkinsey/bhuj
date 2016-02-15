@@ -57,7 +57,6 @@ It is relatively straightforward to provide your own by implementing `CanContext
 
 Roadmap
 ---
-* support set delimiter tag
 * Mustache should return Mustache.Failure, NOT Any
 * ScalaCheck tests?
 * build script + fail on warning

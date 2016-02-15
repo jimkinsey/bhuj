@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache
 
 import com.github.jimkinsey.mustache.context.ContextImplicits
+import com.github.jimkinsey.mustache.parsing.InvalidDelimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -191,28 +192,30 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("set delimiters") {
 
       it("changes the tag delimiters to custom strings") {
-        pendingUntilFixed {
-          mustacheRenderer
-            .render(
-              """* {{default_tags}}
-              |{{=<% %>=}}
-              |* <% erb_style_tags %>
-              |<%={{ }}=%>
-              |* {{ default_tags_again }}
-              |""".
-                stripMargin,
-            context = Map(
-              "default_tags" -> 1,
-              "erb_style_tags" -> 2,
-              "default_tags_again" -> 3
-            )) should be(Right( """* 1
-                |
-                |* 2
-                |
-                |* 3
-                |""".stripMargin
-            ))
-        }
+        mustacheRenderer
+          .render(
+            """* {{default_tags}}
+            |{{=<% %>=}}
+            |* <% erb_style_tags %>
+            |<%={{ }}=%>
+            |* {{ default_tags_again }}
+            |""".
+              stripMargin,
+          context = Map(
+            "default_tags" -> 1,
+            "erb_style_tags" -> 2,
+            "default_tags_again" -> 3
+          )) should be(Right( """* 1
+              |
+              |* 2
+              |
+              |* 3
+              |""".stripMargin
+          ))
+      }
+
+      it("may not use whitespace or the equals sign in the delimiters") {
+        mustacheRenderer.render("{{=<= = >=}}") should be(Left(InvalidDelimiters("<=", "= >")))
       }
 
     }

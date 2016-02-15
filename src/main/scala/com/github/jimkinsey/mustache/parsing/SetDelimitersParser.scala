@@ -2,15 +2,21 @@ package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.components.SetDelimiters
 
-import scala.util.matching.Regex.quote
-
 object SetDelimitersParser extends ComponentParser[SetDelimiters] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {
-    val s = quote(parserConfig.delimiters.start)
-    val e = quote(parserConfig.delimiters.end)
-    val res = s"""$s=(.+?) (.+?)=$e""".r.findFirstMatchIn(template).map { m =>
-      ParseResult(SetDelimiters(Delimiters(m.group(1), m.group(2))), m.after.toString)
+    parserConfig.delimiters.pattern(s"""=(.+?) (.+?)=""").r.findFirstMatchIn(template).fold(emptyResult) {
+      case m if valid(m.group(1), m.group(2))=>
+        Right(Some(ParseResult(SetDelimiters(Delimiters(m.group(1), m.group(2))), m.after.toString)))
+      case m  =>
+        Left(InvalidDelimiters(m.group(1), m.group(2)))
     }
-    Right(res)
   }
+
+  private val emptyResult: Either[Any, Option[ParseResult[SetDelimiters]]] = Right(None)
+
+  private def valid(start: String, end: String) = {
+    start.matches(validDelimiter) && end.matches(validDelimiter)
+  }
+
+  private val validDelimiter = "[^\\s=]+"
 }
