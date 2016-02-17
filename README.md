@@ -58,4 +58,4 @@ It is relatively straightforward to provide your own by implementing `CanContext
 Roadmap
 ---
 * ScalaCheck tests?
-* build script + fail on warning
+* fail on warning
