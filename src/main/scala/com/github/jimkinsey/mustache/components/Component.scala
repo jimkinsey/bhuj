@@ -1,8 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
-import com.github.jimkinsey.mustache
-import com.github.jimkinsey.mustache.{doubleMustaches, Context}
 import com.github.jimkinsey.mustache.parsing.{Delimiters, ParserConfig}
+import com.github.jimkinsey.mustache.{Context, doubleMustaches}
 
 private[mustache] sealed trait Component {
   def rendered(context: Context)(implicit global: Context): Either[Any, String]
@@ -36,7 +35,7 @@ private[mustache] case class Template(initialDelimiters: Delimiters, components:
   lazy val source = formatted(initialDelimiters)
 
   def formatted(delimiters: Delimiters) = components.foldLeft(("", delimiters)) {
-    case ((acc, delimiters), component: SetDelimiters) => (acc + component.formatted(delimiters), component.delimiters)
-    case ((acc, delimiters), component) => (acc + component.formatted(delimiters), delimiters)
+    case ((acc, previousDelimiters), component: SetDelimiters) => (acc + component.formatted(previousDelimiters), component.delimiters)
+    case ((acc, currentDelimiters), component) => (acc + component.formatted(currentDelimiters), currentDelimiters)
   }._1
 }
