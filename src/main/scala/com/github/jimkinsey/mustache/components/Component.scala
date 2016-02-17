@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
-import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache
+import com.github.jimkinsey.mustache.{doubleMustaches, Context}
 import com.github.jimkinsey.mustache.parsing.{Delimiters, ParserConfig}
 
 private[mustache] sealed trait Component {
@@ -21,7 +22,7 @@ private[mustache] object Template {
   val emptyResult: Result = Right("")
 
   def apply(components: Component*): Template = {
-    this(Delimiters("{{", "}}"), components:_*)
+    this(doubleMustaches, components:_*)
   }
 }
 

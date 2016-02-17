@@ -58,7 +58,7 @@ class Mustache(
     new PartialParser(this.renderTemplate(_,_)),
     SetDelimitersParser)
 
-  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context], Delimiters("{{", "}}"))
+  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context], doubleMustaches)
 
   private lazy val parse = Caching.cached(templateParser.template)
 

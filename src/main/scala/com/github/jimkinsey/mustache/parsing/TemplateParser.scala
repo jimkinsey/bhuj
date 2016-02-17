@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache
+import com.github.jimkinsey.mustache.{doubleMustaches, Context}
 import com.github.jimkinsey.mustache.components._
 
 private[mustache] case class ParseResult[+T <: Component](component: T, remainder: String)
@@ -12,7 +13,7 @@ private[mustache] trait ComponentParser[+T <: Component] {
 private[mustache] case class ParserConfig(
   parsed: (String) => Either[Any, Template],
   rendered: (String, Context) => Either[Any, String],
-  delimiters: Delimiters = Delimiters("{{", "}}")
+  delimiters: Delimiters = doubleMustaches
 )
 
 private[mustache] class TemplateParser(componentParsers: ComponentParser[Component]*) {
