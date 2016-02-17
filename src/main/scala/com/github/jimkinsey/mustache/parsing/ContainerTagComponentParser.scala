@@ -1,26 +1,23 @@
 package com.github.jimkinsey.mustache.parsing
 
+import com.github.jimkinsey.mustache.{Failure, UnclosedTag}
 import com.github.jimkinsey.mustache.components.Partial.Render
-import com.github.jimkinsey.mustache.components.{InvertedSection, Section, Template, Container}
-import com.github.jimkinsey.mustache.parsing.ContainerTagComponentParser.UnclosedTag
-import scala.util.matching.Regex.quote
+import com.github.jimkinsey.mustache.components.{Container, InvertedSection, Section, Template}
 
-private[mustache] object ContainerTagComponentParser {
-  case object UnclosedTag
-}
+import scala.util.matching.Regex.quote
 
 private[mustache] trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   def prefix: String
   def constructor: (String, Template, Render) => T
 
-  final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Any, Option[ParseResult[T]]] = {
+  final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Failure, Option[ParseResult[T]]] = {
     parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {
       case None => Right(None)
       case Some(mtch) =>
         val key = mtch.group(1)
         val afterOpenTag = mtch.after.toString
         indexOfClosingTag(key, afterOpenTag) match {
-          case i if i < 0 => Left(UnclosedTag)
+          case i if i < 0 => Left(UnclosedTag(key))
           case i =>
             parserConfig.parsed(afterOpenTag.substring(0, i)).right.map { template =>
               Some(ParseResult(

@@ -13,8 +13,9 @@ class InvertedSectionTests extends FunSpec {
 
     it("propagates a failure from the template") {
       val failing = mock[Template]
-      when(failing.rendered(Map("section" -> false))).thenReturn(Left("BOOM"))
-      new InvertedSection("section", failing, render).rendered(Map("section" -> false)) should be(Left("BOOM"))
+      val failure = mock[Failure]
+      when(failing.rendered(Map("section" -> false))).thenReturn(Left(failure))
+      new InvertedSection("section", failing, render).rendered(Map("section" -> false)) should be(Left(failure))
     }
 
     it("renders the template once when the value is false") {
@@ -39,6 +40,6 @@ class InvertedSectionTests extends FunSpec {
 
   }
 
-  private val render: (String, Context) => Either[Any, String] = (str, ctx) => Right(s"Rendered: $str")
+  private val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
 
 }

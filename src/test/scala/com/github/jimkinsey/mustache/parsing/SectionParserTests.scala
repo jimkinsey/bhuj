@@ -1,9 +1,10 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.components.{Text, Template}
-import com.github.jimkinsey.mustache.parsing.ContainerTagComponentParser.UnclosedTag
+import com.github.jimkinsey.mustache.{Failure, UnclosedTag}
+import com.github.jimkinsey.mustache.components.{Template, Text}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+import org.scalatest.mock.MockitoSugar._
 
 class SectionParserTests extends FunSpec {
   private implicit val parserConfig = ParserConfig(t => Right(Template(Text(t))), (_,_) => ???)
@@ -19,11 +20,11 @@ class SectionParserTests extends FunSpec {
     }
 
     it("fails if there is no closing tag") {
-      SectionParser.parseResult("{{#section}}unclosed") should be(Left(UnclosedTag))
+      SectionParser.parseResult("{{#section}}unclosed") should be(Left(UnclosedTag("section")))
     }
 
     it("fails if there is a closing tag whose name does not match") {
-      SectionParser.parseResult("{{#section}}wrong{{/noitces}}") should be(Left(UnclosedTag))
+      SectionParser.parseResult("{{#section}}wrong{{/noitces}}") should be(Left(UnclosedTag("section")))
     }
 
     it("returns a section with the correct name") {
@@ -39,8 +40,9 @@ class SectionParserTests extends FunSpec {
     }
 
     it("propagates a failure to parse the inner template") {
-      implicit val parserConfig = ParserConfig(_ => Left("BOOM"), (_,_) => ???)
-      SectionParser.parseResult("{{#t}}fail{{/t}}") should be(Left("BOOM"))
+      val failure = mock[Failure]
+      implicit val parserConfig = ParserConfig(_ => Left(failure), (_,_) => ???)
+      SectionParser.parseResult("{{#t}}fail{{/t}}") should be(Left(failure))
     }
 
     it("allows for a nested section with the same key") {

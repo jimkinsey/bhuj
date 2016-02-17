@@ -29,14 +29,16 @@ class SectionTests extends FunSpec {
     }
 
     it("returns the failure if the named value is a lambda which fails") {
-      val failingLambda: Lambda = (_, _) => Left("lol")
-      new Section("wrap", Template(), render).rendered(Map("wrap" -> failingLambda)) should be(Left("lol"))
+      val failure = mock[Failure]
+      val failingLambda: Lambda = (_, _) => Left(failure)
+      new Section("wrap", Template(), render).rendered(Map("wrap" -> failingLambda)) should be(Left(failure))
     }
 
     it("returns the failure if the named value is a non-false value which fails to render") {
+      val failure = mock[Failure]
       val failing = mock[Template]
-      when(failing.rendered(Map("a" -> 1))).thenReturn(Left("lol"))
-      new Section("thing", failing, render).rendered(Map("thing" -> Map("a" -> 1))) should be(Left("lol"))
+      when(failing.rendered(Map("a" -> 1))).thenReturn(Left(failure))
+      new Section("thing", failing, render).rendered(Map("thing" -> Map("a" -> 1))) should be(Left(failure))
     }
 
     it("renders the section once using the value as a context if it is a map") {
@@ -62,7 +64,7 @@ class SectionTests extends FunSpec {
 
     it("renders the section once for a lambda") {
       val template = Template(Text("a"))
-      val render: (String, Context) => Either[Any, String] = (str, ctx) => Right(s"Rendered: $str")
+      val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
       val lambda: Lambda = (template, rendered) => Right(s"LAMBDA'D: ${rendered(template).right.get}")
       new Section("wrap", template, render).rendered(Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: Rendered: a"))
     }
@@ -72,6 +74,6 @@ class SectionTests extends FunSpec {
     }
   }
 
-  private val render: (String, Context) => Either[Any, String] = (str, ctx) => Right(s"Rendered: $str")
+  private val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
 
 }

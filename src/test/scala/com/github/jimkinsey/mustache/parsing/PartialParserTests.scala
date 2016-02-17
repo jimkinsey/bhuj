@@ -1,6 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
-import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache.{Result, Context}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -22,7 +22,7 @@ class PartialParserTests extends FunSpec {
     }
 
     it("sets up the partial with the named-template-rendering function") {
-      val render: (String, Context) => Either[Any,String] = (_,_) => ???
+      val render: (String, Context) => Result = (_,_) => ???
       new PartialParser(render).parseResult("{{> partial}}").right.get.get.component.render should be(render)
     }
   }

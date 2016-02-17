@@ -1,10 +1,9 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.context.{ContextImplicits, CanContextualise}
-import CanContextualise.ContextualisationFailure
-import com.github.jimkinsey.mustache.Mustache.TemplateNotFound
+import com.github.jimkinsey.mustache.context.{CanContextualise, ContextImplicits}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+import org.scalatest.mock.MockitoSugar._
 
 class MustacheTests extends FunSpec {
   import ContextImplicits.canContextualiseMap
@@ -20,16 +19,17 @@ class MustacheTests extends FunSpec {
     }
 
     it("returns the failure if the contextualiser cannot produce a context") {
-      implicit object IntCanContextualise$ extends CanContextualise[Int] {
-        def context(i: Int) = Left(ContextualisationFailure("Ints cannot be maps"))
+      val failure = mock[CanContextualise.Failure]
+      implicit object IntCanContextualise extends CanContextualise[Int] {
+        def context(i: Int) = Left(failure)
       }
       val mustache = new Mustache(templates = Map("x" -> "x={{x}}").get)
-      mustache.renderTemplate("x", 42) should be(Left(ContextualisationFailure("Ints cannot be maps")))
+      mustache.renderTemplate("x", 42) should be(Left(ContextualisationFailure(failure)))
     }
 
     it("uses the available evidence to produce a context for rendering") {
       case class Person(name: String)
-      implicit object PersonCanContextualise$ extends CanContextualise[Person] {
+      implicit object PersonCanContextualise extends CanContextualise[Person] {
         def context(person: Person) = Right(Map("name" -> person.name))
       }
       val mustache = new Mustache(templates = Map("greeting" -> "Hello {{name}}!").get)
@@ -51,6 +51,14 @@ class MustacheTests extends FunSpec {
           |2
           |""".stripMargin
       ))
+    }
+
+    it("fails with an unclosed tag failure when a section tag is not closed") {
+      new Mustache().render("0123{{#sec}}unclosed") should be(Left(UnclosedTag("sec")))
+    }
+
+    it("fails with an invalid delimiters failure when invalid delimiters are used in a set delimiters tag") {
+      new Mustache().render("{{== = =}}") should be(Left(InvalidDelimiters("=", "= ")))
     }
 
   }

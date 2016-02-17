@@ -9,7 +9,7 @@ private[mustache] trait StandaloneTagComponentParser[+T <: Component] extends Co
   final def parseResult(template: String)(implicit parserConfig: ParserConfig) = {
     Right(parserConfig.delimiters.pattern(contentPattern).r.findPrefixMatchOf(template).map { tagMatch =>
       ParseResult[T](constructor(tagMatch.group(1)), tagMatch.after.toString)
-    })         // also need failure conditions for pattern being invalid
+    })
   }
 }
 

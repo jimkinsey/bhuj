@@ -1,5 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
+import com.github.jimkinsey.mustache.InvalidDelimiters
 import com.github.jimkinsey.mustache.components.SetDelimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

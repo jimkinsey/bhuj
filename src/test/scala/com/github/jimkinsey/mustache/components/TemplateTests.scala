@@ -1,7 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
-import com.github.jimkinsey.mustache.Context
 import com.github.jimkinsey.mustache.parsing.Delimiters
+import com.github.jimkinsey.mustache.{Context, Failure}
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -17,7 +17,7 @@ class TemplateTests extends FunSpec {
     }
 
     it("propagates the failure of any components") {
-      val failure = "BOOM"
+      val failure = mock[Failure]
       val failing = mock[Component]
       when(failing.rendered(Map.empty)).thenReturn(Left(failure))
       Template(failing).rendered(Map.empty) should be(Left(failure))

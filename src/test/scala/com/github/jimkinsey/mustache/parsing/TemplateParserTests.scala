@@ -1,5 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
+import com.github.jimkinsey.mustache.Failure
 import com.github.jimkinsey.mustache.components._
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
@@ -18,18 +19,19 @@ class TemplateParserTests extends FunSpec {
     }
 
     it("propagates the failure of one of its component parsers") {
-      val failure = "BOOM!"
+      val failure = mock[Failure]
       val failing = mock[ComponentParser[Component]]
       when(failing.parseResult(equalTo("abc"))(any())).thenReturn(Left(failure))
       new TemplateParser(failing).template("abc") should be(Left(failure))
     }
 
     it("fails fast") {
+      val failure = mock[Failure]
       val failing1 = mock[ComponentParser[Component]]
-      when(failing1.parseResult(equalTo("abc"))(any())).thenReturn(Left(1))
+      when(failing1.parseResult(equalTo("abc"))(any())).thenReturn(Left(failure))
       val failing2 = mock[ComponentParser[Component]]
-      when(failing2.parseResult(equalTo("abc"))(any())).thenReturn(Left(2))
-      new TemplateParser(failing1, failing2).template("abc") should be(Left(1))
+      when(failing2.parseResult(equalTo("abc"))(any())).thenReturn(Left(failure))
+      new TemplateParser(failing1, failing2).template("abc") should be(Left(failure))
     }
 
     it("returns an empty template if no parser matches") {

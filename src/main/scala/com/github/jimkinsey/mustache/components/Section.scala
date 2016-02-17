@@ -3,15 +3,14 @@ package com.github.jimkinsey.mustache.components
 import com.github.jimkinsey.mustache.components.Partial.Render
 import com.github.jimkinsey.mustache.components.Section.emptyResult
 import com.github.jimkinsey.mustache.parsing.Delimiters
-import com.github.jimkinsey.mustache.{Context, Lambda}
+import com.github.jimkinsey.mustache.{Result, Failure, Context, Lambda}
 
 private[mustache] object Section {
-  type Render = (Template, Context) => Either[Any,String]
-  type NonContextualRender = (Template) => Either[Any,String]
-  val emptyResult: Either[Any,String] = Right("")
+  type Render = (Template, Context) => Result
+  val emptyResult: Result = Right("")
 }
 
-private[mustache] case class Section(name: String, template: Template, private val rendered: (String, Context) => Either[Any, String]) extends Container {
+private[mustache] case class Section(name: String, template: Template, private val rendered: (String, Context) => Result) extends Container {
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case true => template.rendered(context)

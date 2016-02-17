@@ -1,14 +1,11 @@
 package com.github.jimkinsey.mustache
 
-import com.github.jimkinsey.mustache.Mustache.{TemplateNotFound, _}
+import com.github.jimkinsey.mustache.Mustache._
 import com.github.jimkinsey.mustache.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import com.github.jimkinsey.mustache.parsing._
 import com.github.jimkinsey.mustache.partials.Caching
 
 object Mustache {
-  trait Failure
-  case class TemplateNotFound(name: String) extends Failure
-
   type Templates = (String => Option[String])
   lazy val emptyTemplates: Templates = Map.empty.get
 }
@@ -21,24 +18,24 @@ class Mustache(
     this(map.get _)
   }
 
-  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
+  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Result = {
     for {
       template <- templates(name).toRight({TemplateNotFound(name)}).right
       parsed <- parse(template).right
-      ctx <- ev.context(context).right
+      ctx <- ev.context(context).left.map(ContextualisationFailure).right
       result <- parsed.rendered(ctx).right
     } yield { result }
   }
 
-  def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Either[Any, String] = {
+  def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Result = {
     for {
       parsed <- parse(template).right
-      ctx <- ev.context(context).right
+      ctx <- ev.context(context).left.map(ContextualisationFailure).right
       rendered <- parsed.rendered(ctx).right
     } yield { rendered }
   }
 
-  def render(template: String): Either[Any, String] = {
+  def render(template: String): Result = {
     for {
       parsed <- parse(template).right
       rendered <- parsed.rendered(Map.empty).right

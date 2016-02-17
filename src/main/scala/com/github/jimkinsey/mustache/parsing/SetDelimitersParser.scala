@@ -1,5 +1,6 @@
 package com.github.jimkinsey.mustache.parsing
 
+import com.github.jimkinsey.mustache.{Failure, InvalidDelimiters}
 import com.github.jimkinsey.mustache.components.SetDelimiters
 
 object SetDelimitersParser extends ComponentParser[SetDelimiters] {
@@ -12,7 +13,9 @@ object SetDelimitersParser extends ComponentParser[SetDelimiters] {
     }
   }
 
-  private val emptyResult: Either[Any, Option[ParseResult[SetDelimiters]]] = Right(None)
+  type Result[T] = Either[Failure, Option[ParseResult[T]]]
+
+  private val emptyResult: Either[Failure, Option[ParseResult[SetDelimiters]]] = Right(None)
 
   private def valid(start: String, end: String) = {
     start.matches(validDelimiter) && end.matches(validDelimiter)
