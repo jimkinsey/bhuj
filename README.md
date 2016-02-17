@@ -57,7 +57,5 @@ It is relatively straightforward to provide your own by implementing `CanContext
 
 Roadmap
 ---
-* Mustache should return Mustache.Failure, NOT Any
-* Parse failure feedback should be better - include index of failure
 * ScalaCheck tests?
 * build script + fail on warning
