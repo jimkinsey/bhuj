@@ -5,6 +5,7 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.EitherValues._
 
 class TemplateParserTests extends FunSpec {
   import org.mockito.Matchers.{any, eq => equalTo}
@@ -35,6 +36,11 @@ class TemplateParserTests extends FunSpec {
       val abcParser = mock[ComponentParser[Component]]
       when(abcParser.parseResult(equalTo("xyz"))(any())).thenReturn(Right(None))
       new TemplateParser(abcParser).template("xyz") should be(Right(Template()))
+    }
+
+    it("returns a template with the initial delimiters from the parser config") {
+      val newParserConfig = parserConfig.copy(delimiters = Delimiters("A", "B"))
+      new TemplateParser().template("")(newParserConfig).right.value.initialDelimiters should be(Delimiters("A", "B"))
     }
 
     it("returns a template containing the component from the successful parse result") {

@@ -20,12 +20,12 @@ private[mustache] class TemplateParser(componentParsers: ComponentParser[Compone
   def template(raw: String)(implicit parserConfig: ParserConfig): Either[Any, Template] = {
     Stream(componentParsers:_*).map(_.parseResult(raw)).collectFirst {
       case Right(Some(ParseResult(directive: ParserDirective, remainder))) =>
-        template(remainder)(directive.modified).right.map(tail => Template(directive).append(tail))
+        template(remainder)(directive.modified).right.map(tail => Template(parserConfig.delimiters, directive +: tail.components :_*))
       case Right(Some(ParseResult(head, remainder))) =>
-        template(remainder).right.map(tail => Template(head).append(tail))
+        template(remainder).right.map(tail => Template(parserConfig.delimiters, head +: tail.components :_*))
       case Left(fail) =>
         Left(fail)
-    }.getOrElse(Right(Template()))
+    }.getOrElse(Right(Template(parserConfig.delimiters)))
   }
 
 }

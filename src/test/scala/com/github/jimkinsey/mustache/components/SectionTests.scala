@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache._
+import com.github.jimkinsey.mustache.parsing.Delimiters
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -67,7 +68,7 @@ class SectionTests extends FunSpec {
     }
 
     it("formats as the tags with the inner template formatted between them") {
-      new Section("name", Template(Text("text")), render).formatted should be("{{#name}}text{{/name}}")
+      new Section("name", Template(Text("text")), render).formatted(Delimiters("{{", "}}")) should be("{{#name}}text{{/name}}")
     }
   }
 

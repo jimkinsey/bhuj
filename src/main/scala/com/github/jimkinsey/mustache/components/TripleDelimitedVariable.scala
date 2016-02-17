@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache.parsing.Delimiters
 
 private[mustache] trait UnescapedVariable extends Value {
   def name: String
@@ -10,9 +11,9 @@ private[mustache] trait UnescapedVariable extends Value {
 }
 
 private[mustache] case class TripleDelimitedVariable(name: String) extends UnescapedVariable {
-  lazy val formatted = s"{{{$name}}}"
+  def formatted(delimiters: Delimiters) = delimiters.tag(s"{$name}")
 }
 
 private[mustache] case class AmpersandPrefixedVariable(name: String) extends UnescapedVariable {
-  lazy val formatted = s"{{&$name}}"
+  def formatted(delimiters: Delimiters) = delimiters.tag(s"&$name")
 }

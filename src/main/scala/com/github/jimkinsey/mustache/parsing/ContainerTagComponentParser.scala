@@ -23,7 +23,10 @@ private[mustache] trait ContainerTagComponentParser[+T <: Container] extends Com
           case i if i < 0 => Left(UnclosedTag)
           case i =>
             parserConfig.parsed(afterOpenTag.substring(0, i)).right.map { template =>
-              Some(ParseResult(constructor(mtch.group(1), template, parserConfig.rendered), afterOpenTag.substring(i + s"{{/$key}}".length)))
+              Some(ParseResult(
+                component = constructor(mtch.group(1), template, parserConfig.rendered),
+                remainder = afterOpenTag.substring(i + parserConfig.delimiters.tag(s"/$key").length)
+              ))
             }
       }
     }

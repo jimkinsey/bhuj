@@ -2,6 +2,7 @@ package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.components.Partial.Render
 import com.github.jimkinsey.mustache.components.Section.emptyResult
+import com.github.jimkinsey.mustache.parsing.Delimiters
 import com.github.jimkinsey.mustache.{Context, Lambda}
 
 private[mustache] object Section {
@@ -14,7 +15,8 @@ private[mustache] case class Section(name: String, template: Template, private v
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case true => template.rendered(context)
-      case lambda: Lambda @unchecked => lambda(template.formatted, rendered(_, context))
+      case lambda: Lambda @unchecked =>
+        lambda(template.source, rendered(_, context))
       case map: Context @unchecked => template.rendered(map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)
@@ -25,7 +27,8 @@ private[mustache] case class Section(name: String, template: Template, private v
     }.getOrElse(emptyResult)
   }
 
-  lazy val formatted = s"{{#$name}}${template.formatted}{{/$name}}"
+  def formatted(delimiters: Delimiters) = s"${delimiters.tag(s"#$name")}${template.formatted(delimiters)}${delimiters.tag(s"/$name")}"
+
 }
 
 private[mustache] case class InvertedSection(name: String, template: Template, render: Render) extends Container {
@@ -33,10 +36,11 @@ private[mustache] case class InvertedSection(name: String, template: Template, r
     context.get(name).map {
       case false => template.rendered(context)
       case None => template.rendered(context)
-      case iterable: Iterable[Context] @unchecked if iterable.isEmpty => template.rendered(context)
+      case iterable: Iterable[Context]@unchecked if iterable.isEmpty => template.rendered(context)
       case _ => emptyResult
     }.getOrElse(template.rendered(context))
   }
 
-  lazy val formatted = s"{{^$name}}${template.formatted}{{/$name}}"
+  def formatted(delimiters: Delimiters) = s"${delimiters.tag(s"^$name")}${template.formatted(delimiters)}${delimiters.tag(s"/$name")}"
+
 }

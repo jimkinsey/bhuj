@@ -1,6 +1,7 @@
 package com.github.jimkinsey.mustache.components
 
 import com.github.jimkinsey.mustache.Context
+import com.github.jimkinsey.mustache.parsing.Delimiters
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -36,11 +37,16 @@ class TemplateTests extends FunSpec {
     }
 
     it("formats by calling formatted on each component") {
-      val component1 = mock[Component]
-      when(component1.formatted).thenReturn("{{component1}}")
-      val component2 = mock[Component]
-      when(component2.formatted).thenReturn("{{component2}}")
-      Template(component1, component2).formatted should be("{{component1}}{{component2}}")
+      val component1 = Variable("component1")
+      val component2 = Variable("component2")
+      Template(component1, component2).formatted(Delimiters("{{", "}}")) should be("{{component1}}{{component2}}")
+    }
+
+    it("obeys the set delimiters tag when formatting") {
+      val a = Variable("a")
+      val b = Variable("b")
+      val setDelimiters = SetDelimiters(Delimiters("(:", ":)"))
+      Template(a, setDelimiters, b).source should be("{{a}}{{=(: :)=}}(:b:)")
     }
 
   }
