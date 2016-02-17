@@ -7,7 +7,7 @@ package object mustache {
   type Result = Either[Any, String]
   type Lambda = (String, NonContextualRender) => Result
 
-  val doubleMustaches = Delimiters("{{", "}}")
+  private[mustache] val doubleMustaches = Delimiters("{{", "}}")
 
   private type NonContextualRender = (String) => Result
 }
