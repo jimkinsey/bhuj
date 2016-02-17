@@ -1,7 +1,7 @@
 package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.components._
-import com.github.jimkinsey.mustache.{Result, Failure, Context, doubleMustaches}
+import com.github.jimkinsey.mustache._
 
 private[mustache] case class ParseResult[+T <: Component](component: T, remainder: String)
 
@@ -11,7 +11,7 @@ private[mustache] trait ComponentParser[+T <: Component] {
 
 private[mustache] case class ParserConfig(
   parsed: (String) => Either[Failure, Template],
-  rendered: (String, Context) => Result,
+  rendered: Render,
   delimiters: Delimiters = doubleMustaches
 )
 

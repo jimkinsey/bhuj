@@ -2,7 +2,7 @@ package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.components.Partial
 
-private[mustache] class PartialParser(rendered: Partial.Render) extends ComponentParser[Partial] {
+private[mustache] class PartialParser(rendered: Partial.RenderTemplate) extends ComponentParser[Partial] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {
     Right(for {
       res <- parserConfig.delimiters.pattern(s">\\s*(.+?)\\s*").r.findPrefixMatchOf(template)

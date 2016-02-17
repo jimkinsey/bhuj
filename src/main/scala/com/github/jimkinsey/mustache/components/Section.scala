@@ -1,16 +1,11 @@
 package com.github.jimkinsey.mustache.components
 
-import com.github.jimkinsey.mustache.components.Partial.Render
-import com.github.jimkinsey.mustache.components.Section.emptyResult
+import com.github.jimkinsey.mustache.components.Partial.RenderTemplate
+import com.github.jimkinsey.mustache.emptyResult
 import com.github.jimkinsey.mustache.parsing.Delimiters
-import com.github.jimkinsey.mustache.{Result, Failure, Context, Lambda}
+import com.github.jimkinsey.mustache._
 
-private[mustache] object Section {
-  type Render = (Template, Context) => Result
-  val emptyResult: Result = Right("")
-}
-
-private[mustache] case class Section(name: String, template: Template, private val rendered: (String, Context) => Result) extends Container {
+private[mustache] case class Section(name: String, template: Template, private val rendered: Render) extends Container {
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case true => template.rendered(context)
@@ -30,7 +25,7 @@ private[mustache] case class Section(name: String, template: Template, private v
 
 }
 
-private[mustache] case class InvertedSection(name: String, template: Template, render: Render) extends Container {
+private[mustache] case class InvertedSection(name: String, template: Template, render: RenderTemplate) extends Container {
   def rendered(context: Context)(implicit global: Context) = {
     context.get(name).map {
       case false => template.rendered(context)

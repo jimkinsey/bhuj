@@ -1,14 +1,14 @@
 package com.github.jimkinsey.mustache.parsing
 
 import com.github.jimkinsey.mustache.{Failure, UnclosedTag}
-import com.github.jimkinsey.mustache.components.Partial.Render
+import com.github.jimkinsey.mustache.components.Partial.RenderTemplate
 import com.github.jimkinsey.mustache.components.{Container, InvertedSection, Section, Template}
 
 import scala.util.matching.Regex.quote
 
 private[mustache] trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   def prefix: String
-  def constructor: (String, Template, Render) => T
+  def constructor: (String, Template, RenderTemplate) => T
 
   final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Failure, Option[ParseResult[T]]] = {
     parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {

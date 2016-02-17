@@ -13,8 +13,6 @@ object SetDelimitersParser extends ComponentParser[SetDelimiters] {
     }
   }
 
-  type Result[T] = Either[Failure, Option[ParseResult[T]]]
-
   private val emptyResult: Either[Failure, Option[ParseResult[SetDelimiters]]] = Right(None)
 
   private def valid(start: String, end: String) = {
