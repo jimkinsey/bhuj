@@ -61,6 +61,14 @@ class MustacheTests extends FunSpec {
       new Mustache().render("{{== = =}}") should be(Left(InvalidDelimiters("=", "= ")))
     }
 
+    it("does not fail really please") {
+      new Mustache().render(
+        """{{#things}}
+          |  {{{things}}}
+          |{{/things}}
+          |""".stripMargin) should not be a[ParseFailure]
+    }
+
   }
 
 }

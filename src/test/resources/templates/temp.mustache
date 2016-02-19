@@ -1,0 +1,61 @@
+{{!}}
+{{#things}}
+    {{{do_this}}}{{&things}}{{!}}{{!}}{{&the_answer}}
+{{/things}}
+
+{{#things}}
+    {{do_this}}{{!}}
+    {{#do_this}}
+    {{!}}{{&the_answer}}{{!}}
+    {{#dont_do_this}}
+        {{&dont_do_this}}{{!}}{{!}}{{!}}{{&do_this}}
+    {{/dont_do_this}}
+
+    {{/do_this}}
+
+    {{#dont_do_this}}
+        {{{dont_do_this}}}{{name}}{{&the_answer}}{{&things}}
+    {{/dont_do_this}}
+    {{{do_this}}}
+{{/things}}
+{{name}}{{!}}{{!}}{{{the_answer}}}
+{{^dont_do_this}}
+    {{{the_answer}}}
+    {{#dont_do_this}}
+        {{name}}
+        {{^do_this}}
+        {{!}} {{do_this}}{{!}}
+        {{/do_this}}
+        {{{do_this}}}
+    {{/dont_do_this}}
+    {{!}}{{name}}
+    {{#dont_do_this}}
+        {{{dont_do_this}}}{{&things}}
+        {{#do_this}}
+            {{{do_this}}}{{&name}}{{!}}{{the_answer}}
+            {{^do_this}}
+                {{&name}}    {{!}}
+                {{#things}}
+
+                {{/things}}
+
+                {{^dont_do_this}}
+
+                {{/dont_do_this}}
+
+            {{/do_this}}
+
+        {{/do_this}}
+
+        {{#dont_do_this}}
+            {{&the_answer}}{{{dont_do_this}}}{{!}}
+            {{#things}}
+            {{!}}{{{dont_do_this}}}     {{name}}
+            {{/things}}
+            {{&name}}
+        {{/dont_do_this}}
+
+    {{/dont_do_this}}
+
+{{/dont_do_this}}
+{{!}}

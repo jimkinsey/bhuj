@@ -7,6 +7,7 @@ package object mustache {
   type Result = Either[Failure, String]
   type Lambda = (String, NonContextualRender) => Result
   type Render = (String, Context) => Result
+  type ParseFailure = Left[Parse, String]
 
   private[mustache] val emptyResult: Result = Right("")
 
