@@ -1,4 +1,4 @@
-Scala Mustache
+Bhuj
 ===
 An implementation of [Mustache](https://mustache.github.io/mustache.5.html) logic-less templates in Scala.
 
@@ -55,6 +55,3 @@ It is relatively straightforward to provide your own by implementing `CanContext
 
     mustache.render("The answer is {{value}}", 42)
 
-Roadmap
----
-* ScalaCheck tests?

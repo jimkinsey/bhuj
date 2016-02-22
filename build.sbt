@@ -1,4 +1,4 @@
-name := "scala-mustache"
+name := "bhuj"
 
 scalaVersion := "2.11.7"
 
