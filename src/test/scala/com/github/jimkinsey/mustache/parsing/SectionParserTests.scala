@@ -5,6 +5,7 @@ import com.github.jimkinsey.mustache.components.{Template, Text}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar._
+import org.scalatest.EitherValues._
 
 class SectionParserTests extends FunSpec {
   private implicit val parserConfig = ParserConfig(t => Right(Template(Text(t))), (_,_) => ???)
@@ -36,7 +37,7 @@ class SectionParserTests extends FunSpec {
     }
 
     it("returns a section containing the content as a template") {
-      SectionParser.parseResult("{{#t}}inner{{/t}}").right.get.get.component.template should be(Template(Text("inner")))
+      SectionParser.parseResult("{{#t}}inner{{/t}}").right.get.get.component.template should have('source ("inner"))
     }
 
     it("propagates a failure to parse the inner template") {
@@ -46,11 +47,15 @@ class SectionParserTests extends FunSpec {
     }
 
     it("allows for a nested section with the same key") {
-      SectionParser.parseResult("{{#t}}a{{#t}}b{{/t}}c{{/t}}").right.get.get.component.template should be(Template(Text("a{{#t}}b{{/t}}c")))
+      SectionParser.parseResult("{{#t}}a{{#t}}b{{/t}}c{{/t}}").right.value.get.component.template should have('source ("a{{#t}}b{{/t}}c"))
     }
 
     it("accounts for nested sections with alternative prefixes") {
-      SectionParser.parseResult("{{#t}}a{{^t}}b{{/t}}c{{/t}}").right.get.get.component.template should be(Template(Text("a{{^t}}b{{/t}}c")))
+      SectionParser.parseResult("{{#t}}a{{^t}}b{{/t}}c{{/t}}").right.value.get.component.template should have('source ("a{{^t}}b{{/t}}c"))
+    }
+
+    it("accounts for nested tags with the same key") {
+      SectionParser.parseResult("{{#t}}a{{{t}}}b{{/t}}").right.value.get.component.template should have('source ("a{{{t}}}b"))
     }
 
   }

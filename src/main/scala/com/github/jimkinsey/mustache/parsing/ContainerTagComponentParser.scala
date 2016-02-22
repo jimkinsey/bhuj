@@ -6,7 +6,7 @@ import com.github.jimkinsey.mustache.components.{Container, InvertedSection, Sec
 
 import scala.util.matching.Regex.quote
 
-private[mustache] trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
+private[mustache] sealed trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
   def prefix: String
   def constructor: (String, Template, RenderTemplate) => T
 
@@ -30,7 +30,7 @@ private[mustache] trait ContainerTagComponentParser[+T <: Container] extends Com
   }
 
   private def indexOfClosingTag(key: String, template: String)(implicit parserConfig: ParserConfig): Int = {
-    parserConfig.delimiters.pattern(s"""(.${quote(key)})""").r.findAllMatchIn(template).foldLeft[Either[Int, Int]](Left(0)) {
+    parserConfig.delimiters.pattern(s"""([#^/]${quote(key)})""").r.findAllMatchIn(template).foldLeft[Either[Int, Int]](Left(0)) {
       case (Left(0), m) if m.group(1).startsWith("/")     => Right(m.start)
       case (Left(open), m) if m.group(1).startsWith("/")  => Left(open - 1)
       case (Left(open), m) if !m.group(1).startsWith("/") => Left(open + 1)

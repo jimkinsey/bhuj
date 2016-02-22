@@ -79,7 +79,7 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
   lazy val sectionKeys = Set("boolean", "iterable")
   lazy val variableKeys = Set("number", "string")
 
-  val MAX_DEPTH = 5
+  val MAX_DEPTH = 3
 
   lazy val mustache = new Mustache()
 
