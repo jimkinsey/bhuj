@@ -10,7 +10,7 @@ private[bhuj] case class Section(name: String, template: Template, private val r
     context.get(name).map {
       case true => template.rendered(context)
       case lambda: Lambda @unchecked =>
-        lambda(template.source, rendered(_, context))
+        lambda(template.source, rendered(_, context)).left.map{ f: Any => LambdaFailure(name, f) }
       case map: Context @unchecked => template.rendered(map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)

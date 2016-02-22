@@ -31,7 +31,7 @@ class SectionTests extends FunSpec {
     it("returns the failure if the named value is a lambda which fails") {
       val failure = mock[Failure]
       val failingLambda: Lambda = (_, _) => Left(failure)
-      new Section("wrap", Template(), render).rendered(Map("wrap" -> failingLambda)) should be(Left(failure))
+      new Section("wrap", Template(), render).rendered(Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
     }
 
     it("returns the failure if the named value is a non-false value which fails to render") {
