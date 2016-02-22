@@ -8,7 +8,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import scala.util.Random
 
-class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
+class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks with TemplateGenerators {
+
   import com.github.jimkinsey.mustache.context.ContextImplicits._
 
   implicit val noShrink = Shrink[String] { _ => Stream.empty }
@@ -19,11 +20,22 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
     }
   }
 
+  private lazy val mustache = new Mustache()
+
+  private lazy val context: Map[String,Any] = Map(
+    "boolean" -> true,
+    "number" -> 42,
+    "string" -> "Charlotte",
+    "iterable" -> Seq(Map("id" -> 4), Map("id" -> 5))
+  )
+}
+
+trait TemplateGenerators {
   def section(depth: Int = 0) = containerTag('#', depth)
 
   def invertedSection(depth: Int = 0) = containerTag('^', depth)
 
-  def containerTag(prefix: Char, depth: Int): Gen[String] = {
+  private def containerTag(prefix: Char, depth: Int): Gen[String] = {
     if (depth >= MAX_DEPTH) return const("")
     for {
       inner <- template(depth + 1)
@@ -38,7 +50,7 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
   lazy val ampersandPrefixedVariable = oneOf(variableKeys.toSeq).map(key => s"{{&$key}}")
 
   lazy val text =
-    (1 to Random.nextInt(20)).foldLeft(const("")) {
+    (1 to Random.nextInt(MAX_WORDS_IN_TEXT)).foldLeft(const("")) {
       case (acc, _) => for {
         head <- aWord
         tail <- acc
@@ -46,14 +58,14 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
     }
 
   lazy val aWord = for {
-    len <- chooseNum(1, 13)
+    len <- chooseNum(1, MAX_WORD_LENGTH)
     str <- alphaStr
   } yield str.take(len)
 
   lazy val comment = text.map(t => s"{{!$t}}")
 
-  def template(depth: Int = 0): Gen[String] =
-    (1 to 10).foldLeft(const("")) {
+  def template(depth: Int = 0): Gen[String] = {
+    (1 to MAX_ROOT_NODES).foldLeft(const("")) {
       case (acc, _) => for {
         tail <- acc
         head <- oneOf(
@@ -66,21 +78,16 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks {
           comment)
       } yield head + tail
     }
+  }
 
-  def pad(depth: Int) = (1 to depth).map(_ => "  ").mkString
+  private def pad(depth: Int) = (1 to depth).map(_ => "  ").mkString
 
-  lazy val context: Map[String,Any] = Map(
-    "boolean" -> true,
-    "number" -> 42,
-    "string" -> "Charlotte",
-    "iterable" -> Seq(Map("id" -> 4), Map("id" -> 5))
-  )
+  private lazy val sectionKeys = Set("boolean", "iterable")
+  private lazy val variableKeys = Set("number", "string")
 
-  lazy val sectionKeys = Set("boolean", "iterable")
-  lazy val variableKeys = Set("number", "string")
-
-  val MAX_DEPTH = 3
-
-  lazy val mustache = new Mustache()
+  private val MAX_DEPTH = 3
+  private val MAX_ROOT_NODES = 10
+  private val MAX_WORD_LENGTH = 13
+  private val MAX_WORDS_IN_TEXT = 20
 
 }
