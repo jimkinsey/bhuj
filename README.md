@@ -55,3 +55,4 @@ It is relatively straightforward to provide your own by implementing `CanContext
 
     mustache.render("The answer is {{value}}", 42)
 
+[![Build Status](https://travis-ci.org/jimkinsey/bhuj.png?branch=master)](https://travis-ci.org/jimkinsey/bhuj)
