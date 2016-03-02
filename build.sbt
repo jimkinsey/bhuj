@@ -1,5 +1,7 @@
 name := "bhuj"
 
+organization := "com.github.jimkinsey"
+
 scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
