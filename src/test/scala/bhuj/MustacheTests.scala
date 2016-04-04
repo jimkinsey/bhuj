@@ -61,7 +61,7 @@ class MustacheTests extends FunSpec {
       new Mustache().render("{{== = =}}") should be(Left(InvalidDelimiters("=", "= ")))
     }
 
-    it("does not fail really please") {
+    it("does not fail to parse when a context contains a key the same as that of the context itself") {
       new Mustache().render(
         """{{#things}}
           |  {{{things}}}
