@@ -16,7 +16,10 @@ private[bhuj] case class Section(name: String, template: Template, private val r
         case (Right(acc), ctx) => template.rendered(ctx).right.map(acc + _)
         case (Left(fail), _) => Left(fail)
       }
-      case Some(ctx: Context @unchecked) => template.rendered(ctx)
+      case Some(item) => item match {
+        case ctx: Context @unchecked => template.rendered(ctx)
+        case nonCtx => template.rendered(Map("_" -> nonCtx))
+      }
       case _ => emptyResult
     }.getOrElse(emptyResult)
   }

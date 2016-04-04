@@ -64,13 +64,16 @@ class SectionTests extends FunSpec {
 
     it("renders the section once for a lambda") {
       val template = Template(Text("a"))
-      val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
       val lambda: Lambda = (template, rendered) => Right(s"LAMBDA'D: ${rendered(template).right.get}")
       new Section("wrap", template, render).rendered(Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: Rendered: a"))
     }
 
     it("formats as the tags with the inner template formatted between them") {
       new Section("name", Template(Text("text")), render).formatted(Delimiters("{{", "}}")) should be("{{#name}}text{{/name}}")
+    }
+
+    it("creates a context with _ set to the current value for a non-empty Option which does not contain a Context") {
+      new Section("pet", Template(Variable("_")), render).rendered(Map("pet" -> Some("Owl"))) should be(Right("Owl"))
     }
   }
 

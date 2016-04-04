@@ -69,6 +69,10 @@ class MustacheTests extends FunSpec {
           |""".stripMargin) should not be a[ParseFailure]
     }
 
+    it("allows access to the context item when rendering an Option using underscore (_)") {
+      new Mustache().render("""{{#maybe}}~{{_}}~{{/maybe}}""", Map("maybe" -> Some("It is!!!"))) should be(Right("~It is!!!~"))
+    }
+
   }
 
 }
