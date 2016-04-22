@@ -59,6 +59,13 @@ class CaseClassConverterTests extends FunSpec {
       ))
     }
 
+    it("recursively converts an option") {
+      case class Outer(inner: Option[Inner])
+      case class Inner(n: Int)
+
+      map(Outer(Some(Inner(10)))) should be(Right(Map("inner" -> Some(Map("n" -> 10)))))
+    }
+
     it("recursively converts an iterable") {
       case class Thing(n: Int)
       case class Container(things: Seq[Thing])
