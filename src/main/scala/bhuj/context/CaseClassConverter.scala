@@ -30,6 +30,8 @@ class CaseClassConverter {
       map.map { case (k,v) => k.toString -> value(v) }
     case iterable: Iterable[_] =>
       iterable.map(value)
+    case option: Option[_] =>
+      option.map(value)
     case _ =>
       obj
   }
