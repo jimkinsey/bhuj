@@ -4,6 +4,7 @@ import bhuj.Mustache._
 import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
+import bhuj.rendering.Renderer
 
 object Mustache {
   type Templates = (String => Option[String])
@@ -23,7 +24,7 @@ class Mustache(
       template <- templates(name).toRight({TemplateNotFound(name)}).right
       parsed <- parse(template).right
       ctx <- ev.context(context).left.map(ContextualisationFailure).right
-      result <- parsed.rendered(ctx).right
+      result <- renderer.rendered(parsed, ctx).right
     } yield { result }
   }
 
@@ -31,16 +32,18 @@ class Mustache(
     for {
       parsed <- parse(template).right
       ctx <- ev.context(context).left.map(ContextualisationFailure).right
-      rendered <- parsed.rendered(ctx).right
+      rendered <- renderer.rendered(parsed, ctx).right
     } yield { rendered }
   }
 
   def render(template: String): Result = {
     for {
       parsed <- parse(template).right
-      rendered <- parsed.rendered(Map.empty).right
+      rendered <- renderer.rendered(parsed, Map.empty).right
     } yield { rendered }
   }
+
+  private lazy val renderer = new Renderer()
 
   private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
 
