@@ -39,7 +39,7 @@ class Mustache(
   def render(template: String): Result = {
     for {
       parsed <- parse(template).right
-      rendered <- renderer.rendered(parsed, Map.empty).right
+      rendered <- renderer.rendered(parsed, emptyContext).right
     } yield { rendered }
   }
 

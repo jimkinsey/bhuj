@@ -9,6 +9,8 @@ package object bhuj {
 
   private[bhuj] val emptyResult: Result = Right("")
 
+  private[bhuj] val emptyContext: Context = Map.empty
+
   private[bhuj] val doubleMustaches = Delimiters("{{", "}}")
 
   private type NonContextualRender = (String) => Result

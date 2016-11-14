@@ -9,17 +9,21 @@ object Renderer {
 
 private[bhuj] class Renderer {
 
-  def rendered(component: Component, context: Context)(implicit global: Context): Result = component match {
-    case Text(content) => Right(content)
-    case Variable(name) => Right((global ++ context).get(name).map(_.toString).map(escapeHTML).getOrElse(""))
-    case variable: UnescapedVariable => Right((global ++ context).get(variable.name).map(_.toString).getOrElse(""))
-    case section: Section => renderedSection(section, context)
-    case section: InvertedSection => renderedInvertedSection(section, context)
-    case Partial(name, render) => render(name, context) // FIXME partial does not pick up the global context?
-    case template: Template => template.components.foldLeft(emptyResult) {
+  def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
+    template.components.foldLeft(emptyResult) {
       case (Right(acc), c) => rendered(c, global ++ context).right.map(acc + _)
       case (failure: Left[Failure, String], _) => failure
     }
+  }
+
+  private[bhuj] def rendered(component: Component, context: Context): Result = component match {
+    case Text(content) => Right(content)
+    case Variable(name) => Right(context.get(name).map(_.toString).map(escapeHTML).getOrElse(""))
+    case variable: UnescapedVariable => Right(context.get(variable.name).map(_.toString).getOrElse(""))
+    case section: Section => renderedSection(section, context)
+    case section: InvertedSection => renderedInvertedSection(section, context)
+    case Partial(name, render) => render(name, context)
+    case template: Template => rendered(template, context)
     case _ => emptyResult
   }
 
@@ -33,7 +37,7 @@ private[bhuj] class Renderer {
     ''' -> "&#39;"
   )
 
-  private def renderedInvertedSection(section: InvertedSection, context: Context)(implicit global: Context) = {
+  private def renderedInvertedSection(section: InvertedSection, context: Context) = {
     context.get(section.name).map {
       case false => rendered(section.template, context)
       case None => rendered(section.template, context)
@@ -42,7 +46,7 @@ private[bhuj] class Renderer {
     }.getOrElse(rendered(section.template, context))
   }
 
-  private def renderedSection(section: Section, context: Context)(implicit global: Context) = {
+  private def renderedSection(section: Section, context: Context) = {
     context.get(section.name).map {
       case true => rendered(section.template, context)
       case lambda: Lambda @unchecked =>

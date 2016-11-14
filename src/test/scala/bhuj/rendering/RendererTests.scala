@@ -22,14 +22,9 @@ class RendererTests extends FunSpec {
         renderer.rendered(Variable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
-      it("uses the value from the global context when not in the local") {
-        val global = Map("name" -> "Jim")
-        renderer.rendered(Variable("name"), Map.empty)(global) should be(Right("Jim"))
-      }
-
       it("overrides the value from the global context with the local") {
         val global = Map("name" -> "James")
-        renderer.rendered(Variable("name"), Map("name" -> "Jim"))(global) should be(Right("Jim"))
+        renderer.rendered(Variable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
       it("converts the value to a string when it is not") {
@@ -52,14 +47,9 @@ class RendererTests extends FunSpec {
         renderer.rendered(TripleDelimitedVariable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
-      it("uses the value from the global context when not in the local") {
-        val global = Map("name" -> "Jim")
-        renderer.rendered(TripleDelimitedVariable("name"), Map.empty)(global) should be(Right("Jim"))
-      }
-
       it("overrides the value from the global context with the local") {
         val global = Map("name" -> "James")
-        renderer.rendered(TripleDelimitedVariable("name"), Map("name" -> "Jim"))(global) should be(Right("Jim"))
+        renderer.rendered(TripleDelimitedVariable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
       it("converts the value to a string when it is not") {
@@ -75,18 +65,18 @@ class RendererTests extends FunSpec {
     describe("A template") {
 
       it("renders to an empty string if it has no components") {
-        renderer.rendered(Template(), Map.empty) should be(Right(""))
+        renderer.rendered(Template(), emptyContext) should be(Right(""))
       }
 
       it("propagates the failure of any components") {
         val failing = Partial("failing", (_,_) => Left(failure))
-        renderer.rendered(Template(failing), Map.empty) should be(Left(failure))
+        renderer.rendered(Template(failing), emptyContext) should be(Left(failure))
       }
 
       it("concatenates the results of rendering all its components") {
         val component1 = Text("X")
         val component2 = Text("Y")
-        renderer.rendered(Template(component1, component2), Map.empty) should be(Right("XY"))
+        renderer.rendered(Template(component1, component2), emptyContext) should be(Right("XY"))
       }
 
       it("uses values in the global context") {
@@ -99,7 +89,7 @@ class RendererTests extends FunSpec {
     describe("A set delimiters directive") {
 
       it("renders to an empty string") {
-        renderer.rendered(SetDelimiters(Delimiters("[[", "]]")), Map.empty) should be(Right(""))
+        renderer.rendered(SetDelimiters(Delimiters("[[", "]]")), emptyContext) should be(Right(""))
       }
 
     }
@@ -107,7 +97,7 @@ class RendererTests extends FunSpec {
     describe("A section component") {
 
       it("does not render when the key is not in the context") {
-        renderer.rendered(Section("things", Template(), render), Map.empty) should be(Right(""))
+        renderer.rendered(Section("things", Template(), render), emptyContext) should be(Right(""))
       }
 
       it("does not render if the named value in the context is false") {
@@ -165,7 +155,7 @@ class RendererTests extends FunSpec {
 
       it("propagates failure to render the template") {
         val rendered: (String, Context) => Result = (_,_) => Left(failure)
-        renderer.rendered(new Partial("partial", rendered), Map.empty) should be(Left(failure))
+        renderer.rendered(new Partial("partial", rendered), emptyContext) should be(Left(failure))
       }
 
       it("renders the named template in the provided context") {
@@ -199,7 +189,7 @@ class RendererTests extends FunSpec {
       }
 
       it("renders once when the key does not exist") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), Map.empty) should be(Right("a"))
+        renderer.rendered(InvertedSection("section", Template(Text("a")), render), emptyContext) should be(Right("a"))
       }
 
     }
