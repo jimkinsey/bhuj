@@ -1,14 +1,13 @@
 package bhuj.components
 
-import bhuj.{Result, Failure, Context}
 import bhuj.components.Partial.RenderTemplate
 import bhuj.parsing.Delimiters
+import bhuj.{Context, Result}
 
 private[bhuj] object Partial {
   type RenderTemplate = (String, Context) => Result
 }
 
-private[bhuj] class Partial(val name: String, val render: RenderTemplate) extends Value {
-  def rendered(context: Context)(implicit global: Context) = render(name, context)
+private[bhuj] case class Partial(name: String, render: RenderTemplate) extends Value {
   def formatted(delimiters: Delimiters) = delimiters.tag(s"> $name")
 }

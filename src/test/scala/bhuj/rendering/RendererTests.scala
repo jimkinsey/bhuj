@@ -3,7 +3,6 @@ package bhuj.rendering
 import bhuj._
 import bhuj.components._
 import bhuj.parsing.Delimiters
-import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar._
@@ -80,17 +79,13 @@ class RendererTests extends FunSpec {
       }
 
       it("propagates the failure of any components") {
-        val failure = mock[Failure]
-        val failing = mock[Component]
-        when(failing.rendered(Map.empty)).thenReturn(Left(failure))
+        val failing = Partial("failing", (_,_) => Left(failure))
         renderer.rendered(Template(failing), Map.empty) should be(Left(failure))
       }
 
       it("concatenates the results of rendering all its components") {
-        val component1 = mock[Component]
-        when(component1.rendered(Map.empty)).thenReturn(Right("X"))
-        val component2 = mock[Component]
-        when(component2.rendered(Map.empty)).thenReturn(Right("Y"))
+        val component1 = Text("X")
+        val component2 = Text("Y")
         renderer.rendered(Template(component1, component2), Map.empty) should be(Right("XY"))
       }
 
@@ -128,15 +123,12 @@ class RendererTests extends FunSpec {
       }
 
       it("returns the failure if the named value is a lambda which fails") {
-        val failure = mock[Failure]
         val failingLambda: Lambda = (_, _) => Left(failure)
         renderer.rendered(Section("wrap", Template(), render), Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
       }
 
       it("returns the failure if the named value is a non-false value which fails to render") {
-        val failure = mock[Failure]
-        val failing = mock[Template]
-        when(failing.rendered(Map("a" -> 1))).thenReturn(Left(failure))
+        val failing = Template(Partial("failing", (_,_) => Left(failure)))
         renderer.rendered(Section("thing", failing, render), Map("thing" -> Map("a" -> 1))) should be(Left(failure))
       }
 
@@ -186,8 +178,7 @@ class RendererTests extends FunSpec {
     describe("An inverted section") {
 
       it("propagates a failure from the template") {
-        val failing = mock[Template]
-        when(failing.rendered(Map("section" -> false))).thenReturn(Left(failure))
+        val failing = Template(Partial("failing", (_,_) => Left(failure)))
         renderer.rendered(InvertedSection("section", failing, render), Map("section" -> false)) should be(Left(failure))
       }
 
