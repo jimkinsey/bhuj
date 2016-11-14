@@ -3,10 +3,6 @@ package bhuj.rendering
 import bhuj.components.{Partial, _}
 import bhuj.{LambdaFailure, _}
 
-object Renderer {
-  val emptyResult: Result = Right("")
-}
-
 private[bhuj] class Renderer {
 
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
@@ -23,7 +19,6 @@ private[bhuj] class Renderer {
     case section: Section => renderedSection(section, context)
     case section: InvertedSection => renderedInvertedSection(section, context)
     case Partial(name, render) => render(name, context)
-    case template: Template => rendered(template, context)
     case _ => emptyResult
   }
 
@@ -39,26 +34,26 @@ private[bhuj] class Renderer {
 
   private def renderedInvertedSection(section: InvertedSection, context: Context) = {
     context.get(section.name).map {
-      case false => rendered(section.template, context)
-      case None => rendered(section.template, context)
-      case iterable: Iterable[Context]@unchecked if iterable.isEmpty => rendered(section.template, context)
+      case false => rendered(section.template, context)(emptyContext)
+      case None => rendered(section.template, context)(emptyContext)
+      case iterable: Iterable[Context]@unchecked if iterable.isEmpty => rendered(section.template, context)(emptyContext)
       case _ => emptyResult
     }.getOrElse(rendered(section.template, context))
   }
 
   private def renderedSection(section: Section, context: Context) = {
     context.get(section.name).map {
-      case true => rendered(section.template, context)
+      case true => rendered(section.template, context)(emptyContext)
       case lambda: Lambda @unchecked =>
         lambda(section.template.source, section.render(_, context)).left.map{ f: Any => LambdaFailure(section.name, f) }
       case map: Context @unchecked => rendered(section.template, map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
-        case (Right(acc), ctx) => rendered(section.template, ctx).right.map(acc + _)
+        case (Right(acc), ctx) => rendered(section.template, ctx)(emptyContext).right.map(acc + _)
         case (Left(fail), _) => Left(fail)
       }
       case Some(item) => item match {
-        case ctx: Context @unchecked => rendered(section.template, ctx)
-        case nonCtx => rendered(section.template, Map("_" -> nonCtx))
+        case ctx: Context @unchecked => rendered(section.template, ctx)(emptyContext)
+        case nonCtx => rendered(section.template, Map("_" -> nonCtx))(emptyContext)
       }
       case _ => emptyResult
     }.getOrElse(emptyResult)

@@ -1,5 +1,6 @@
-package bhuj.components
+package bhuj
 
+import bhuj.components.{SetDelimiters, Variable}
 import bhuj.parsing.Delimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

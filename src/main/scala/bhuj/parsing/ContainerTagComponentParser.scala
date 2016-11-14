@@ -1,8 +1,8 @@
 package bhuj.parsing
 
-import bhuj.{Failure, UnclosedTag}
+import bhuj.{Failure, Template, UnclosedTag}
 import bhuj.components.Partial.RenderTemplate
-import bhuj.components.{Container, InvertedSection, Section, Template}
+import bhuj.components.{Container, InvertedSection, Section}
 
 import scala.util.matching.Regex.quote
 

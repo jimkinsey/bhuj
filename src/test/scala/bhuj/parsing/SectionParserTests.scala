@@ -1,7 +1,7 @@
 package bhuj.parsing
 
-import bhuj.components.{Template, Text}
-import bhuj.{Failure, UnclosedTag}
+import bhuj.components.Text
+import bhuj.{Failure, Template, UnclosedTag}
 import org.scalatest.EitherValues._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
