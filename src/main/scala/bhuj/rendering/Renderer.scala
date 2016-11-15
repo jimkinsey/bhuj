@@ -1,6 +1,7 @@
 package bhuj.rendering
 
 import bhuj.components.{Partial, _}
+import bhuj.formatting.Formatter
 import bhuj.{LambdaFailure, _}
 
 private[bhuj] class Renderer {
@@ -45,7 +46,7 @@ private[bhuj] class Renderer {
     context.get(section.name).map {
       case true => rendered(section.template, context)(emptyContext)
       case lambda: Lambda @unchecked =>
-        lambda(section.template.source, section.render(_, context)).left.map{ f: Any => LambdaFailure(section.name, f) }
+        lambda(formatter.source(section.template), section.render(_, context)).left.map{ f: Any => LambdaFailure(section.name, f) }
       case map: Context @unchecked => rendered(section.template, map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
         case (Right(acc), ctx) => rendered(section.template, ctx)(emptyContext).right.map(acc + _)
@@ -58,5 +59,7 @@ private[bhuj] class Renderer {
       case _ => emptyResult
     }.getOrElse(emptyResult)
   }
+
+  private lazy val formatter = new Formatter
 
 }

@@ -63,8 +63,8 @@ class TemplateParserTests extends FunSpec {
     }
 
     it("uses the parser config provided by the component when it is a directive") {
-      val directiveParser = mock[ComponentParser[ParserDirective]]
-      val directive = mock[ParserDirective]
+      val directiveParser = mock[ComponentParser[SetDelimiters]]
+      val directive = mock[SetDelimiters]
       when(directiveParser.parseResult(equalTo("dirtail"))(any())).thenReturn(Right(Some(ParseResult(directive, "tail"))))
       val newParserConfig = mock[ParserConfig]
       when(directive.modified(parserConfig)).thenReturn(newParserConfig)

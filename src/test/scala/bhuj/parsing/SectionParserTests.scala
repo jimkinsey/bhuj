@@ -1,6 +1,7 @@
 package bhuj.parsing
 
 import bhuj.components.Text
+import bhuj.formatting.Formatter
 import bhuj.{Failure, Template, UnclosedTag}
 import org.scalatest.EitherValues._
 import org.scalatest.FunSpec
@@ -37,7 +38,7 @@ class SectionParserTests extends FunSpec {
     }
 
     it("returns a section containing the content as a template") {
-      SectionParser.parseResult("{{#t}}inner{{/t}}").right.get.get.component.template should have('source ("inner"))
+      source(SectionParser.parseResult("{{#t}}inner{{/t}}").right.get.get.component.template) should be("inner")
     }
 
     it("propagates a failure to parse the inner template") {
@@ -47,17 +48,19 @@ class SectionParserTests extends FunSpec {
     }
 
     it("allows for a nested section with the same key") {
-      SectionParser.parseResult("{{#t}}a{{#t}}b{{/t}}c{{/t}}").right.value.get.component.template should have('source ("a{{#t}}b{{/t}}c"))
+      source(SectionParser.parseResult("{{#t}}a{{#t}}b{{/t}}c{{/t}}").right.value.get.component.template) should be("a{{#t}}b{{/t}}c")
     }
 
     it("accounts for nested sections with alternative prefixes") {
-      SectionParser.parseResult("{{#t}}a{{^t}}b{{/t}}c{{/t}}").right.value.get.component.template should have('source ("a{{^t}}b{{/t}}c"))
+      source(SectionParser.parseResult("{{#t}}a{{^t}}b{{/t}}c{{/t}}").right.value.get.component.template) should be("a{{^t}}b{{/t}}c")
     }
 
     it("accounts for nested tags with the same key") {
-      SectionParser.parseResult("{{#t}}a{{{t}}}b{{/t}}").right.value.get.component.template should have('source ("a{{{t}}}b"))
+      source(SectionParser.parseResult("{{#t}}a{{{t}}}b{{/t}}").right.value.get.component.template) should be("a{{{t}}}b")
     }
 
   }
+
+  private def source(template: Template) = new Formatter().source(template)
 
 }

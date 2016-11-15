@@ -2,11 +2,11 @@ package bhuj.parsing
 
 import bhuj.{Failure, Template, UnclosedTag}
 import bhuj.components.Partial.RenderTemplate
-import bhuj.components.{Container, InvertedSection, Section}
+import bhuj.components.{Component, Container, InvertedSection, Section}
 
 import scala.util.matching.Regex.quote
 
-private[bhuj] sealed trait ContainerTagComponentParser[+T <: Container] extends ComponentParser[T] {
+private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Container] extends ComponentParser[T] {
   def prefix: String
   def constructor: (String, Template, RenderTemplate) => T
 
