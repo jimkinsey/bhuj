@@ -1,14 +1,13 @@
 package bhuj.parsing
 
-import bhuj.{Failure, Template, UnclosedTag}
-import bhuj.components.Partial.RenderTemplate
 import bhuj.components.{Component, Container, InvertedSection, Section}
+import bhuj.{Failure, Render, Template, UnclosedTag}
 
 import scala.util.matching.Regex.quote
 
 private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Container] extends ComponentParser[T] {
   def prefix: String
-  def constructor: (String, Template, RenderTemplate) => T
+  def constructor: (String, Template, Render) => T
 
   final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Failure, Option[ParseResult[T]]] = {
     parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {

@@ -1,8 +1,9 @@
 package bhuj.parsing
 
+import bhuj.Render
 import bhuj.components.Partial
 
-private[bhuj] class PartialParser(rendered: Partial.RenderTemplate) extends ComponentParser[Partial] {
+private[bhuj] class PartialParser(rendered: Render) extends ComponentParser[Partial] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {
     Right(for {
       res <- parserConfig.delimiters.pattern(s">\\s*(.+?)\\s*").r.findPrefixMatchOf(template)
