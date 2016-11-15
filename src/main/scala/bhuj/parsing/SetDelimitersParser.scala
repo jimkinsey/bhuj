@@ -1,6 +1,6 @@
 package bhuj.parsing
 
-import bhuj.{Failure, InvalidDelimiters}
+import bhuj.{ParseTemplateFailure, Failure, InvalidDelimiters}
 import bhuj.model.SetDelimiters
 
 object SetDelimitersParser extends ComponentParser[SetDelimiters] {
@@ -13,7 +13,7 @@ object SetDelimitersParser extends ComponentParser[SetDelimiters] {
     }
   }
 
-  private val emptyResult: Either[Failure, Option[ParseResult[SetDelimiters]]] = Right(None)
+  private val emptyResult: Either[ParseTemplateFailure, Option[ParseResult[SetDelimiters]]] = Right(None)
 
   private def valid(start: String, end: String) = {
     start.matches(validDelimiter) && end.matches(validDelimiter)

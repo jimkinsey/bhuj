@@ -21,11 +21,6 @@ class RendererTests extends FunSpec {
         renderer.rendered(Variable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
-      it("overrides the value from the global context with the local") {
-        val global = Map("name" -> "James")
-        renderer.rendered(Variable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
-      }
-
       it("converts the value to a string when it is not") {
         renderer.rendered(Variable("age"), Map("age" -> 37)) should be(Right("37"))
       }
@@ -46,11 +41,6 @@ class RendererTests extends FunSpec {
         renderer.rendered(TripleDelimitedVariable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
       }
 
-      it("overrides the value from the global context with the local") {
-        val global = Map("name" -> "James")
-        renderer.rendered(TripleDelimitedVariable("name"), Map("name" -> "Jim")) should be(Right("Jim"))
-      }
-
       it("converts the value to a string when it is not") {
         renderer.rendered(TripleDelimitedVariable("age"), Map("age" -> 37)) should be(Right("37"))
       }
@@ -68,8 +58,8 @@ class RendererTests extends FunSpec {
       }
 
       it("propagates the failure of any components") {
-        val failing = Partial("failing", (_,_) => Left(failure))
-        renderer.rendered(Template(failing), emptyContext) should be(Left(failure))
+        val failing = Partial("non-existent")
+        renderer.rendered(Template(failing), emptyContext) should be(Left(TemplateNotFound("non-existent")))
       }
 
       it("concatenates the results of rendering all its components") {
@@ -96,56 +86,57 @@ class RendererTests extends FunSpec {
     describe("A section component") {
 
       it("does not render when the key is not in the context") {
-        renderer.rendered(Section("things", Template(), render), emptyContext) should be(Right(""))
+        renderer.rendered(Section("things", Template()), emptyContext) should be(Right(""))
       }
 
       it("does not render if the named value in the context is false") {
-        renderer.rendered(Section("doIt", Template(), render), Map("doIt" -> false)) should be(Right(""))
+        renderer.rendered(Section("doIt", Template()), Map("doIt" -> false)) should be(Right(""))
       }
 
       it("does not render if the named value in the context is an empty iterable") {
-        renderer.rendered(Section("things", Template(), render), Map("things" -> List.empty)) should be(Right(""))
+        renderer.rendered(Section("things", Template()), Map("things" -> List.empty)) should be(Right(""))
       }
 
       it("does not render if the named value in the context is an undefined option") {
-        renderer.rendered(Section("maybe", Template(Text("a")), render), Map("Maybe" -> None)) should be(Right(""))
+        renderer.rendered(Section("maybe", Template(Text("a"))), Map("Maybe" -> None)) should be(Right(""))
       }
 
       it("returns the failure if the named value is a lambda which fails") {
+        val failure = LambdaFailure("key", "#fail")
         val failingLambda: Lambda = (_, _) => Left(failure)
-        renderer.rendered(Section("wrap", Template(), render), Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
+        renderer.rendered(Section("wrap", Template()), Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
       }
 
       it("returns the failure if the named value is a non-false value which fails to render") {
-        val failing = Template(Partial("failing", (_,_) => Left(failure)))
-        renderer.rendered(Section("thing", failing, render), Map("thing" -> Map("a" -> 1))) should be(Left(failure))
+        val failing = Template(Partial("failing"))
+        renderer.rendered(Section("thing", failing), Map("thing" -> Map("a" -> 1))) should be(Left(TemplateNotFound("failing")))
       }
 
       it("renders the section once using the value as a context if it is a map") {
         val template = Template(Text("a"))
-        val section = Section("section", template, render)
+        val section = Section("section", template)
         renderer.rendered(section, Map("section" -> Map("a" -> 1))) should be(Right(s"a"))
       }
 
       it("renders the section once in the current context if it is true") {
         val template = Template(Text("a"))
-        renderer.rendered(Section("doIt", template, render), Map("doIt" -> true)) should be(Right("a"))
+        renderer.rendered(Section("doIt", template), Map("doIt" -> true)) should be(Right("a"))
       }
 
       it("renders the section once in the current context if the item is a defined option") {
         val template = Template(Text("a"))
-        renderer.rendered(Section("maybe", template, render), Map("maybe" -> Some(Map.empty))) should be(Right("a"))
+        renderer.rendered(Section("maybe", template), Map("maybe" -> Some(Map.empty))) should be(Right("a"))
       }
 
       it("renders the section for each item in a non-empty iterable with the item as the context") {
         val template = Template(Text("a"))
-        renderer.rendered(Section("things", template, render), Map("things" -> List(Map.empty, Map.empty, Map.empty))) should be(Right(s"aaa"))
+        renderer.rendered(Section("things", template), Map("things" -> List(Map.empty, Map.empty, Map.empty))) should be(Right(s"aaa"))
       }
 
       it("renders the section once for a lambda") {
         val template = Template(Text("a"))
         val lambda: Lambda = (template, rendered) => Right(s"LAMBDA'D: ${rendered(template).right.get}")
-        renderer.rendered(Section("wrap", template, render), Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: Rendered: a"))
+        renderer.rendered(Section("wrap", template), Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: a"))
       }
 
     }
@@ -153,13 +144,19 @@ class RendererTests extends FunSpec {
     describe("A partial component") {
 
       it("propagates failure to render the template") {
-        val rendered: (String, Context) => Result = (_,_) => Left(failure)
-        renderer.rendered(new Partial("partial", rendered), emptyContext) should be(Left(failure))
+        val renderer = new Renderer(new Mustache().parse, {
+          case "partial" => Some("{{> non-existent}}")
+          case _ => None
+        })
+        renderer.rendered(Partial("partial"), emptyContext) should be(Left(TemplateNotFound("non-existent")))
       }
 
       it("renders the named template in the provided context") {
-        val rendered: (String, Context) => Result = (_,_) => Right("42")
-        renderer.rendered(new Partial("partial", rendered), Map("foo" -> 42)) should be(Right("42"))
+        val renderer = new Renderer(new Mustache().parse, {
+          case "partial" => Some("{{foo}}")
+          case _ => None
+        })
+        renderer.rendered(Partial("partial"), Map("foo" -> 42)) should be(Right("42"))
       }
 
     }
@@ -167,38 +164,34 @@ class RendererTests extends FunSpec {
     describe("An inverted section") {
 
       it("propagates a failure from the template") {
-        val failing = Template(Partial("failing", (_,_) => Left(failure)))
-        renderer.rendered(InvertedSection("section", failing, render), Map("section" -> false)) should be(Left(failure))
+        val failing = Template(Partial("failing"))
+        renderer.rendered(InvertedSection("section", failing), Map("section" -> false)) should be(Left(TemplateNotFound("failing")))
       }
 
       it("renders the template once when the value is false") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), Map("section" -> false)) should be(Right("a"))
+        renderer.rendered(InvertedSection("section", Template(Text("a"))), Map("section" -> false)) should be(Right("a"))
       }
 
       it("renders the template once when the value is none") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), Map("section" -> None)) should be(Right("a"))
+        renderer.rendered(InvertedSection("section", Template(Text("a"))), Map("section" -> None)) should be(Right("a"))
       }
 
       it("renders nothing when the value is true") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), Map("section" -> true)) should be(Right(""))
+        renderer.rendered(InvertedSection("section", Template(Text("a"))), Map("section" -> true)) should be(Right(""))
       }
 
       it("renders the template once when the value is an empty iterable") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), Map("section" -> List.empty)) should be(Right("a"))
+        renderer.rendered(InvertedSection("section", Template(Text("a"))), Map("section" -> List.empty)) should be(Right("a"))
       }
 
       it("renders once when the key does not exist") {
-        renderer.rendered(InvertedSection("section", Template(Text("a")), render), emptyContext) should be(Right("a"))
+        renderer.rendered(InvertedSection("section", Template(Text("a"))), emptyContext) should be(Right("a"))
       }
 
     }
 
   }
 
-  private lazy val renderer = new Renderer
-
-  private val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
-
-  private lazy val failure = LambdaFailure("key", "#fail")
+  private lazy val renderer = new Renderer(new Mustache().parse, _ => None)
 
 }

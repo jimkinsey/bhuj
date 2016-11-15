@@ -18,9 +18,9 @@ private[bhuj] class Formatter {
     case TripleDelimitedVariable(name) => delimiters.tag(s"{$name}")
     case AmpersandPrefixedVariable(name) => delimiters.tag(s"&$name")
     case SetDelimiters(newDelimiters) => delimiters.tag(s"=${newDelimiters.start} ${newDelimiters.end}=")
-    case Section(name, template, _) => s"${delimiters.tag(s"#$name")}${source(template, delimiters)}${delimiters.tag(s"/$name")}"
-    case InvertedSection(name, template, _) => s"${delimiters.tag(s"^$name")}${source(template, delimiters)}${delimiters.tag(s"/$name")}"
-    case Partial(name, _) => delimiters.tag(s"> $name")
+    case Section(name, template) => s"${delimiters.tag(s"#$name")}${source(template, delimiters)}${delimiters.tag(s"/$name")}"
+    case InvertedSection(name, template) => s"${delimiters.tag(s"^$name")}${source(template, delimiters)}${delimiters.tag(s"/$name")}"
+    case Partial(name) => delimiters.tag(s"> $name")
     case Comment(content) => delimiters.tag(s"!$content")
   }
 

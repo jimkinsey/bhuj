@@ -43,7 +43,7 @@ class Mustache(
     } yield { rendered }
   }
 
-  private lazy val renderer = new Renderer()
+  private lazy val renderer = new Renderer(parse, templates)
 
   private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
 
@@ -58,8 +58,8 @@ class Mustache(
     new PartialParser(this.renderTemplate(_,_)),
     SetDelimitersParser)
 
-  private implicit val parserConfig: ParserConfig = ParserConfig(parse, render[Context], doubleMustaches)
+  private implicit val parserConfig: ParserConfig = ParserConfig(parse, doubleMustaches)
 
-  private lazy val parse = Caching.cached(templateParser.template)
+  private[bhuj] lazy val parse: ParseTemplate = Caching.cached(templateParser.template)
 
 }

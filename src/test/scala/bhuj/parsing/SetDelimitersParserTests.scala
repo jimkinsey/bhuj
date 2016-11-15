@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class SetDelimitersParserTests extends FunSpec {
-  implicit val parserConfig = ParserConfig(_ => ???, (_,_) => ???, Delimiters("{{", "}}"))
+  implicit val parserConfig = ParserConfig(_ => ???, Delimiters("{{", "}}"))
 
   describe("A set delimiters parser") {
 

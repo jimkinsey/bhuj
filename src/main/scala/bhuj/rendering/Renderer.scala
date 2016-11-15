@@ -1,10 +1,11 @@
 package bhuj.rendering
 
+import bhuj.Mustache.Templates
 import bhuj.model.{Partial, _}
 import bhuj.formatting.Formatter
 import bhuj.{LambdaFailure, _}
 
-private[bhuj] class Renderer {
+private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
 
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
     template.components.foldLeft(emptyResult) {
@@ -19,7 +20,13 @@ private[bhuj] class Renderer {
     case variable: UnescapedVariable => Right(context.get(variable.name).map(_.toString).getOrElse(""))
     case section: Section => renderedSection(section, context)
     case section: InvertedSection => renderedInvertedSection(section, context)
-    case Partial(name, render) => render(name, context)
+    case Partial(name) => {
+      for {
+        template <- templates(name).toRight({ TemplateNotFound(name) }).right
+        parsed <- parse(template).right
+        result <- rendered(parsed, context).right
+      } yield { result }
+    }
     case _ => emptyResult
   }
 
@@ -46,7 +53,9 @@ private[bhuj] class Renderer {
     context.get(section.name).map {
       case true => rendered(section.template, context)(emptyContext)
       case lambda: Lambda @unchecked =>
-        lambda(formatter.source(section.template), section.render(_, context)).left.map{ f: Any => LambdaFailure(section.name, f) }
+        // FIXME deal with parse failure:
+        val render: NonContextualRender = (templateString) => rendered(parse(templateString).right.get, context)
+        lambda(formatter.source(section.template), render).left.map{ f: Any => LambdaFailure(section.name, f) }
       case map: Context @unchecked => rendered(section.template, map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
         case (Right(acc), ctx) => rendered(section.template, ctx)(emptyContext).right.map(acc + _)

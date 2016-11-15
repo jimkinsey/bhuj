@@ -9,6 +9,6 @@ private[bhuj] class PartialParser(rendered: Render) extends ComponentParser[Part
       res <- parserConfig.delimiters.pattern(s">\\s*(.+?)\\s*").r.findPrefixMatchOf(template)
       name = res.group(1)
       remainder = res.after.toString
-    } yield ParseResult(new Partial(name, rendered), remainder))
+    } yield ParseResult(Partial(name), remainder))
   }
 }

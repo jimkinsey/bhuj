@@ -1,15 +1,15 @@
 package bhuj.parsing
 
 import bhuj.model._
-import bhuj.{Failure, Render, UnclosedTag}
+import bhuj.{ParseTemplateFailure, Failure, Render, UnclosedTag}
 
 import scala.util.matching.Regex.quote
 
 private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Container] extends ComponentParser[T] {
   def prefix: String
-  def constructor: (String, Template, Render) => T
+  def constructor: (String, Template) => T
 
-  final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[Failure, Option[ParseResult[T]]] = {
+  final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[ParseTemplateFailure, Option[ParseResult[T]]] = {
     parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {
       case None => Right(None)
       case Some(mtch) =>
@@ -20,7 +20,7 @@ private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Cont
           case i =>
             parserConfig.parsed(afterOpenTag.substring(0, i)).right.map { template =>
               Some(ParseResult(
-                component = constructor(mtch.group(1), template, parserConfig.rendered),
+                component = constructor(mtch.group(1), template),
                 remainder = afterOpenTag.substring(i + parserConfig.delimiters.tag(s"/$key").length)
               ))
             }

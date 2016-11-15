@@ -1,3 +1,4 @@
+import bhuj.model.Template
 import bhuj.parsing.Delimiters
 
 package object bhuj {
@@ -7,13 +8,17 @@ package object bhuj {
   type Render = (String, Context) => Result
   type ParseFailure = Left[Parse, String]
 
+  private[bhuj] type ParseTemplateFailure = Failure with Parse
+
+  private[bhuj] type ParseTemplate = (String => Either[ParseTemplateFailure, Template])
+
   private[bhuj] val emptyResult: Result = Right("")
 
   private[bhuj] val emptyContext: Context = Map.empty
 
   private[bhuj] val doubleMustaches = Delimiters("{{", "}}")
 
-  private type NonContextualRender = (String) => Result
+  private[bhuj] type NonContextualRender = (String) => Result
 }
 
 

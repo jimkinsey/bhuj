@@ -5,7 +5,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class TextParserTests extends FunSpec {
-  private implicit val parserConfig = ParserConfig(_ => ???, (_,_) => ???)
+  private implicit val parserConfig = ParserConfig(_ => ???)
 
   describe("A text node parser") {
 

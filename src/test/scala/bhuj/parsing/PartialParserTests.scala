@@ -5,7 +5,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class PartialParserTests extends FunSpec {
-  private lazy implicit val parseConfig = ParserConfig(_ => ???, (_,_) => ???)
+  private lazy implicit val parseConfig = ParserConfig(parsed = _ => ???)
 
   describe("A partial parser") {
 
@@ -21,9 +21,5 @@ class PartialParserTests extends FunSpec {
       new PartialParser((_,_) => ???).parseResult("{{> spaced }}").right.get.get.component.name should be("spaced")
     }
 
-    it("sets up the partial with the named-template-rendering function") {
-      val render: (String, Context) => Result = (_,_) => ???
-      new PartialParser(render).parseResult("{{> partial}}").right.get.get.component.render should be(render)
-    }
   }
 }
