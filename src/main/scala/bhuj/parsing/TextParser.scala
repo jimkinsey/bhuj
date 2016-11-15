@@ -1,6 +1,6 @@
 package bhuj.parsing
 
-import bhuj.components.Text
+import bhuj.model.Text
 
 private[bhuj] object TextParser extends ComponentParser[Text] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {

@@ -1,7 +1,7 @@
 package bhuj.parsing
 
-import bhuj.{Failure, Template}
-import bhuj.components._
+import bhuj.Failure
+import bhuj.model._
 import org.mockito.Mockito.when
 import org.scalatest.EitherValues._
 import org.scalatest.FunSpec

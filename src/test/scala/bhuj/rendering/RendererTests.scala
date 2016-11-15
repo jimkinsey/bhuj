@@ -1,7 +1,7 @@
 package bhuj.rendering
 
 import bhuj._
-import bhuj.components._
+import bhuj.model._
 import bhuj.parsing.Delimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

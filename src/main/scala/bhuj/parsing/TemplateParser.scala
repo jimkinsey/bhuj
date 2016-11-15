@@ -1,6 +1,6 @@
 package bhuj.parsing
 
-import bhuj.components._
+import bhuj.model._
 import bhuj._
 
 private[bhuj] case class ParseResult[+T <: Component](component: T, remainder: String)

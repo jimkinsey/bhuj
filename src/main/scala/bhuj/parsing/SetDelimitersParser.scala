@@ -1,7 +1,7 @@
 package bhuj.parsing
 
 import bhuj.{Failure, InvalidDelimiters}
-import bhuj.components.SetDelimiters
+import bhuj.model.SetDelimiters
 
 object SetDelimitersParser extends ComponentParser[SetDelimiters] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {

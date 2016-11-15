@@ -1,7 +1,7 @@
 package bhuj.parsing
 
 import bhuj.Render
-import bhuj.components.Partial
+import bhuj.model.Partial
 
 private[bhuj] class PartialParser(rendered: Render) extends ComponentParser[Partial] {
   def parseResult(template: String)(implicit parserConfig: ParserConfig) = {

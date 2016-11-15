@@ -1,7 +1,6 @@
 package bhuj.formatting
 
-import bhuj.Template
-import bhuj.components.{SetDelimiters, Variable}
+import bhuj.model.{SetDelimiters, Template, Variable}
 import bhuj.parsing.Delimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._

@@ -1,6 +1,6 @@
 package bhuj.parsing
 
-import bhuj.components._
+import bhuj.model._
 
 private[bhuj] trait StandaloneTagComponentParser[+T <: Component] extends ComponentParser[T] {
   def contentPattern: String

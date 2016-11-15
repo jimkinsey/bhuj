@@ -1,7 +1,7 @@
 package bhuj.parsing
 
 import bhuj.InvalidDelimiters
-import bhuj.components.SetDelimiters
+import bhuj.model.SetDelimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

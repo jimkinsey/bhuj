@@ -1,7 +1,6 @@
 package bhuj.formatting
 
-import bhuj.Template
-import bhuj.components._
+import bhuj.model.{Template, _}
 import bhuj.parsing.Delimiters
 
 private[bhuj] class Formatter {

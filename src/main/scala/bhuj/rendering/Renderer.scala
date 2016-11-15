@@ -1,6 +1,6 @@
 package bhuj.rendering
 
-import bhuj.components.{Partial, _}
+import bhuj.model.{Partial, _}
 import bhuj.formatting.Formatter
 import bhuj.{LambdaFailure, _}
 

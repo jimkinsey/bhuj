@@ -1,6 +1,6 @@
 package bhuj.parsing
 
-import bhuj.components.Text
+import bhuj.model.Text
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

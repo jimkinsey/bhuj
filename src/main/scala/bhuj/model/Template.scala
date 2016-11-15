@@ -1,6 +1,6 @@
-package bhuj
+package bhuj.model
 
-import bhuj.components.Component
+import bhuj._
 import bhuj.parsing.Delimiters
 
 private[bhuj] case class Template(initialDelimiters: Delimiters, components: Component*)
