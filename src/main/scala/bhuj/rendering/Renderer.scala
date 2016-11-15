@@ -53,8 +53,10 @@ private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
     context.get(section.name).map {
       case true => rendered(section.template, context)(emptyContext)
       case lambda: Lambda @unchecked =>
-        // FIXME deal with parse failure:
-        val render: NonContextualRender = (templateString) => rendered(parse(templateString).right.get, context)
+        val render: NonContextualRender = (templateString) => for {
+          template <- parse(templateString).right
+          result <- rendered(template, context).right
+        } yield { result }
         lambda(formatter.source(section.template), render).left.map{ f: Any => LambdaFailure(section.name, f) }
       case map: Context @unchecked => rendered(section.template, map)
       case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
