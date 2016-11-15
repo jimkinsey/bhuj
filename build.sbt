@@ -8,6 +8,4 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 
-libraryDependencies += "org.mockito" % "mockito-core" % "1.8.5"  % "test"
-
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"

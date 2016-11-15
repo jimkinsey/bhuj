@@ -5,7 +5,6 @@ import bhuj.model._
 import bhuj.parsing.Delimiters
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import org.scalatest.mock.MockitoSugar._
 
 class RendererTests extends FunSpec {
   implicit val globalContext: Context = Map.empty
@@ -200,6 +199,6 @@ class RendererTests extends FunSpec {
 
   private val render: (String, Context) => Result = (str, ctx) => Right(s"Rendered: $str")
 
-  private lazy val failure = mock[Failure]
+  private lazy val failure = LambdaFailure("key", "#fail")
 
 }

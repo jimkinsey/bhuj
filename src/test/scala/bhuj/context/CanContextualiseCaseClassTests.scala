@@ -1,15 +1,12 @@
 package bhuj.context
 
 import bhuj.context.CanContextualiseCaseClass.ConversionFailure
-import bhuj.context.CaseClassConverter.GeneralFailure
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import bhuj.context.CaseClassConverter.NotACaseClass
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import org.scalatest.mock.MockitoSugar.mock
 
 class CanContextualiseCaseClassTests extends FunSpec {
-  private val converter = mock[CaseClassConverter]
+  private val converter = new CaseClassConverter
   private val contextualiser = new CanContextualiseCaseClass(converter)
   import contextualiser._
 
@@ -17,14 +14,14 @@ class CanContextualiseCaseClassTests extends FunSpec {
 
     it("delegates to the converter") {
       case class House(number: Int)
-      when(converter.map(any())).thenReturn(Right(Map("hello" -> "world")))
-      context(House(11)) should be(Right(Map("hello" -> "world")))
+      context(House(11)) should be(Right(Map("number" -> 11)))
     }
 
     it("wraps a conversion error in a contextualisation error") {
-      case class Cat(name: String)
-      when(converter.map(any())).thenReturn(Left(GeneralFailure("#fail")))
-      context(Cat("Eowyn")) should be(Left(ConversionFailure(GeneralFailure("#fail"))))
+      case class Cat(name: String) {
+        val fail = "Can't handle non constructor fields"
+      }
+      context(Cat("Eowyn")) should be(Left(ConversionFailure(NotACaseClass(Cat("Eowyn")))))
     }
 
   }

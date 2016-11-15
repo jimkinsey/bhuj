@@ -1,12 +1,11 @@
 package bhuj.parsing
 
-import bhuj.model.{Template, Text}
+import bhuj.UnclosedTag
 import bhuj.formatting.Formatter
-import bhuj.{Failure, UnclosedTag}
+import bhuj.model.{Template, Text}
 import org.scalatest.EitherValues._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import org.scalatest.mock.MockitoSugar._
 
 class SectionParserTests extends FunSpec {
   private implicit val parserConfig = ParserConfig(t => Right(Template(Text(t))), (_,_) => ???)
@@ -42,7 +41,7 @@ class SectionParserTests extends FunSpec {
     }
 
     it("propagates a failure to parse the inner template") {
-      val failure = mock[Failure]
+      val failure = UnclosedTag("t")
       implicit val parserConfig = ParserConfig(_ => Left(failure), (_,_) => ???)
       SectionParser.parseResult("{{#t}}fail{{/t}}") should be(Left(failure))
     }

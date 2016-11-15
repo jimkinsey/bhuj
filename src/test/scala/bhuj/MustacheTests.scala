@@ -3,7 +3,6 @@ package bhuj
 import bhuj.context.{CanContextualise, ContextImplicits}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import org.scalatest.mock.MockitoSugar._
 
 class MustacheTests extends FunSpec {
   import ContextImplicits.canContextualiseMap
@@ -19,7 +18,7 @@ class MustacheTests extends FunSpec {
     }
 
     it("returns the failure if the contextualiser cannot produce a context") {
-      val failure = mock[CanContextualise.Failure]
+      val failure = new CanContextualise.Failure {}
       implicit object IntCanContextualise extends CanContextualise[Int] {
         def context(i: Int) = Left(failure)
       }
