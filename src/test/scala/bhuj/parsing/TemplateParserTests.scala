@@ -63,17 +63,9 @@ class TemplateParserTests extends FunSpec {
     }
 
     it("uses the parser config provided by the component when it is a directive") {
-      val directiveParser = mock[ComponentParser[SetDelimiters]]
-      val directive = mock[SetDelimiters]
-      when(directiveParser.parseResult(equalTo("dirtail"))(any())).thenReturn(Right(Some(ParseResult(directive, "tail"))))
-      val newParserConfig = mock[ParserConfig]
-      when(directive.modified(parserConfig)).thenReturn(newParserConfig)
-
-      val tailParser = mock[ComponentParser[Component]]
-      val tail = mock[Component]
-      when(tailParser.parseResult(equalTo("tail"))(equalTo(newParserConfig))).thenReturn(Right(Some(ParseResult(tail, ""))))
-
-      new TemplateParser(directiveParser, tailParser).template("dirtail") should be(Right(Template(directive, tail)))
+      new TemplateParser(SetDelimitersParser, VariableParser).template("{{=~: :~=}}~:foo:~") should be(Right(
+        Template(SetDelimiters(Delimiters("~:", ":~")), Variable("foo"))
+      ))
     }
 
   }
