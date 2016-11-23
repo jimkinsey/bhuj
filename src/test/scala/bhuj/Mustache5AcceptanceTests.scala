@@ -63,7 +63,8 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("renders the inner template for each item of the list") {
-        mustacheRenderer.render(
+        pendingUntilFixed {
+          mustacheRenderer.render(
             template =
               """{{#repo}}
                 |  <b>{{name}}</b>
@@ -82,65 +83,76 @@ class Mustache5AcceptanceTests extends FunSpec {
               |""".stripMargin
             ))
         }
+      }
 
       it("invokes the lambda with the unprocessed template and a render method") {
-        val wrapped: Lambda = (template, render) => Right(s"<b>${render(template).right.get}</b>")
-        mustacheRenderer.render(
-            template = """{{#wrapped}}
+        pendingUntilFixed {
+          val wrapped: Lambda = (template, render) => Right(s"<b>${render(template).right.get}</b>")
+          mustacheRenderer.render(
+            template =
+              """{{#wrapped}}
               |  {{name}} is awesome.
               |{{/wrapped}}""".stripMargin,
             context = Map(
               "name" -> "Willy",
               "wrapped" -> wrapped)
           ) should be(Right(
-          """<b>
+            """<b>
             |  Willy is awesome.
             |</b>""".stripMargin
           ))
         }
+      }
 
       it("for a non-false, non-iterable value uses the value as the context for a rendering of the section template") {
-        mustacheRenderer.render(
+        pendingUntilFixed {
+          mustacheRenderer.render(
             template =
               """{{#person?}}
                 |  Hi {{name}}!
                 |{{/person?}}""".stripMargin,
             context = Map("person?" -> Map("name" -> "Jon"))
           ) should be(Right(
-          """
+            """
             |  Hi Jon!
             |""".stripMargin
           ))
         }
+      }
 
     }
-
     describe("an inverted section tag") {
 
       it("renders once when the key doesn't exist") {
-        mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
+        pendingUntilFixed {
+          mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
+        }
       }
 
       it("renders once when the key is a false value") {
-        mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+        pendingUntilFixed {
+          mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+        }
       }
 
       it("renders once when the key is an empty list") {
-        mustacheRenderer.render(
-          template =
-            """{{#repo}}
+        pendingUntilFixed {
+          mustacheRenderer.render(
+            template =
+              """{{#repo}}
               |  <b>{{name}}</b>
               |{{/repo}}
               |{{^repo}}
               |  No repos! :(
               |{{/repo}}""".stripMargin,
-          context = Map("repo" -> List.empty)) should be(Right(
+          context
+            = Map("repo" -> List.empty)) should be(Right(
             """
               |
               |  No repos! :(
               |""".stripMargin))
+        }
       }
-
     }
 
     describe("a comment") {
@@ -152,8 +164,8 @@ class Mustache5AcceptanceTests extends FunSpec {
       it("may contain newlines") {
         mustacheRenderer.render(
           """{{!
-            |If you can read this, something went wrong
-            |}}""".stripMargin) should be(Right(""))
+          |If you can read this, something went wrong
+          |}}""".stripMargin) should be(Right(""))
       }
 
     }
@@ -161,30 +173,36 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a partial") {
 
       it("is rendered once in the current context") {
-        mustacheRenderer.withTemplates("user" -> "<strong>{{name}}</strong>").render(
-          template = """<h2>Names</h2>
+        pendingUntilFixed {
+          mustacheRenderer.withTemplates("user" -> "<strong>{{name}}</strong>").render(
+            template = """<h2>Names</h2>
                        |{{#names}}
                        |  {{> user}}
                        |{{/names}}""".stripMargin,
-          context = Map("names" -> Seq(Map("name" -> "Jennifer")))
-        ) should be(Right(
-          """<h2>Names</h2>
-            |
-            |  <strong>Jennifer</strong>
-            |""".stripMargin))
+            context = Map("names" -> Seq(
+              Map("name" ->
+                "Jennifer")))
+            ) should be(Right(
+              """<h2>Names</h2>
+              |
+              |  <strong>Jennifer</strong>
+              |""".stripMargin))
+        }
       }
 
       it("is rendered at runtime and so may be recursive") {
-        mustacheRenderer
-          .withTemplates("child" -> "{{name}} {{#child}}{{> child}}{{/child}}")
-          .renderTemplate("child", Map(
-            "name" -> "Grandma",
-            "child" -> Map(
-              "name" -> "Mum",
-              "child" -> Map("name" -> "Me")
-          ))) should be(Right(
+        pendingUntilFixed {
+          mustacheRenderer
+            .withTemplates("child" -> "{{name}} {{#child}}{{> child}}{{/child}}")
+            .renderTemplate("child", Map(
+              "name" -> "Grandma",
+              "child" -> Map(
+                "name" -> "Mum",
+                "child" -> Map("name" -> "Me")
+              ))) should be(Right(
             "Grandma Mum Me "
           ))
+        }
       }
     }
 

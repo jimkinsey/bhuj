@@ -9,3 +9,4 @@ case class InvalidDelimiters(start: String, end: String) extends Failure with Pa
 case class ContextualisationFailure(failure: CanContextualise.Failure) extends Failure
 case class TemplateNotFound(name: String) extends Failure
 case class LambdaFailure(key: String, failure: Any) extends Failure
+case object RenderFailure extends Failure// FIXME

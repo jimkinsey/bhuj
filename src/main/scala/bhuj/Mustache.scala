@@ -4,7 +4,7 @@ import bhuj.Mustache._
 import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
-import bhuj.rendering.Renderer
+import bhuj.rendering.{Renderer, ScalaConverter, TemplateCompiler}
 
 object Mustache {
   type Templates = (String => Option[String])
@@ -43,7 +43,7 @@ class Mustache(
     } yield { rendered }
   }
 
-  private lazy val renderer = new Renderer(parse, templates)
+  private lazy val renderer = new Renderer(new ScalaConverter, new TemplateCompiler)
 
   private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
 
