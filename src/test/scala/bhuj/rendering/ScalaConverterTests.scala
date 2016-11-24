@@ -47,6 +47,14 @@ class ScalaConverterTests extends FunSpec {
 
     }
 
+    describe("containing partials") {
+
+      it("retrieve the partial and render it") {
+        new ScalaConverter().scala(Template(Partial("template"))) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedPartial("template"))"""))
+      }
+
+    }
+
   }
 
 }

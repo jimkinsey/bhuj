@@ -1,33 +1,48 @@
 package bhuj.rendering
 
+import bhuj.Mustache.{Templates, emptyTemplates}
 import bhuj._
 import bhuj.model._
 
-private[bhuj] class Renderer(scalaConverter: ScalaConverter, compiler: TemplateCompiler) {
+private[bhuj] class Renderer(
+  scalaConverter: ScalaConverter,
+  compiler: TemplateCompiler,
+  parse: ParseTemplate,
+  templates: Templates = emptyTemplates) {
 
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
-    // FIXME the global needs passing all the way down still, and tests need to be written for this
-    val tools = new Tools
-
-    val res = for {
-      scala <- scalaConverter.scala(template).right
-      render <- compiler.compiled(scala).right
-      result <- render(tools)(context).right
-    } yield { result }
-
-    res.left.map(_ => RenderFailure) // FIXME propagate failure
+    for {
+      preRenderedPartials <- renderedPartials(template, context).right
+      scala               <- scalaConverter.scala(template).right
+      render              <- compiler.compiled(scala).right
+      result              <- render(new Tools(preRenderedPartials))(context).right
+    } yield {
+      result
+    }
   }
-//
+
+  private def renderedPartials(template: Template, context: Context): Either[Failure, Map[String, String]] = {
+    /* TODO possible optimisation is to convert partials which do not reference other partials into lists of components
+     maybe could even check if there is recursion / recursively optimise templates? */
+    template.components.foldLeft[Either[Failure, Map[String, String]]](Right(Map.empty)) {
+      case (Right(acc), Partial(name)) =>
+        for {
+          rawPartial      <- templates(name).toRight({ TemplateNotFound(name) }).right
+          partial         <- parse(rawPartial).right
+          renderedPartial <- rendered(partial, context)(emptyContext).right
+        } yield {
+          acc ++ Map(name -> renderedPartial)
+        }
+      case (f: Left[Failure, _], _) => f
+      case (acc, _) => acc
+    }
+  }
+
+  // maybe should prerender sections like partials as well? but how would you name them?
+  //
 //  private def rendered(component: Component, context: Context): Result = component match {
 //    case section: Section => renderedSection(section, context)
 //    case section: InvertedSection => renderedInvertedSection(section, context)
-//    case Partial(name) => {
-//      for {
-//        template <- templates(name).toRight({ TemplateNotFound(name) }).right
-//        parsed <- parse(template).right
-//        result <- rendered(parsed, context).right
-//      } yield { result }
-//    }
 //  }
 //
 //  private def renderedInvertedSection(section: InvertedSection, context: Context) = {

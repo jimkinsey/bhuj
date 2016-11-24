@@ -43,7 +43,7 @@ class Mustache(
     } yield { rendered }
   }
 
-  private lazy val renderer = new Renderer(new ScalaConverter, new TemplateCompiler)
+  private lazy val renderer = new Renderer(new ScalaConverter, new TemplateCompiler, parse, templates)
 
   private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
 

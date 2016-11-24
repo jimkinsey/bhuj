@@ -58,10 +58,8 @@ class RendererTests extends FunSpec {
       }
 
       it("propagates the failure of any components") {
-        pendingUntilFixed {
-          val failing = Partial("non-existent")
-          renderer.rendered(Template(failing), emptyContext) should be(Left(TemplateNotFound("non-existent")))
-        }
+        val failing = Partial("non-existent")
+        renderer.rendered(Template(failing), emptyContext) should be(Left(TemplateNotFound("non-existent")))
       }
 
       it("concatenates the results of rendering all its components") {
@@ -162,25 +160,29 @@ class RendererTests extends FunSpec {
     describe("A partial component") {
 
       it("propagates failure to render the template") {
-        pendingUntilFixed {
-          fail
-        }
-//        val renderer = new Renderer(new Mustache().parse, {
-//          case "partial" => Some("{{> non-existent}}")
-//          case _ => None
-//        })
-//        renderer.rendered(Template(Partial("partial")), emptyContext) should be(Left(TemplateNotFound("non-existent")))
+        val renderer = new Renderer(
+          new ScalaConverter,
+          new TemplateCompiler,
+          new Mustache().parse,
+          {
+            case "partial" => Some("{{> no-such-partial}}")
+            case _ => None
+          }
+        )
+        renderer.rendered(Template(Partial("partial")), Map("foo" -> 42)) should be(Left(TemplateNotFound("no-such-partial")))
       }
 
       it("renders the named template in the provided context") {
-        pendingUntilFixed {
-          fail
-        }
-//        val renderer = new Renderer(new Mustache().parse, {
-//          case "partial" => Some("{{foo}}")
-//          case _ => None
-//        })
-//        renderer.rendered(Template(Partial("partial")), Map("foo" -> 42)) should be(Right("42"))
+        val renderer = new Renderer(
+          new ScalaConverter,
+          new TemplateCompiler,
+          new Mustache().parse,
+          {
+            case "partial" => Some("{{foo}}")
+            case _ => None
+          }
+        )
+        renderer.rendered(Template(Partial("partial")), Map("foo" -> 42)) should be(Right("42"))
       }
 
     }
@@ -226,6 +228,6 @@ class RendererTests extends FunSpec {
 
   }
 
-  private lazy val renderer = new Renderer(new ScalaConverter, new TemplateCompiler)
+  private lazy val renderer = new Renderer(new ScalaConverter, new TemplateCompiler, new Mustache().parse, _ => None)
 
 }
