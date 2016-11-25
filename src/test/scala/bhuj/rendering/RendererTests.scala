@@ -104,55 +104,41 @@ class RendererTests extends FunSpec {
       }
 
       it("returns the failure if the named value is a lambda which fails") {
-        pendingUntilFixed {
-          val failure = LambdaFailure("key", "#fail")
-          val failingLambda: Lambda = (_, _) => Left(failure)
-          renderer.rendered(Template(Section("wrap", Template())), Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
-        }
+        val failure = LambdaFailure("key", "#fail")
+        val failingLambda: Lambda = (_, _) => Left(failure)
+        renderer.rendered(Template(Section("wrap", Template())), Map("wrap" -> failingLambda)) should be(Left(LambdaFailure("wrap", failure)))
       }
 
       it("returns the failure if the named value is a non-false value which fails to render") {
-        pendingUntilFixed {
-          val failing = Template(Partial("failing"))
-          renderer.rendered(Template(Section("thing", failing)), Map("thing" -> Map("a" -> 1))) should be(Left(TemplateNotFound("failing")))
-        }
+        val failing = Template(Partial("failing"))
+        renderer.rendered(Template(Section("thing", failing)), Map("thing" -> Map("a" -> 1))) should be(Left(TemplateNotFound("failing")))
       }
 
       it("renders the section once using the value as a context if it is a map") {
-        pendingUntilFixed {
-          val template = Template(Text("a"))
-          val section = Section("section", template)
-          renderer.rendered(Template(section), Map("section" -> Map("a" -> 1))) should be(Right(s"a"))
-        }
+        val template = Template(Text("a"))
+        val section = Section("section", template)
+        renderer.rendered(Template(section), Map("section" -> Map("a" -> 1))) should be(Right(s"a"))
       }
 
       it("renders the section once in the current context if it is true") {
-        pendingUntilFixed {
-          val template = Template(Text("a"))
-          renderer.rendered(Template(Section("doIt", template)), Map("doIt" -> true)) should be(Right("a"))
-        }
+        val template = Template(Text("a"))
+        renderer.rendered(Template(Section("doIt", template)), Map("doIt" -> true)) should be(Right("a"))
       }
 
       it("renders the section once in the current context if the item is a defined option") {
-        pendingUntilFixed {
-          val template = Template(Text("a"))
-          renderer.rendered(Template(Section("maybe", template)), Map("maybe" -> Some(Map.empty))) should be(Right("a"))
-        }
+        val template = Template(Text("a"))
+        renderer.rendered(Template(Section("maybe", template)), Map("maybe" -> Some(Map.empty))) should be(Right("a"))
       }
 
       it("renders the section for each item in a non-empty iterable with the item as the context") {
-        pendingUntilFixed {
-          val template = Template(Text("a"))
-          renderer.rendered(Template(Section("things", template)), Map("things" -> List(Map.empty, Map.empty, Map.empty))) should be(Right(s"aaa"))
-        }
+        val template = Template(Text("a"))
+        renderer.rendered(Template(Section("things", template)), Map("things" -> List(Map.empty, Map.empty, Map.empty))) should be(Right(s"aaa"))
       }
 
       it("renders the section once for a lambda") {
-        pendingUntilFixed {
-          val template = Template(Text("a"))
-          val lambda: Lambda = (template, rendered) => Right(s"LAMBDA'D: ${rendered(template).right.get}")
-          renderer.rendered(Template(Section("wrap", template)), Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: a"))
-        }
+        val template = Template(Text("a"))
+        val lambda: Lambda = (template, rendered) => Right(s"LAMBDA'D: ${rendered(template).right.get}")
+        renderer.rendered(Template(Section("wrap", template)), Map("wrap" -> lambda)) should be(Right(s"LAMBDA'D: a"))
       }
 
     }

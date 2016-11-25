@@ -49,8 +49,17 @@ class ScalaConverterTests extends FunSpec {
 
     describe("containing partials") {
 
-      it("retrieve the partial and render it") {
+      it("inserts the pre-rendered partial") {
         new ScalaConverter().scala(Template(Partial("template"))) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedPartial("template"))"""))
+      }
+
+    }
+
+    describe("containing sections") {
+
+      it("inserts the pre-rendered section") {
+        val sectionTemplate = Template()
+        new ScalaConverter().scala(Template(Section("section", sectionTemplate))) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedSection("section", ${sectionTemplate.hashCode()}))"""))
       }
 
     }

@@ -12,6 +12,7 @@ class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks with Te
   implicit val noShrink = Shrink[String] { _ => Stream.empty }
 
   property("valid template does not result in parse error") {
+    pending
     forAll(template() -> "template") { template =>
       mustache.render(template, context) should not be a[ParseFailure]
     }

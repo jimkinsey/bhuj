@@ -71,9 +71,7 @@ class MustacheTests extends FunSpec {
     }
 
     it("allows access to the context item when rendering an Option using underscore (_)") {
-      pendingUntilFixed {
-        new Mustache().render("""{{#maybe}}~{{_}}~{{/maybe}}""", Map("maybe" -> Some("It is!!!"))) should be(Right("~It is!!!~"))
-      }
+      new Mustache().render("""{{#maybe}}~{{_}}~{{/maybe}}""", Map("maybe" -> Some("It is!!!"))) should be(Right("~It is!!!~"))
     }
 
   }

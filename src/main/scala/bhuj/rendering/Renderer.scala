@@ -2,6 +2,7 @@ package bhuj.rendering
 
 import bhuj.Mustache.{Templates, emptyTemplates}
 import bhuj._
+import bhuj.formatting.Formatter
 import bhuj.model._
 
 private[bhuj] class Renderer(
@@ -13,9 +14,10 @@ private[bhuj] class Renderer(
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
     for {
       preRenderedPartials <- renderedPartials(template, context).right
+      preRenderedSections <- renderedSections(template, context).right
       scala               <- scalaConverter.scala(template).right
       render              <- compiler.compiled(scala).right
-      result              <- render(new Tools(preRenderedPartials))(context).right
+      result              <- render(new Tools(preRenderedPartials, preRenderedSections))(context).right
     } yield {
       result
     }
@@ -38,10 +40,7 @@ private[bhuj] class Renderer(
     }
   }
 
-  // maybe should prerender sections like partials as well? but how would you name them?
-  //
 //  private def rendered(component: Component, context: Context): Result = component match {
-//    case section: Section => renderedSection(section, context)
 //    case section: InvertedSection => renderedInvertedSection(section, context)
 //  }
 //
@@ -54,28 +53,37 @@ private[bhuj] class Renderer(
 //    }.getOrElse(rendered(section.template, context))
 //  }
 //
-//  private def renderedSection(section: Section, context: Context) = {
-//    context.get(section.name).map {
-//      case true => rendered(section.template, context)(emptyContext)
-//      case lambda: Lambda @unchecked =>
-//        val render: NonContextualRender = (templateString) => for {
-//          template <- parse(templateString).right
-//          result <- rendered(template, context).right
-//        } yield { result }
-//        lambda(formatter.source(section.template), render).left.map{ f: Any => LambdaFailure(section.name, f) }
-//      case map: Context @unchecked => rendered(section.template, map)
-//      case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
-//        case (Right(acc), ctx) => rendered(section.template, ctx)(emptyContext).right.map(acc + _)
-//        case (Left(fail), _) => Left(fail)
-//      }
-//      case Some(item) => item match {
-//        case ctx: Context @unchecked => rendered(section.template, ctx)(emptyContext)
-//        case nonCtx => rendered(section.template, Map("_" -> nonCtx))(emptyContext)
-//      }
-//      case _ => emptyResult
-//    }.getOrElse(emptyResult)
-//  }
-//
-//  private lazy val formatter = new Formatter
+
+  private def renderedSections(template: Template, context: Context) = {
+    template.components.foldLeft[Either[Failure, Map[(String, Int), String]]](Right(Map.empty)) {
+      case (Right(acc), section @ Section(name, sectionTemplate)) => renderedSection(section, context).right.map(rendered => acc ++ Map(name -> sectionTemplate.hashCode() -> rendered))
+      case (failure: Left[_,_], _) => failure
+      case (acc, _) => acc
+    }
+  }
+
+  private def renderedSection(section: Section, context: Context) = {
+    context.get(section.name).map {
+      case true => rendered(section.template, context)(emptyContext)
+      case lambda: Lambda @unchecked =>
+        val render: NonContextualRender = (templateString) => for {
+          template <- parse(templateString).right
+          result <- rendered(template, context).right
+        } yield { result }
+        lambda(formatter.source(section.template), render).left.map{ f: Any => LambdaFailure(section.name, f) }
+      case map: Context @unchecked => rendered(section.template, map)
+      case iterable: Iterable[Context] @unchecked => iterable.foldLeft(emptyResult) {
+        case (Right(acc), ctx) => rendered(section.template, ctx)(emptyContext).right.map(acc + _)
+        case (Left(fail), _) => Left(fail)
+      }
+      case Some(item) => item match {
+        case ctx: Context @unchecked => rendered(section.template, ctx)(emptyContext)
+        case nonCtx => rendered(section.template, Map("_" -> nonCtx))(emptyContext)
+      }
+      case _ => emptyResult
+    }.getOrElse(emptyResult)
+  }
+
+  private lazy val formatter = new Formatter
 
 }
