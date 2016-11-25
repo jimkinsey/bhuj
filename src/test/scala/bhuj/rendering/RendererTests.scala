@@ -69,10 +69,13 @@ class RendererTests extends FunSpec {
       }
 
       it("uses values in the global context") {
-        pendingUntilFixed {
-          val global = Map("x" -> 2, "y" -> 3)
-          renderer.rendered(Template(Variable("x"), Variable("y")), Map("x" -> 1))(global) should be(Right("13"))
-        }
+        val global = Map("x" -> 2, "y" -> 3)
+        renderer.rendered(Template(Variable("x"), Variable("y")), Map("x" -> 1))(global) should be(Right("13"))
+      }
+
+      it("makes the global context available to sub-templates") {
+        val global: Context = Map("x" -> 2, "xxx" -> true)
+        renderer.rendered(Template(Section("xxx", Template(Variable("x")))), Map())(global) should be(Right("2"))
       }
 
     }

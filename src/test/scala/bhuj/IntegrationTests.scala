@@ -29,23 +29,19 @@ class IntegrationTests extends FunSpec with TemplateFiles {
     }
 
     it("provides a global context which is useful for localisation") {
-      pendingUntilFixed {
-        val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
-        val mustache = mustacheRenderer
-          .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")
-          .withHelpers("localised" -> localised)
-        mustache.renderTemplate("greeting", Person("Elisabeth")) should be(Right("Bonjour Elisabeth"))
-      }
+      val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
+      val mustache = mustacheRenderer
+        .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")
+        .withHelpers("localised" -> localised)
+      mustache.renderTemplate("greeting", Person("Elisabeth")) should be(Right("Bonjour Elisabeth"))
     }
 
     it("honours the set delimiters tag when applying a lambda which renders the content") {
-      pendingUntilFixed {
-        val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
-        val mustache = mustacheRenderer
-          .withTemplates("greeting" -> "{{#localised}}Hello {{=<% %>=}}<%name%> {{name}}{{/localised}}")
-          .withHelpers("localised" -> localised)
-        mustache.renderTemplate("greeting", Person("Charlotte")) should be(Right("Bonjour Charlotte {{name}}"))
-      }
+      val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
+      val mustache = mustacheRenderer
+        .withTemplates("greeting" -> "{{#localised}}Hello {{=<% %>=}}<%name%> {{name}}{{/localised}}")
+        .withHelpers("localised" -> localised)
+      mustache.renderTemplate("greeting", Person("Charlotte")) should be(Right("Bonjour Charlotte {{name}}"))
     }
 
     it("switches the delimiters when the set delimiters tag is used") {
