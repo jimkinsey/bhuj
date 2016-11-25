@@ -6,15 +6,11 @@ object Benchmarking extends App {
 
   val context: Context = Map(
     "title" -> "Page Title",
-    "content" ->
-      """<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-        |<p>This is a paragraph.</p>
-      """.stripMargin,
+    "items" -> (1 to 100).map(i =>
+      Map(
+        "title" -> s"Item $i",
+        "content" -> "<p>This is a paragraph.</p>")
+    ),
     "nav" -> Map(
       "items" -> Seq(
         Map("title" -> "Home", "link" -> "/"),
