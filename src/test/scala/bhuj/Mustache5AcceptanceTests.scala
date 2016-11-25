@@ -118,34 +118,28 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("an inverted section tag") {
 
       it("renders once when the key doesn't exist") {
-        pendingUntilFixed {
-          mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
-        }
+        mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
       }
 
       it("renders once when the key is a false value") {
-        pendingUntilFixed {
-          mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
-        }
+        mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
       }
 
       it("renders once when the key is an empty list") {
-        pendingUntilFixed {
-          mustacheRenderer.render(
-            template =
-              """{{#repo}}
-              |  <b>{{name}}</b>
-              |{{/repo}}
-              |{{^repo}}
-              |  No repos! :(
-              |{{/repo}}""".stripMargin,
-          context
-            = Map("repo" -> List.empty)) should be(Right(
-            """
-              |
-              |  No repos! :(
-              |""".stripMargin))
-        }
+        mustacheRenderer.render(
+          template =
+            """{{#repo}}
+            |  <b>{{name}}</b>
+            |{{/repo}}
+            |{{^repo}}
+            |  No repos! :(
+            |{{/repo}}""".stripMargin,
+        context
+          = Map("repo" -> List.empty)) should be(Right(
+          """
+            |
+            |  No repos! :(
+            |""".stripMargin))
       }
     }
 

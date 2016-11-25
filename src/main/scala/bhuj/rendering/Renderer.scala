@@ -40,23 +40,23 @@ private[bhuj] class Renderer(
     }
   }
 
-//  private def rendered(component: Component, context: Context): Result = component match {
-//    case section: InvertedSection => renderedInvertedSection(section, context)
-//  }
-//
-//  private def renderedInvertedSection(section: InvertedSection, context: Context) = {
-//    context.get(section.name).map {
-//      case false => rendered(section.template, context)(emptyContext)
-//      case None => rendered(section.template, context)(emptyContext)
-//      case iterable: Iterable[Context]@unchecked if iterable.isEmpty => rendered(section.template, context)(emptyContext)
-//      case _ => emptyResult
-//    }.getOrElse(rendered(section.template, context))
-//  }
-//
+  private def renderedInvertedSection(section: InvertedSection, context: Context) = {
+    context.get(section.name).map {
+      case false => rendered(section.template, context)(emptyContext)
+      case None => rendered(section.template, context)(emptyContext)
+      case iterable: Iterable[Context]@unchecked if iterable.isEmpty => rendered(section.template, context)(emptyContext)
+      case _ => emptyResult
+    }.getOrElse(rendered(section.template, context))
+  }
+
 
   private def renderedSections(template: Template, context: Context) = {
-    template.components.foldLeft[Either[Failure, Map[(String, Int), String]]](Right(Map.empty)) {
-      case (Right(acc), section @ Section(name, sectionTemplate)) => renderedSection(section, context).right.map(rendered => acc ++ Map(name -> sectionTemplate.hashCode() -> rendered))
+    def key(component: Component): Int = component.hashCode()
+    template.components.foldLeft[Either[Failure, Map[Int, String]]](Right(Map.empty)) {
+      case (Right(acc), section: Section) if !acc.contains(key(section)) =>
+        renderedSection(section, context).right.map(rendered => acc ++ Map(key(section) -> rendered))
+      case (Right(acc), section: InvertedSection) if !acc.contains(key(section)) =>
+        renderedInvertedSection(section, context).right.map(rendered => acc ++ Map(key(section) -> rendered))
       case (failure: Left[_,_], _) => failure
       case (acc, _) => acc
     }

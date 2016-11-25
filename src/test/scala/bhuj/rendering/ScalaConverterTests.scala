@@ -58,8 +58,17 @@ class ScalaConverterTests extends FunSpec {
     describe("containing sections") {
 
       it("inserts the pre-rendered section") {
-        val sectionTemplate = Template()
-        new ScalaConverter().scala(Template(Section("section", sectionTemplate))) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedSection("section", ${sectionTemplate.hashCode()}))"""))
+        val section = Section("section", Template())
+        new ScalaConverter().scala(Template(section)) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedSection(${section.hashCode()}))"""))
+      }
+
+    }
+
+    describe("containing inverted sections") {
+
+      it("inserts the pre-rendered inverted section") {
+        val invertedSection = InvertedSection("section", Template())
+        new ScalaConverter().scala(Template(invertedSection)) should be(Right(s"""(tools: bhuj.rendering.Tools) => (context: bhuj.Context) => Right("" + tools.renderedSection(${invertedSection.hashCode()}))"""))
       }
 
     }

@@ -176,22 +176,16 @@ class RendererTests extends FunSpec {
     describe("An inverted section") {
 
       it("propagates a failure from the template") {
-        pendingUntilFixed {
-          val failing = Template(Partial("failing"))
-          renderer.rendered(Template(InvertedSection("section", failing)), Map("section" -> false)) should be(Left(TemplateNotFound("failing")))
-        }
+        val failing = Template(Partial("failing"))
+        renderer.rendered(Template(InvertedSection("section", failing)), Map("section" -> false)) should be(Left(TemplateNotFound("failing")))
       }
 
       it("renders the template once when the value is false") {
-        pendingUntilFixed {
-          renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> false)) should be(Right("a"))
-        }
+        renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> false)) should be(Right("a"))
       }
 
       it("renders the template once when the value is none") {
-        pendingUntilFixed {
-          renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> None)) should be(Right("a"))
-        }
+        renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> None)) should be(Right("a"))
       }
 
       it("renders nothing when the value is true") {
@@ -199,15 +193,11 @@ class RendererTests extends FunSpec {
       }
 
       it("renders the template once when the value is an empty iterable") {
-        pendingUntilFixed {
-          renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> List.empty)) should be(Right("a"))
-        }
+        renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), Map("section" -> List.empty)) should be(Right("a"))
       }
 
       it("renders once when the key does not exist") {
-        pendingUntilFixed {
-          renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), emptyContext) should be(Right("a"))
-        }
+        renderer.rendered(Template(InvertedSection("section", Template(Text("a")))), emptyContext) should be(Right("a"))
       }
 
     }
