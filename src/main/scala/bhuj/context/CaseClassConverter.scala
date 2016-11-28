@@ -24,16 +24,11 @@ class CaseClassConverter {
   }
 
   private def value(obj: Any): Any = obj match {
-    case product: Product if isCaseClass(product) =>
-      caseClassMap(obj.asInstanceOf[Product])
-    case map: Map[_,_] =>
-      map.map { case (k,v) => k.toString -> value(v) }
-    case iterable: Iterable[_] =>
-      iterable.map(value)
-    case option: Option[_] =>
-      option.map(value)
-    case _ =>
-      obj
+    case product: Product if isCaseClass(product) => caseClassMap(obj.asInstanceOf[Product])
+    case map: Map[_,_]                            => map.map { case (k,v) => k.toString -> value(v) }
+    case iterable: Iterable[_]                    => iterable.map(value)
+    case option: Option[_]                        => option.map(value)
+    case _                                        => obj
   }
 
   private def publicFields(obj: Product) = {

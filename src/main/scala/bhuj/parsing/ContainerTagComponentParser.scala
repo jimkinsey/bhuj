@@ -11,7 +11,7 @@ private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Cont
 
   final def parseResult(template: String)(implicit parserConfig: ParserConfig): Either[ParseTemplateFailure, Option[ParseResult[T]]] = {
     parserConfig.delimiters.pattern(s"""${quote(prefix)}(.+?)""").r.findPrefixMatchOf(template) match {
-      case None => Right(None)
+      case None       => Right(None)
       case Some(mtch) =>
         val key = mtch.group(1)
         val afterOpenTag = mtch.after.toString
