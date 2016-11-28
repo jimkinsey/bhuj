@@ -14,7 +14,7 @@ private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
     }
   }
 
-  private[bhuj] def rendered(component: Component, context: Context): Result = component match {
+  private def rendered(component: Component, context: Context): Result = component match {
     case Text(content)               => Right(content)
     case Variable(name)              => Right(context.get(name).map(_.toString).map(escapeHTML).getOrElse(""))
     case variable: UnescapedVariable => Right(context.get(variable.name).map(_.toString).getOrElse(""))
