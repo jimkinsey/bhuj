@@ -55,7 +55,7 @@ class Mustache(
     CommentParser,
     SectionParser,
     InvertedSectionParser,
-    new PartialParser(this.renderTemplate(_,_)),
+    PartialParser,
     SetDelimitersParser)
 
   private implicit val parserConfig: ParserConfig = ParserConfig(parse, doubleMustaches)
