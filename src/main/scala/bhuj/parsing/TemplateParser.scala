@@ -19,12 +19,12 @@ private[bhuj] class TemplateParser(componentParsers: ComponentParser[Component]*
   def template(raw: String)(implicit parserConfig: ParserConfig): Either[ParseTemplateFailure, Template] = {
     Stream(componentParsers:_*).map(_.parseResult(raw)).collectFirst {
       case Right(Some(ParseResult(setDelimiters: SetDelimiters, remainder))) =>
-        template(remainder)(modifiedConfig(setDelimiters)).right.map(tail => Template(parserConfig.delimiters, setDelimiters +: tail.components :_*))
+        template(remainder)(modifiedConfig(setDelimiters)).right.map(tail => Template(parserConfig.delimiters, setDelimiters +: tail.components))
       case Right(Some(ParseResult(head, remainder))) =>
-        template(remainder).right.map(tail => Template(parserConfig.delimiters, head +: tail.components :_*))
+        template(remainder).right.map(tail => Template(parserConfig.delimiters, head +: tail.components))
       case Left(fail) =>
         Left(fail)
-    }.getOrElse(Right(Template(parserConfig.delimiters)))
+    }.getOrElse(Right(Template(parserConfig.delimiters, Seq.empty)))
   }
 
   private def modifiedConfig(setDelimiters: SetDelimiters)(implicit config: ParserConfig) =

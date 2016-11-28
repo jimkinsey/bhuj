@@ -5,13 +5,24 @@ import bhuj.model.{Partial, _}
 import bhuj.formatting.Formatter
 import bhuj.{LambdaFailure, _}
 
-private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
+private[bhuj] object Renderer {
+  val noOptimise: Optimise = Right.apply
+}
+
+private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates, optimise: Optimise = Renderer.noOptimise) {
 
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
-    template.components.foldLeft(emptyResult) {
-      case (Right(acc), c) => rendered(c, global ++ context).right.map(acc + _)
-      case (failure: Left[Failure, String], _) => failure
+    for {
+      optimised <- optimise(template).right
+      rendered <- rendered(optimised.components, context).right
+    } yield {
+      rendered
     }
+  }
+
+  private[bhuj] def rendered(components: Seq[Component], context: Context)(implicit global: Context): Result = components.foldLeft(emptyResult) {
+    case (Right(acc), c) => rendered(c, global ++ context).right.map(acc + _)
+    case (failure: Left[Failure, String], _) => failure
   }
 
   private[bhuj] def rendered(component: Component, context: Context): Result = component match {

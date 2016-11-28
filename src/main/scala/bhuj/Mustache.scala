@@ -4,7 +4,7 @@ import bhuj.Mustache._
 import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
-import bhuj.rendering.Renderer
+import bhuj.rendering.{Optimiser, Renderer}
 
 object Mustache {
   type Templates = (String => Option[String])
@@ -43,7 +43,7 @@ class Mustache(
     } yield { rendered }
   }
 
-  private lazy val renderer = new Renderer(parse, templates)
+  private lazy val renderer = new Renderer(parse, templates, optimise)
 
   private implicit val canContextualiseMap: CanContextualiseMap = new CanContextualiseMap(new CaseClassConverter)
 
@@ -61,5 +61,9 @@ class Mustache(
   private implicit val parserConfig: ParserConfig = ParserConfig(parse, doubleMustaches)
 
   private[bhuj] lazy val parse: ParseTemplate = Caching.cached(templateParser.template)
+
+  private lazy val optimiser: Optimiser = new Optimiser(parse, templates)
+
+  private lazy val optimise: Optimise = Caching.cached(optimiser.optimise)
 
 }

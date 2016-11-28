@@ -8,6 +8,8 @@ package object bhuj {
   type Render = (String, Context) => Result
   type ParseFailure = Left[Parse, String]
 
+  private[bhuj] type Optimise = (Template => Either[Failure, Template])
+
   private[bhuj] type ParseTemplateFailure = Failure with Parse
 
   private[bhuj] type ParseTemplate = (String => Either[ParseTemplateFailure, Template])
