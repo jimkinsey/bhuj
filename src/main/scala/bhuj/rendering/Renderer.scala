@@ -9,7 +9,7 @@ private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
 
   def rendered(template: Template, context: Context)(implicit global: Context = emptyContext): Result = {
     template.components.foldLeft(emptyResult) {
-      case (Right(acc), c)         => rendered(c, global ++ context).right.map(acc + _)
+      case (Right(acc), c)         => rendered(c, global ++ context).map(acc + _)
       case (failure: Left[_,_], _) => failure
     }
   }
@@ -36,9 +36,9 @@ private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
 
   private def renderedPartial(name: String, context: Context) = {
     for {
-      template <- templates(name).toRight({ TemplateNotFound(name) }).right
-      parsed   <- parse(template).right
-      result   <- rendered(parsed, context).right
+      template <- templates(name).toRight({ TemplateNotFound(name) })
+      parsed   <- parse(template)
+      result   <- rendered(parsed, context)
     } yield { result }
   }
 
@@ -54,8 +54,8 @@ private[bhuj] class Renderer(parse: ParseTemplate, templates: Templates) {
   private def renderedSection(section: Section, context: Context) = {
     def renderedLambda(lambda: Lambda) = {
       val render: NonContextualRender = (templateString) => for {
-        template <- parse(templateString).right
-        result   <- rendered(template, context).right
+        template <- parse(templateString)
+        result   <- rendered(template, context)
       } yield { result }
       lambda(formatter.source(section.template), render).left.map{ f: Any => LambdaFailure(section.name, f) }
     }

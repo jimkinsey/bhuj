@@ -21,28 +21,28 @@ class Mustache(
 
   def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Result = {
     for {
-      template  <- templates(name).toRight({TemplateNotFound(name)}).right
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      ctx       <- ev.context(context).left.map(ContextualisationFailure).right
-      result    <- renderer.rendered(optimised, ctx).right
+      template  <- templates(name).toRight({TemplateNotFound(name)})
+      parsed    <- parse(template)
+      optimised <- optimise(parsed)
+      ctx       <- ev.context(context).left.map(ContextualisationFailure)
+      result    <- renderer.rendered(optimised, ctx)
     } yield { result }
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Result = {
     for {
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      ctx       <- ev.context(context).left.map(ContextualisationFailure).right
-      rendered  <- renderer.rendered(optimised, ctx).right
+      parsed    <- parse(template)
+      optimised <- optimise(parsed)
+      ctx       <- ev.context(context).left.map(ContextualisationFailure)
+      rendered  <- renderer.rendered(optimised, ctx)
     } yield { rendered }
   }
 
   def render(template: String): Result = {
     for {
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      rendered  <- renderer.rendered(optimised, emptyContext).right
+      parsed    <- parse(template)
+      optimised <- optimise(parsed)
+      rendered  <- renderer.rendered(optimised, emptyContext)
     } yield { rendered }
   }
 
