@@ -1,10 +1,10 @@
 package bhuj
 
 import bhuj.context.ContextImplicits
-import org.scalatest.FunSpec
+import org.scalatest.AsyncFunSpec
 import org.scalatest.Matchers._
 
-class Mustache5AcceptanceTests extends FunSpec {
+class Mustache5AcceptanceTests extends AsyncFunSpec {
   import ContextImplicits._
   import MustacheBuilder.mustacheRenderer
 
@@ -13,23 +13,23 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a variable tag") {
 
       it("is replaced by an empty string when the key is not in the context") {
-        mustacheRenderer.render("Hello {{name}}", Map[String,Any]()) should be(Right("Hello "))
+        mustacheRenderer.render("Hello {{name}}", Map[String,Any]()) map (_ shouldBe Right("Hello "))
       }
 
       it("is replaced by the value from the context when present") {
-        mustacheRenderer.render("Hello {{name}}", Map("name" -> "Chris")) should be(Right("Hello Chris"))
+        mustacheRenderer.render("Hello {{name}}", Map("name" -> "Chris")) map (_ shouldBe Right("Hello Chris"))
       }
 
       it("escapes for HTML by default") {
-        mustacheRenderer.render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
+        mustacheRenderer.render("{{html}}", Map("html" -> """<blink>"&'</blink>""")) map (_ shouldBe Right("&lt;blink&gt;&quot;&amp;&#39;&lt;/blink&gt;"))
       }
 
       it("does not escape when the variable is triple-delimited") {
-        mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+        mustacheRenderer.render("{{{html}}}", Map("html" -> """<blink>"&'</blink>""")) map (_ shouldBe Right("""<blink>"&'</blink>"""))
       }
 
       it("does not escape when the variable starts with an ampersand") {
-        mustacheRenderer.render("{{&html}}", Map("html" -> """<blink>"&'</blink>""")) should be(Right("""<blink>"&'</blink>"""))
+        mustacheRenderer.render("{{&html}}", Map("html" -> """<blink>"&'</blink>""")) map (_ shouldBe Right("""<blink>"&'</blink>"""))
       }
 
     }
@@ -37,7 +37,7 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a section tag") {
 
       it("does not render when the key is not in the context") {
-        mustacheRenderer.render("before:{{#x}}X{{/x}}:after") should be(Right("before::after"))
+        mustacheRenderer.render("before:{{#x}}X{{/x}}:after") map (_ shouldBe Right("before::after"))
       }
 
       it("does not render for a false value") {
@@ -45,7 +45,7 @@ class Mustache5AcceptanceTests extends FunSpec {
           """Shown.
             |{{#person}}
             |  Never shown!
-            |{{/person}}""".stripMargin, Map("person" -> false)) should be(Right(
+            |{{/person}}""".stripMargin, Map("person" -> false)) map (_ shouldBe Right(
           """Shown.
             |""".stripMargin
         ))
@@ -56,7 +56,7 @@ class Mustache5AcceptanceTests extends FunSpec {
           """Shown.
             |{{#person}}
             |  Never shown!
-            |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) should be(Right(
+            |{{/person}}""".stripMargin, Map("person" -> Seq.empty)) map (_ shouldBe Right(
           """Shown.
             |""".stripMargin
         ))
@@ -72,7 +72,7 @@ class Mustache5AcceptanceTests extends FunSpec {
               Map("name" -> "resque"),
               Map("name" -> "hub"),
               Map("name" -> "rip")
-            ))) should be(Right(
+            ))) map (_ shouldBe Right(
             """
               |  <b>resque</b>
               |
@@ -92,7 +92,7 @@ class Mustache5AcceptanceTests extends FunSpec {
             context = Map(
               "name" -> "Willy",
               "wrapped" -> wrapped)
-          ) should be(Right(
+          ) map (_ shouldBe Right(
           """<b>
             |  Willy is awesome.
             |</b>""".stripMargin
@@ -106,7 +106,7 @@ class Mustache5AcceptanceTests extends FunSpec {
                 |  Hi {{name}}!
                 |{{/person?}}""".stripMargin,
             context = Map("person?" -> Map("name" -> "Jon"))
-          ) should be(Right(
+          ) map (_ shouldBe Right(
           """
             |  Hi Jon!
             |""".stripMargin
@@ -118,11 +118,11 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("an inverted section tag") {
 
       it("renders once when the key doesn't exist") {
-        mustacheRenderer.render("{{^name}}No name!{{/name}}") should be(Right("No name!"))
+        mustacheRenderer.render("{{^name}}No name!{{/name}}") map (_ shouldBe Right("No name!"))
       }
 
       it("renders once when the key is a false value") {
-        mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) should be(Right("do this"))
+        mustacheRenderer.render("{{^else}}do this{{/else}}", Map("else" -> false)) map (_ shouldBe Right("do this"))
       }
 
       it("renders once when the key is an empty list") {
@@ -134,7 +134,7 @@ class Mustache5AcceptanceTests extends FunSpec {
               |{{^repo}}
               |  No repos! :(
               |{{/repo}}""".stripMargin,
-          context = Map("repo" -> List.empty)) should be(Right(
+          context = Map("repo" -> List.empty)) map (_ shouldBe Right(
             """
               |
               |  No repos! :(
@@ -146,14 +146,14 @@ class Mustache5AcceptanceTests extends FunSpec {
     describe("a comment") {
 
       it("is not rendered") {
-        mustacheRenderer.render("""<h1>Today{{! ignore me }}.</h1>""") should be(Right("<h1>Today.</h1>"))
+        mustacheRenderer.render("""<h1>Today{{! ignore me }}.</h1>""") map (_ shouldBe Right("<h1>Today.</h1>"))
       }
 
       it("may contain newlines") {
         mustacheRenderer.render(
           """{{!
             |If you can read this, something went wrong
-            |}}""".stripMargin) should be(Right(""))
+            |}}""".stripMargin) map (_ shouldBe Right(""))
       }
 
     }
@@ -167,7 +167,7 @@ class Mustache5AcceptanceTests extends FunSpec {
                        |  {{> user}}
                        |{{/names}}""".stripMargin,
           context = Map("names" -> Seq(Map("name" -> "Jennifer")))
-        ) should be(Right(
+        ) map (_ shouldBe Right(
           """<h2>Names</h2>
             |
             |  <strong>Jennifer</strong>
@@ -182,7 +182,7 @@ class Mustache5AcceptanceTests extends FunSpec {
             "child" -> Map(
               "name" -> "Mum",
               "child" -> Map("name" -> "Me")
-          ))) should be(Right(
+          ))) map (_ shouldBe Right(
             "Grandma Mum Me "
           ))
       }
@@ -204,7 +204,7 @@ class Mustache5AcceptanceTests extends FunSpec {
             "default_tags" -> 1,
             "erb_style_tags" -> 2,
             "default_tags_again" -> 3
-          )) should be(Right( """* 1
+          )) map (_ shouldBe Right( """* 1
               |
               |* 2
               |
@@ -214,7 +214,7 @@ class Mustache5AcceptanceTests extends FunSpec {
       }
 
       it("may not use whitespace or the equals sign in the delimiters") {
-        mustacheRenderer.render("{{=<= = >=}}") should be(Left(InvalidDelimiters("<=", "= >")))
+        mustacheRenderer.render("{{=<= = >=}}") map (_ shouldBe Left(InvalidDelimiters("<=", "= >")))
       }
 
     }

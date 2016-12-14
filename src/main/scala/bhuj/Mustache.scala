@@ -5,6 +5,7 @@ import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
 import bhuj.rendering.{Optimiser, Renderer}
+import scala.concurrent.{ExecutionContext, Future}
 
 object Mustache {
   type Templates = (String => Option[String])
@@ -15,34 +16,36 @@ class Mustache(
   templates: Templates = emptyTemplates,
   implicit val globalContext: Context = Map.empty) {
 
+  import bhuj.result.EventualResult._
+
   def this(map: Map[String,String]) = {
     this(map.get _)
   }
 
-  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Result = {
+  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C], ec: ExecutionContext): Future[Result] = {
     for {
-      template  <- templates(name).toRight({TemplateNotFound(name)})
-      parsed    <- parse(template)
-      optimised <- optimise(parsed)
-      ctx       <- ev.context(context).left.map(ContextualisationFailure)
-      result    <- renderer.rendered(optimised, ctx)
+      template  <- templates(name)                                        |> fromOption({TemplateNotFound(name)})
+      parsed    <- parse(template)                                        |> fromEither
+      optimised <- optimise(parsed)                                       |> fromEither
+      ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
+      result    <- renderer.rendered(optimised, ctx)                      |> fromEither
     } yield { result }
   }
 
-  def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Result = {
+  def render[C](template: String, context: C)(implicit ev: CanContextualise[C], ec: ExecutionContext): Future[Result] = {
     for {
-      parsed    <- parse(template)
-      optimised <- optimise(parsed)
-      ctx       <- ev.context(context).left.map(ContextualisationFailure)
-      rendered  <- renderer.rendered(optimised, ctx)
+      parsed    <- parse(template)                                        |> fromEither
+      optimised <- optimise(parsed)                                       |> fromEither
+      ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
+      rendered  <- renderer.rendered(optimised, ctx)                      |> fromEither
     } yield { rendered }
   }
 
-  def render(template: String): Result = {
+  def render(template: String)(implicit ec: ExecutionContext): Future[Result]= {
     for {
-      parsed    <- parse(template)
-      optimised <- optimise(parsed)
-      rendered  <- renderer.rendered(optimised, emptyContext)
+      parsed    <- parse(template)                            |> fromEither
+      optimised <- optimise(parsed)                           |> fromEither
+      rendered  <- renderer.rendered(optimised, emptyContext) |> fromEither
     } yield { rendered }
   }
 

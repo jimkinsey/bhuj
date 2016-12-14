@@ -1,12 +1,12 @@
 package bhuj
 
 import bhuj.context.ContextImplicits
-import org.scalatest.FunSpec
+import org.scalatest.AsyncFunSpec
 import org.scalatest.Matchers._
 
 import scala.language.postfixOps
 
-class IntegrationTests extends FunSpec with TemplateFiles {
+class IntegrationTests extends AsyncFunSpec with TemplateFiles {
   import ContextImplicits._
   import MustacheBuilder._
 
@@ -15,17 +15,19 @@ class IntegrationTests extends FunSpec with TemplateFiles {
     it("allows for rapid turnaround by not caching template files") {
       val mustache = mustacheRenderer.withTemplatePath(templateDirPath).withoutCache
       require(templateFile("greeting", "hello {{name}}").exists())
-      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
-      require(templateFile("greeting", "HELLO {{name}}").exists())
-      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("HELLO Jim"))
+      mustache.renderTemplate("greeting", Person("Jim")) flatMap { _ =>
+        require(templateFile("greeting", "HELLO {{name}}").exists())
+        mustache.renderTemplate("greeting", Person("Jim")) map (_ shouldBe Right("HELLO Jim"))
+      }
     }
 
     it("allows for better performance by caching template files") {
       val mustache = mustacheRenderer.withTemplatePath(templateDirPath).withCache
       require(templateFile("greeting", "hello {{name}}").exists())
-      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
-      require(templateFile("greeting", "HELLO {{name}}").exists())
-      mustache.renderTemplate("greeting", Person("Jim")) should be(Right("hello Jim"))
+      mustache.renderTemplate("greeting", Person("Jim")) flatMap { _ =>
+        require(templateFile("greeting", "HELLO {{name}}").exists())
+        mustache.renderTemplate("greeting", Person("Jim")) map (_ shouldBe Right("hello Jim"))
+      }
     }
 
     it("provides a global context which is useful for localisation") {
@@ -33,7 +35,7 @@ class IntegrationTests extends FunSpec with TemplateFiles {
       val mustache = mustacheRenderer
         .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")
         .withHelpers("localised" -> localised)
-      mustache.renderTemplate("greeting", Person("Elisabeth")) should be(Right("Bonjour Elisabeth"))
+      mustache.renderTemplate("greeting", Person("Elisabeth")) map (_ shouldBe Right("Bonjour Elisabeth"))
     }
 
     it("honours the set delimiters tag when applying a lambda which renders the content") {
@@ -41,11 +43,11 @@ class IntegrationTests extends FunSpec with TemplateFiles {
       val mustache = mustacheRenderer
         .withTemplates("greeting" -> "{{#localised}}Hello {{=<% %>=}}<%name%> {{name}}{{/localised}}")
         .withHelpers("localised" -> localised)
-      mustache.renderTemplate("greeting", Person("Charlotte")) should be(Right("Bonjour Charlotte {{name}}"))
+      mustache.renderTemplate("greeting", Person("Charlotte")) map (_ shouldBe Right("Bonjour Charlotte {{name}}"))
     }
 
     it("switches the delimiters when the set delimiters tag is used") {
-      mustacheRenderer.render("A: {{a}} {{=<% %>=}}B: <%b%> C: {{c}}", Map("a" -> 1, "b" -> 2, "c" -> 3)) should be(Right("A: 1 B: 2 C: {{c}}"))
+      mustacheRenderer.render("A: {{a}} {{=<% %>=}}B: <%b%> C: {{c}}", Map("a" -> 1, "b" -> 2, "c" -> 3)) map (_ shouldBe Right("A: 1 B: 2 C: {{c}}"))
     }
 
   }
