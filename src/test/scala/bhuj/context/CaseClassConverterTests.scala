@@ -5,6 +5,8 @@ import bhuj.context.CaseClassConverter.NotACaseClass
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
+import scala.concurrent.Future
+
 class CaseClassConverterTests extends FunSpec {
   import converter.map
 
@@ -41,7 +43,7 @@ class CaseClassConverterTests extends FunSpec {
 
     it("can convert a Mustache-compatible lambda field") {
       case class Ram(lambda: Lambda)
-      val lambda: Lambda = (str, render) => Right("Lambdad!")
+      val lambda: Lambda = (str, render) => Future successful Right("Lambdad!")
       map(Ram(lambda)) should be(Right(Map("lambda" -> lambda)))
     }
 

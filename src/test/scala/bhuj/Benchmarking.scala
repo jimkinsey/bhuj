@@ -35,7 +35,7 @@ object Benchmarking extends App {
   val mustache = mustacheRenderer
     .withTemplatePath(getClass.getClassLoader.getResource("templates").getPath)
     .withCache
-    .withHelpers("localised" -> ((template, rendered) => Right("LOCALISED!!!")))
+    .withHelpers("localised" -> ((template, rendered) => Future successful Right("LOCALISED!!!")))
 
   def doRun() = Future { System.currentTimeMillis() } flatMap {
     runStart =>

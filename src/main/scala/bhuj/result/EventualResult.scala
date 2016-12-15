@@ -27,6 +27,7 @@ private[bhuj] object EventualResult {
 
   def point[Success](s: Success) = EventualResult(Future.successful(Right(s)))
   def fromEither[Success](either: Either[Failure,Success]) = EventualResult(Future.successful(either))
+  def fromFutureEither[Success](futEither: Future[Either[Failure,Success]]) = EventualResult(futEither)
   def fromOption[Success](none: => Failure)(option: Option[Success]) = EventualResult(Future.successful(option.toRight(none)))
   def fromFutureOption[Success](none: => Failure)(futOption: Future[Option[Success]])(implicit ec: ExecutionContext) = EventualResult(futOption.map(_.toRight(none)))
 

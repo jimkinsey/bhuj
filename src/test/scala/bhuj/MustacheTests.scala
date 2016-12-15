@@ -4,17 +4,19 @@ import bhuj.context.{CanContextualise, ContextImplicits}
 import org.scalatest.{AsyncFunSpec, FunSpec}
 import org.scalatest.Matchers._
 
+import scala.concurrent.Future
+
 class MustacheTests extends AsyncFunSpec {
   import ContextImplicits.canContextualiseMap
 
   describe("A Mustache renderer") {
 
     it("returns a TemplateNotFound failure when asked to render a template not known to it") {
-      new Mustache(templates = Map.empty.get).renderTemplate("page", Map[String,Any]()) map (_ shouldBe Left(TemplateNotFound("page")))
+      new Mustache(templates = _ => Future successful None).renderTemplate("page", Map[String,Any]()) map (_ shouldBe Left(TemplateNotFound("page")))
     }
 
     it("returns the result of rendering the named template when it is available") {
-      new Mustache(templates = Map("page" -> "A page!").get).renderTemplate("page", Map[String,Any]()) map (_ shouldBe Right("A page!"))
+      new Mustache(templates = name => Future successful Some(s"A $name!")).renderTemplate("page", Map[String,Any]()) map (_ shouldBe Right("A page!"))
     }
 
     it("returns the failure if the contextualiser cannot produce a context") {
@@ -22,7 +24,7 @@ class MustacheTests extends AsyncFunSpec {
       implicit object IntCanContextualise extends CanContextualise[Int] {
         def context(i: Int) = Left(failure)
       }
-      val mustache = new Mustache(templates = Map("x" -> "x={{x}}").get)
+      val mustache = new Mustache(templates = _ => Future successful Some("{{x}}"))
       mustache.renderTemplate("x", 42) map (_ shouldBe Left(ContextualisationFailure(failure)))
     }
 
@@ -31,7 +33,7 @@ class MustacheTests extends AsyncFunSpec {
       implicit object PersonCanContextualise extends CanContextualise[Person] {
         def context(person: Person) = Right(Map("name" -> person.name))
       }
-      val mustache = new Mustache(templates = Map("greeting" -> "Hello {{name}}!").get)
+      val mustache = new Mustache(templates = _ => Future successful Some("Hello {{name}}!"))
       mustache.renderTemplate("greeting", Person("Charlotte")) map (_ shouldBe Right("Hello Charlotte!"))
     }
 

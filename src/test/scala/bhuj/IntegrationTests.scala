@@ -31,7 +31,7 @@ class IntegrationTests extends AsyncFunSpec with TemplateFiles {
     }
 
     it("provides a global context which is useful for localisation") {
-      val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
+      val localised: Lambda = (template, render) => render(template) map (_ map (_.replaceAll("Hello", "Bonjour")))
       val mustache = mustacheRenderer
         .withTemplates("greeting" -> "{{#localised}}Hello{{/localised}} {{name}}")
         .withHelpers("localised" -> localised)
@@ -39,7 +39,7 @@ class IntegrationTests extends AsyncFunSpec with TemplateFiles {
     }
 
     it("honours the set delimiters tag when applying a lambda which renders the content") {
-      val localised: Lambda = (template, render) => render(template).right.map(_.replaceAll("Hello", "Bonjour"))
+      val localised: Lambda = (template, render) => render(template) map (_ map (_.replaceAll("Hello", "Bonjour")))
       val mustache = mustacheRenderer
         .withTemplates("greeting" -> "{{#localised}}Hello {{=<% %>=}}<%name%> {{name}}{{/localised}}")
         .withHelpers("localised" -> localised)

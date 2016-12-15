@@ -1,7 +1,7 @@
 package bhuj.parsing
 
 import bhuj.model._
-import bhuj.{ParseTemplateFailure, Failure, Render, UnclosedTag}
+import bhuj.{ParseTemplateFailure, UnclosedTag}
 
 import scala.util.matching.Regex.quote
 

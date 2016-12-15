@@ -84,7 +84,7 @@ class Mustache5AcceptanceTests extends AsyncFunSpec {
         }
 
       it("invokes the lambda with the unprocessed template and a render method") {
-        val wrapped: Lambda = (template, render) => Right(s"<b>${render(template).right.get}</b>")
+        val wrapped: Lambda = (template, render) => render(template) map (_ map (res => s"<b>$res</b>"))
         mustacheRenderer.render(
             template = """{{#wrapped}}
               |  {{name}} is awesome.
