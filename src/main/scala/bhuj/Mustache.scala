@@ -4,7 +4,7 @@ import bhuj.Mustache._
 import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
-import bhuj.rendering.{Optimiser, Renderer}
+import bhuj.rendering.Renderer
 import scala.concurrent.{ExecutionContext, Future}
 
 object Mustache {
@@ -22,26 +22,23 @@ class Mustache(
     for {
       template  <- templates(name)                                        |> fromFutureOption({TemplateNotFound(name)})
       parsed    <- parse(template)                                        |> fromEither
-      optimised <- optimiser.optimise(parsed)                             |> fromFutureEither
       ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
-      result    <- renderer.rendered(optimised, ctx)                      |> fromFutureEither
+      result    <- renderer.rendered(parsed, ctx)                      |> fromFutureEither
     } yield { result }
   }
 
   def render[C](template: String, context: C)(implicit ev: CanContextualise[C], ec: ExecutionContext): Future[Result] = {
     for {
       parsed    <- parse(template)                                        |> fromEither
-      optimised <- optimiser.optimise(parsed)                             |> fromFutureEither
       ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
-      rendered  <- renderer.rendered(optimised, ctx)                      |> fromFutureEither
+      rendered  <- renderer.rendered(parsed, ctx)                      |> fromFutureEither
     } yield { rendered }
   }
 
   def render(template: String)(implicit ec: ExecutionContext): Future[Result]= {
     for {
       parsed    <- parse(template)                            |> fromEither
-      optimised <- optimiser.optimise(parsed)                 |> fromFutureEither
-      rendered  <- renderer.rendered(optimised, emptyContext) |> fromFutureEither
+      rendered  <- renderer.rendered(parsed, emptyContext) |> fromFutureEither
     } yield { rendered }
   }
 
@@ -63,8 +60,5 @@ class Mustache(
   private implicit val parserConfig: ParserConfig = ParserConfig(parse, doubleMustaches)
 
   private[bhuj] lazy val parse: ParseTemplate = Caching.cached(templateParser.template)
-
-  private lazy val optimiser: Optimiser = new Optimiser(parse, templates)
-
 
 }
