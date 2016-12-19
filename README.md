@@ -4,7 +4,7 @@ An implementation of [Mustache](https://mustache.github.io/mustache.5.html) logi
 
 [![Build Status](https://travis-ci.org/jimkinsey/bhuj.png?branch=master)](https://travis-ci.org/jimkinsey/bhuj)
 
-    mustache.render("Hello, {{name}}!", Person(name = "Charlotte")) // Right("Hello, Charlotte!")
+    mustache.render("Hello, {{name}}!", Person(name = "Charlotte")) // (eventually) Right("Hello, Charlotte!")
 
 Table of Contents
 ---
@@ -135,9 +135,21 @@ Note that the practice of using an Either where Right contains the successful re
 
 The first argument of type `String` is the content of a section, the second argument is a function which will render a Mustache template in the current context. `Result` is a type alias for `Either[Failure, String]`.
 
-    val shout: Lambda = (text, rendered) => Future.successful(Right(text.toUpperCase))
+    val shout: Lambda = (text, _) => Future.successful(Right(text.toUpperCase))
     mustache.render("{{#shout}}I'm on the train{{/shout}}", Map("shout" -> shout)) // "I'M ON THE TRAIN"
+    
+Using the render function:
 
+    val whisper: Lambda = (text, rendered) => rendered(text) map (_ map (_.toUppercase))
+    mustache.render("{{#whisper}}{{msg}}{{/whisper}}", Map("msg" -> "YOU AIN'T SEEN ME, RIGHT?")) // you aint'seen me, right?
+    
+In the above example, the future is mapped as the function should return a future and then the inner either is mapped so that a render failure would be quickly propagated. A more realistic example of how futures would be useful would be if the Lambda was used for an internationalisation function which loaded its data asynchronously:
+
+    val i18n: Lambda = (text, rendered) => for {
+      internationalised <- loadReplacement(currentIsoCode, text) // assuming this returns a Future of Either
+      renderedText      <- rendered(internationalised)
+    } yield { renderedText }
+    mustache.render("{{#i18n}}welcome.message{{/i18n}}", Map("name" -> "Jim")) // "Bonjour Jim", "Wilkommen Jim" ...
 
 Global Context
 ---
