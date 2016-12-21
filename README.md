@@ -4,7 +4,7 @@ An implementation of [Mustache](https://mustache.github.io/mustache.5.html) logi
 
 [![Build Status](https://travis-ci.org/jimkinsey/bhuj.png?branch=master)](https://travis-ci.org/jimkinsey/bhuj)
 
-    mustache.render("Hello, {{name}}!", Person(name = "Charlotte")) // Right("Hello, Charlotte!")
+    mustache.render("Hello, {{name}}!", Person(name = "Charlotte")) // (eventually) Right("Hello, Charlotte!")
 
 Table of Contents
 ---
@@ -36,9 +36,9 @@ Assuming a template `greeting.mustache` with content `Hello {{name}}!` is in the
 
     val mustache = mustacheRenderer.withTemplatePath("templates")
     case class Person(name: String)
-    mustache.renderTemplate("greeting", Person(name = "Charlotte")).right.get
+    mustache.renderTemplate("greeting", Person(name = "Charlotte")) map (_.right.get)
 
-Results in `Hello Charlotte!`.
+Results in a Future containing `Hello Charlotte!`.
 
 ## Setting Up
 
@@ -64,17 +64,18 @@ The following builder methods are provided:
 
 ## Partials
 
-Bhuj provides a `renderTemplate` method which takes the name of a template in place of a template string. The renderer needs to be set up with the named partial in advance, which in its rawest form is a function of template name to option of template:
+Bhuj provides a `renderTemplate` method which takes the name of a template in place of a template string. The renderer needs to be set up with the named partial in advance, which in its rawest form is a function of template name to future of option of template:
 
-    String => Option[String]
+    String => Future[Option[String]]
 
-This allows flexibility of template source - it could be an in-memory Map, or a function to load from the file system or a database for example.
+This allows flexibility of template source - it could be an in-memory Map, or a function to load from the file system or a remote URL or a database for example.
 
-    val templates = Map(
-      "person" -> "Name: {{name}}, Address: {{#address}}{{> address}}{{/address}}"
-      "address" -> "{{number}} {{streetName}}, {{city}} {{postcode}}"
-    )
-    val mustache = new Mustache(templates = templates.get)
+    val templates = {
+      case "person"  => Future.successful(Some("Name: {{name}}, Address: {{#address}}{{> address}}{{/address}}"))
+      case "address" => Future.successful(Some("{{number}} {{streetName}}, {{city}} {{postcode}}"))
+      case _         => Future.successful(None)
+    }
+    val mustache = new Mustache(templates = templates)
     val person = Person("John Watson", Address(221, "Baker Street", "London", "NW16XE"))
     mustache.renderTemplate("person", person) // "Name: John Watson, Address: 221 Baker Street, London NW16XE"
 
@@ -91,9 +92,9 @@ This means that the partial loading function will not be invoked with the same n
 
 ## Results
 
-Bhuj uses Scala's own `Either` to encapsulate the result of rendering, following the convention of failure on the left and success on the right.
+Bhuj to encapsulate the result of rendering in a future of either, following the convention of failure on the left and success on the right.
 
-    Either[Failure, String]
+    Future[Either[Failure, String]]
 
 Failure is a sealed trait and may be any of the following types:
 
@@ -128,15 +129,27 @@ The mustache spec for sections includes support for "Lambdas", functions which a
 
 In Bhuj the signature for a Lambda is like so:
 
-    (String, (String) => Result)) => Either[Any, String]
+    (String, (String) => Future[Result])) => Future[Either[Any, String]]
 
 Note that the practice of using an Either where Right contains the successful result and Left a failure is applied here.
 
 The first argument of type `String` is the content of a section, the second argument is a function which will render a Mustache template in the current context. `Result` is a type alias for `Either[Failure, String]`.
 
-    val shout: Lambda = (text, rendered) => Right(text.toUpperCase)
+    val shout: Lambda = (text, _) => Future.successful(Right(text.toUpperCase))
     mustache.render("{{#shout}}I'm on the train{{/shout}}", Map("shout" -> shout)) // "I'M ON THE TRAIN"
+    
+Using the render function:
 
+    val whisper: Lambda = (text, rendered) => rendered(text) map (_ map (_.toUppercase))
+    mustache.render("{{#whisper}}{{msg}}{{/whisper}}", Map("msg" -> "YOU AIN'T SEEN ME, RIGHT?")) // you aint'seen me, right?
+    
+In the above example, the future is mapped as the function should return a future and then the inner either is mapped so that a render failure would be quickly propagated. A more realistic example of how futures would be useful would be if the Lambda was used for an internationalisation function which loaded its data asynchronously:
+
+    val i18n: Lambda = (text, rendered) => for {
+      internationalised <- loadReplacement(currentIsoCode, text) // assuming this returns a Future of Either
+      renderedText      <- rendered(internationalised)
+    } yield { renderedText }
+    mustache.render("{{#i18n}}welcome.message{{/i18n}}", Map("name" -> "Jim")) // "Bonjour Jim", "Wilkommen Jim" ...
 
 Global Context
 ---

@@ -1,7 +1,7 @@
 package bhuj.parsing
 
 import bhuj.model._
-import bhuj.{ParseTemplateFailure, Failure, Render, UnclosedTag}
+import bhuj.{ParseTemplateFailure, UnclosedTag}
 
 import scala.util.matching.Regex.quote
 
@@ -18,7 +18,7 @@ private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Cont
         indexOfClosingTag(key, afterOpenTag) match {
           case i if i < 0 => Left(UnclosedTag(key))
           case i =>
-            parserConfig.parsed(afterOpenTag.substring(0, i)).right.map { template =>
+            parserConfig.parsed(afterOpenTag.substring(0, i)).map { template =>
               Some(ParseResult(
                 component = constructor(mtch.group(1), template),
                 remainder = afterOpenTag.substring(i + parserConfig.delimiters.tag(s"/$key").length)
@@ -34,7 +34,7 @@ private[bhuj] sealed trait ContainerTagComponentParser[+T <: Component with Cont
       case (Left(open), m) if m.group(1).startsWith("/")  => Left(open - 1)
       case (Left(open), m) if !m.group(1).startsWith("/") => Left(open + 1)
       case (Right(index), _)                              => Right(index)
-    }.right.toOption.getOrElse(-1)
+    }.toOption.getOrElse(-1)
   }
 }
 

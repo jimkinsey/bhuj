@@ -8,6 +8,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 class TemplateChecks extends PropSpec with GeneratorDrivenPropertyChecks with TemplateGenerators {
 
   import bhuj.context.ContextImplicits._
+  import scala.concurrent.ExecutionContext.Implicits.global
+
 
   implicit val noShrink = Shrink[String] { _ => Stream.empty }
 

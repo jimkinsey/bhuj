@@ -10,7 +10,7 @@ class CanContextualiseMap(caseClassConverter: CaseClassConverter) extends CanCon
       case map: Map[String,Any] @unchecked        => map.mapValues(value)
       case iterable: Iterable[Product] @unchecked => iterable.map(value)
       case option: Option[Any] @unchecked         => option.map(value)
-      case product: Product                       => caseClassConverter.map(product).right.getOrElse(product)
+      case product: Product                       => caseClassConverter.map(product).getOrElse(product)
       case value                                  => value
     }
   }

@@ -4,45 +4,41 @@ import bhuj.Mustache._
 import bhuj.context.{CanContextualise, CanContextualiseMap, CaseClassConverter}
 import bhuj.parsing._
 import bhuj.partials.Caching
-import bhuj.rendering.{Optimiser, Renderer}
+import bhuj.rendering.Renderer
+import scala.concurrent.{ExecutionContext, Future}
 
 object Mustache {
-  type Templates = (String => Option[String])
-  lazy val emptyTemplates: Templates = Map.empty.get
+  type Templates = (String => Future[Option[String]])
+  lazy val emptyTemplates: Templates = _ => Future successful None
 }
 
 class Mustache(
   templates: Templates = emptyTemplates,
   implicit val globalContext: Context = Map.empty) {
 
-  def this(map: Map[String,String]) = {
-    this(map.get _)
-  }
+  import bhuj.result.EventualResult._
 
-  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C]): Result = {
+  def renderTemplate[C](name: String, context: C)(implicit ev: CanContextualise[C], ec: ExecutionContext): Future[Result] = {
     for {
-      template  <- templates(name).toRight({TemplateNotFound(name)}).right
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      ctx       <- ev.context(context).left.map(ContextualisationFailure).right
-      result    <- renderer.rendered(optimised, ctx).right
+      template  <- templates(name)                                        |> fromFutureOption({TemplateNotFound(name)})
+      parsed    <- parse(template)                                        |> fromEither
+      ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
+      result    <- renderer.rendered(parsed, ctx)                      |> fromFutureEither
     } yield { result }
   }
 
-  def render[C](template: String, context: C)(implicit ev: CanContextualise[C]): Result = {
+  def render[C](template: String, context: C)(implicit ev: CanContextualise[C], ec: ExecutionContext): Future[Result] = {
     for {
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      ctx       <- ev.context(context).left.map(ContextualisationFailure).right
-      rendered  <- renderer.rendered(optimised, ctx).right
+      parsed    <- parse(template)                                        |> fromEither
+      ctx       <- ev.context(context).left.map(ContextualisationFailure) |> fromEither
+      rendered  <- renderer.rendered(parsed, ctx)                      |> fromFutureEither
     } yield { rendered }
   }
 
-  def render(template: String): Result = {
+  def render(template: String)(implicit ec: ExecutionContext): Future[Result]= {
     for {
-      parsed    <- parse(template).right
-      optimised <- optimise(parsed).right
-      rendered  <- renderer.rendered(optimised, emptyContext).right
+      parsed    <- parse(template)                            |> fromEither
+      rendered  <- renderer.rendered(parsed, emptyContext) |> fromFutureEither
     } yield { rendered }
   }
 
@@ -64,9 +60,5 @@ class Mustache(
   private implicit val parserConfig: ParserConfig = ParserConfig(parse, doubleMustaches)
 
   private[bhuj] lazy val parse: ParseTemplate = Caching.cached(templateParser.template)
-
-  private lazy val optimiser: Optimiser = new Optimiser(parse, templates)
-
-  private lazy val optimise: Optimise = Caching.cached(optimiser.optimise)
 
 }

@@ -2,6 +2,7 @@ package bhuj
 
 import bhuj.partials.FilePartialLoader
 
+import scala.concurrent.Future
 import scala.language.implicitConversions
 
 object MustacheBuilder {
@@ -30,7 +31,7 @@ case class MustacheBuilder(
     val partials: Mustache.Templates =
       templatePath
         .map(path => new FilePartialLoader(path).partial _)
-        .orElse(templates.map(_.get _))
+        .orElse(templates.map( map => (name: String) => Future.successful(map.get(name)) ))
         .map(fn => if (cached) fn.withCache else fn)
         .getOrElse(Mustache.emptyTemplates)
     new Mustache(partials, globalContext)
